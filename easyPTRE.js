@@ -91,9 +91,7 @@ if (/page=ingame&component=galaxy/.test(location.href)){
 
     if (mode == 1) {
         var interSendActi = setInterval(sendGalaxyActivities, 1000);
-        if (GM_getValue(ptreUseAGRList) != 'true'){
-            var interListePlayer = setInterval(addPTREStuffsToGalaxyPage, 800);
-        }
+        var interListePlayer = setInterval(addPTREStuffsToGalaxyPage, 800);
     } else {
         setTimeout(addPTREStuffsToGalaxyPage, 800);
         setTimeout(sendGalaxyActivities, 1000);
@@ -384,6 +382,11 @@ function addPTREStuffsToGalaxyPage() {
         document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
         console.log("ADD DEBUG DIV");
     }
+
+    if (GM_getValue(ptreUseAGRList) == 'true'){
+        return;
+    }
+
     var galaxy = document.getElementsByClassName('galaxyRow ctContentRow ');
     var nbBtnPTRE = 0;
     if (!document.getElementById('spanAddPlayer0') && !document.getElementById('spanSuppPlayer0')) {
