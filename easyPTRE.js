@@ -90,13 +90,13 @@ if (/page=ingame&component=galaxy/.test(location.href)){
     
 
     if (mode == 1) {
-        var interSendActi = setInterval(sendGalaxieActi, 1000);
+        var interSendActi = setInterval(sendGalaxyActivities, 1000);
         if (GM_getValue(ptreUseAGRList) != 'true'){
-            var interListePlayer = setInterval(setListePlayer, 800);
+            var interListePlayer = setInterval(addPTREStuffsToGalaxyPage, 800);
         }
     } else {
-        setTimeout(setListePlayer, 800);
-        setTimeout(sendGalaxieActi, 1000);
+        setTimeout(addPTREStuffsToGalaxyPage, 800);
+        setTimeout(sendGalaxyActivities, 1000);
     }
 }
 
@@ -104,7 +104,7 @@ if (/page=ingame&component=galaxy/.test(location.href)){
 if (/page=messages/.test(location.href))
 {
     if (GM_getValue(ptreTeamKey) != '') {
-        var interGetRE = setInterval(setBtnSendRE, 800);
+        var interGetRE = setInterval(addPTRESendSRButtonToMessagesPage, 800);
     }
 }
 
@@ -128,6 +128,7 @@ function displayPTREMessage(message) {
     }
 }
 
+// Display message under galaxy view
 function displayPTREGalaxyMessage(message) {
     if (document.getElementById("ptreSpanGalaxyMessageD")) {
         document.getElementById("ptreSpanGalaxyMessageD").innerHTML = "PTRE: " + message;
@@ -238,7 +239,7 @@ function displayPTRETeamKeyMenu() {
 }
 
 // Remove player from PTRE list
-function deleteJoueurListe(playerId, playerPseudo, type) {
+function deletePlayerFromList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
     if (isPlayerInList(playerId, playerPseudo)) {
@@ -285,7 +286,7 @@ function deleteJoueurListe(playerId, playerPseudo, type) {
 }
 
 // Add player to PTRE list
-function addJoueurListe(playerId, playerPseudo, type) {
+function addPlayerToList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
     if (!isPlayerInList(playerId, playerPseudo, type)) {
@@ -324,9 +325,8 @@ function addJoueurListe(playerId, playerPseudo, type) {
     }
 }
 
-
 // Add PTRE button to spy reports
-function setBtnSendRE() {
+function addPTRESendSRButtonToMessagesPage() {
 
     if (document.getElementById('subtabs-nfFleet20')) {
         if (/ui-tabs-active/.test(document.getElementById('subtabs-nfFleet20').className) && !document.getElementById('PTREspan')) {
@@ -371,23 +371,9 @@ function setBtnSendRE() {
     }
 }
 
-
-
-
-
-
-
-
-
-// *** *** ***
-// Functions to rework
-// *** *** ***
-
-
-// ???
-// Add buttons to galaxy ?
-function setListePlayer() {
-    //console.log("setListePlayer: Updating galaxy");
+// Add buttons to galaxy
+function addPTREStuffsToGalaxyPage() {
+    //console.log("addPTREStuffsToGalaxyPage: Updating galaxy");
 
     // Add PTRE debug message Div
     if (!document.getElementById("ptreGalaxyMessageD")) {
@@ -436,7 +422,7 @@ function setListePlayer() {
                             document.getElementById('addcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
                             {
                                 //alert('J ajoute le joueur '+playerPseudo+' '+playerId);
-                                var retAdd = addJoueurListe(playerId, playerPseudo, 'PTRE');
+                                var retAdd = addPlayerToList(playerId, playerPseudo, 'PTRE');
                                 displayPTREMessage(retAdd);
                             }, true);
                             nbBtnPTRE++;
@@ -448,7 +434,7 @@ function setListePlayer() {
                             lignePosition.children[7].appendChild(btnSupPlayer);//
                             document.getElementById('suppcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
                             {
-                                var retSupp = deleteJoueurListe(playerId, playerPseudo, 'PTRE');
+                                var retSupp = deletePlayerFromList(playerId, playerPseudo, 'PTRE');
                                 displayPTREMessage(retSupp);
                             }, true);
                             nbBtnPTRE++;
@@ -461,7 +447,7 @@ function setListePlayer() {
 }
 
 // Function called on galaxy page
-function sendGalaxieActi(){
+function sendGalaxyActivities(){
 
     var systemElem = $("input#system_input")[0];
     var galaxyElem = $("input#galaxy_input")[0];
@@ -478,41 +464,19 @@ function sendGalaxieActi(){
 
     console.log("Checking system " + galaxy + '.' + system);
 
-    //if (document.getElementById('ptreGalaxyMessage')){
-    //    console.log("sendGalaxieActi: 1");
-        //console.log(newSs);
-        //console.log(document.getElementById('ptreGalaxyMessage').innerText);
-        //console.log(document.getElementById('ptreGalaxyMessage').innerText.indexOf(newSs));
-    //    if (document.getElementById('ptreGalaxyMessage').innerText.indexOf(newSs) == -1){
-    //        document.getElementById('ptreGalaxyMessage').parentNode.removeChild(document.getElementById('ptreGalaxyMessage'));
-    //        console.log("sendGalaxieActi: 2");
-    //    }
-    //} else {
-        // TODO: virer les 2 lignes en dessous
-        galaxy = galaxyElem.value;
-        system = systemElem.value;
-        if (0 === galaxy.length || $.isNumeric(+galaxy) === false) {
-            galaxy = 1;
-        }
-        if (0 === system.length || $.isNumeric(+system) === false) {
-            system = 1;
-        }
-        
-        //var spanPTREGalaxyMessage = '<span style="font-weight:bold;"></span>';
-        //var divPTREGalaxyMessage = document.createElement("div");
-        //divPTREGalaxyMessage.innerHTML = spanPTREGalaxyMessage;
-        //divPTREGalaxyMessage.id = 'ptreGalaxyMessage';
-        //document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessage);
-
-        console.log("Sending Activities for: " + galaxy + '.' + system);
-        displayPTREGalaxyMessage("Sending Activities for: " + galaxy + '.' + system);
-        recupGalaRender(galaxy, system);
-    //}
+    if (0 === galaxy.length || $.isNumeric(+galaxy) === false) {
+        galaxy = 1;
+    }
+    if (0 === system.length || $.isNumeric(+system) === false) {
+        system = 1;
+    }
+    console.log("Sending Activities for: " + galaxy + '.' + system);
+    displayPTREGalaxyMessage("Sending Activities for: " + galaxy + '.' + system);
+    recupGalaRender(galaxy, system);
 
 }
 
-
-
+// Check is player is in list
 function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
 
     //listeJoueurCheck = GM_getValue(); Nom valeur a déterminer stockage aussi
@@ -535,13 +499,11 @@ function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
             }
         });
     }
-
     return ret;
 }
 
-
-
-function setListeCheckAGR() {
+// Copy AGR internal players list to local AGR list
+function updateLocalAGRList() {
     var tabAgo = document.getElementsByClassName('ago_panel_overview');
     var listeJoueurAGR = [];
     var jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
@@ -562,7 +524,7 @@ function setListeCheckAGR() {
             listeJoueurAGR.push(playerAGR);
 
             if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
-                var retAdd = addJoueurListe(IdPlayer, PseudoPlayer, 'AGR');
+                var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
                 //alert(retAdd);
             }
         }
@@ -599,10 +561,10 @@ function recupGalaRender(galaxy, system){
     $.post(galaxyContentLinkTest, {
       galaxy: galaxy,
       system: system
-    }, afficheRenderGala);
+    }, displayGalaxyRender);
 }
 
-function afficheRenderGala(data){
+function displayGalaxyRender(data){
 
     var json = $.parseJSON(data);
     var systemPos = json.system.galaxyContent;
@@ -621,7 +583,7 @@ function afficheRenderGala(data){
             if (GM_getValue(ptreUseAGRList)){
                type = 'AGR';
                 // On maj la liste AGR avant chaque envoi
-                setListeCheckAGR();
+                updateLocalAGRList();
             }
             if (isPlayerInList(player_id, player_name, type)){
 
@@ -720,31 +682,11 @@ function afficheRenderGala(data){
             cache: false,
             success : function(reponse){
                 var reponseDecode = jQuery.parseJSON(reponse);
-                if (reponseDecode.code == '1'){
-
-                    //if (document.getElementById('ptreGalaxyMessage')){
-                    //   document.getElementById('ptreGalaxyMessage').parentNode.removeChild(document.getElementById('ptreGalaxyMessage'));
-                    //}
-                    //var spanPTREGalaxyMessage = '<span style="color:green;font-weight:bold;">'+galaxy+'.'+system+': Activities sent to PTRE</span>';
-                    //var divPTREGalaxyMessage = document.createElement("div");
-                    //divPTREGalaxyMessage.innerHTML = spanPTREGalaxyMessage;
-                    //divPTREGalaxyMessage.id = 'ptreGalaxyMessage';
-                    //document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessage);
-                }
-                displayPTREMessage(reponseDecode.message);
+                  displayPTREMessage(reponseDecode.message);
                 displayPTREGalaxyMessage(reponseDecode.message);
             }
         });
     } else {
-        //if (document.getElementById('ptreGalaxyMessage')){
-        //    document.getElementById('ptreGalaxyMessage').parentNode.removeChild(document.getElementById('ptreGalaxyMessage'));
-        //}
-        //var spanPTREGalaxyMessage = '<span style="font-weight:bold;"></span>';
-        //var divPTREGalaxyMessage = document.createElement("div");
-        //divPTREGalaxyMessage.innerHTML = spanPTREGalaxyMessage;
-        //divPTREGalaxyMessage.id = 'ptreGalaxyMessage';
-        //document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessage);
-
         displayPTREGalaxyMessage("No data to send to PTRE");
     }
 }
