@@ -160,13 +160,15 @@ function displayPTRETeamKeyMenu() {
         divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Settings</div></td></tr>';
         divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input style="width:160px;" type="text" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
+        divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
         // If AGR is detected
         if (isAGREnabled()) {
             useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
             divPTRE += '<td align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
             divPTRE += useAGR;
             divPTRE += ' /></td></tr>';
+        } else {
+            divPTRE += '<td align="center"><span style="color:red;font-weight:bold;">AGR is not enabled!</span></td></tr>';
         }
 
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
