@@ -441,7 +441,7 @@ function setListePlayer() {
                             btnSupPlayer.id = 'spanSuppPlayer'+nbBtnPTRE;
                             lignePosition.children[7].appendChild(btnSupPlayer);//
                             document.getElementById('suppcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
-                                                                                                {
+                            {
                                 var retSupp = deleteJoueurListe(playerId, playerPseudo, 'PTRE');
                                 displayPTREMessage(retSupp);
                             }, true);
@@ -482,7 +482,6 @@ function sendGalaxieActi(){
     //        console.log("sendGalaxieActi: 2");
     //    }
     //} else {
-        console.log("sendGalaxieActi: 3");
         // TODO: virer les 2 lignes en dessous
         galaxy = galaxyElem.value;
         system = systemElem.value;
@@ -600,7 +599,6 @@ function recupGalaRender(galaxy, system){
 function afficheRenderGala(data){
 
     var json = $.parseJSON(data);
-    //console.log("IN: " + json);
     var systemPos = json.system.galaxyContent;
     var tabActiPos = [];
     var galaxy = "";
@@ -629,12 +627,13 @@ function afficheRenderGala(data){
                     var position = infoPos.position;
                     var coords = galaxy+":"+system+":"+position;
 
-                    //console.log(infoPos);
+                    console.log(infoPos);
                     var planete = infoPos.planets;
                     var planet_id = planete[0]['planetId'];
                     var planet_name = planete[0]['planetName'];
                     var planet_acti = planete[0]['activity']['showActivity'];
 
+                    // Update activities to OGLight format
                     if (planet_acti == '15') {
                         planet_acti = '*';
                     } else if (planet_acti == '60') {
@@ -644,23 +643,34 @@ function afficheRenderGala(data){
                     }
                     //console.log("PLANET: " + planete);
 
-                    if (planete.length == 2){
-                    //if (planete.length > 1){
-                        //console.log("MOON => " + planete[1]);
-                        var lune_id = planete[1]['planetId'];
-                        var lune_size = planete[1]['size'];
-                        var lune_acti = planete[1]['activity']['showActivity'];
-
-                        if (lune_acti == '15') {
-                            lune_acti = '*';
-                        } else if (lune_acti == '60') {
-                            lune_acti = planete[1]['activity']['idleTime'];
-                        } else if (!lune_acti) {
-                            lune_acti = '60';
+                    // If their is a debris fiel AND/OR a moon
+                    if (planete.length > 1) {
+                        // Search Moon index
+                        var moonIndex = -1;
+                        if (planete[1]['planetType'] == 3) {
+                            moonIndex = 1;
+                        } else if (planete[2]['planetType'] == 3) {
+                            moonIndex = 2;
                         }
-                        var jsonLune = {id:lune_id, size:lune_size, activity:lune_acti};
-                        //jsonLune = JSON.stringify(jsonLune);
-                        //console.log("MOON: " + jsonLune);
+                        if (moonIndex != -1) {
+                            //console.log("MOON => " + planete[1]);
+                            var lune_id = planete[moonIndex]['planetId'];
+                            var lune_size = planete[moonIndex]['size'];
+                            var lune_acti = planete[moonIndex]['activity']['showActivity'];
+                            // Update activities to OGLight format
+                            if (lune_acti == '15') {
+                                lune_acti = '*';
+                            } else if (lune_acti == '60') {
+                                lune_acti = planete[moonIndex]['activity']['idleTime'];
+                            } else if (!lune_acti) {
+                                lune_acti = '60';
+                            }
+                            var jsonLune = {id:lune_id, size:lune_size, activity:lune_acti};
+                            //jsonLune = JSON.stringify(jsonLune);
+                            //console.log("MOON: " + jsonLune);
+                        } else {
+                            console.log("[PTRE] Error: Cant find moon (it should exists)");
+                        }
                     } else {
                         //console.log("NO MOON");
                     }
