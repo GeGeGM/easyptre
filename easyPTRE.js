@@ -235,7 +235,7 @@ function displayPTRETeamKeyMenu() {
 function deleteJoueurListe(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
-    if (!verifListeJoueur(playerId, playerPseudo)) {
+    if (isPlayerInList(playerId, playerPseudo)) {
         // Get list content depending on if its PTRE or AGR list
         var jsonJoueurCheck = '';
         if (type == 'PTRE') {
@@ -282,7 +282,7 @@ function deleteJoueurListe(playerId, playerPseudo, type) {
 function addJoueurListe(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
-    if (verifListeJoueur(playerId, playerPseudo, type)) {
+    if (!isPlayerInList(playerId, playerPseudo, type)) {
         // Get list content depending on if its PTRE or AGR list
         var jsonJoueurCheck = '';
         if (type == 'PTRE') {
@@ -420,8 +420,8 @@ function setListePlayer() {
                             notIna = false;
                         }
                         //console.log('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
-                        var presenceListe = verifListeJoueur(playerId, playerPseudo);
-                        if (presenceListe && notIna) {
+                        var isInList = isPlayerInList(playerId, playerPseudo);
+                        if (!isInList && notIna) {
                             var AddPlayerCheck = '<a class="tooltip" id="addcheckptr_'+nbBtnPTRE+'" title="Ajouter ce joueur a la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgAddPlayer + '" rel="' + imgAddPlayer + '" height="20" width="20"></a>';
                             var btnAddPlayer = document.createElement("span");
                             btnAddPlayer.innerHTML = AddPlayerCheck;
@@ -434,7 +434,7 @@ function setListePlayer() {
                                 displayPTREMessage(retAdd);
                             }, true);
                             nbBtnPTRE++;
-                        } else if (!presenceListe) {
+                        } else if (isInList) {
                             var SupPlayerCheck = '<a class="tooltip" id="suppcheckptr_'+nbBtnPTRE+'" title="Retirer ce joueur de la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" rel="' + imgSupPlayer + '" height="20" width="20"></a>';
                             var btnSupPlayer = document.createElement("span");
                             btnSupPlayer.innerHTML = SupPlayerCheck;
@@ -507,7 +507,7 @@ function sendGalaxieActi(){
 
 
 
-function verifListeJoueur(playerId, playerPseudo, type = 'PTRE') {
+function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
 
     //listeJoueurCheck = GM_getValue(); Nom valeur a déterminer stockage aussi
     var jsonJoueurCheck = '';
@@ -517,15 +517,15 @@ function verifListeJoueur(playerId, playerPseudo, type = 'PTRE') {
         jsonJoueurCheck = GM_getValue('ptreAGRPlayerListJSON' + serveur + userPlayerID, '');
     }
 
-    var ret = true;
+    var ret = false;
     if (jsonJoueurCheck != '') {
         var listeJoueurCheck = JSON.parse(jsonJoueurCheck);
 
         $.each(listeJoueurCheck, function(i, PlayerCheck) {
             if (PlayerCheck.id == playerId) {
-                ret = false;
+                ret = true;
             } else if (PlayerCheck.pseudo == playerPseudo) {
-                ret = false;
+                ret = true;
             }
         });
     }
@@ -555,7 +555,7 @@ function setListeCheckAGR() {
             var playerAGR = {id : IdPlayer, pseudo :PseudoPlayer};
             listeJoueurAGR.push(playerAGR);
 
-            if (verifListeJoueur(IdPlayer, PseudoPlayer, 'AGR')) {
+            if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
                 var retAdd = addJoueurListe(IdPlayer, PseudoPlayer, 'AGR');
                 //alert(retAdd);
             }
@@ -617,7 +617,7 @@ function afficheRenderGala(data){
                 // On maj la liste AGR avant chaque envoi
                 setListeCheckAGR();
             }
-            if (!verifListeJoueur(player_id, player_name, type)){
+            if (isPlayerInList(player_id, player_name, type)){
 
                 var ina = infoPos.positionFilters;
 
