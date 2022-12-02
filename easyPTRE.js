@@ -583,13 +583,12 @@ function displayGalaxyRender(data){
             var player_name = infoPos.player['playerName'];
             //console.log(infoPos);
             var type = 'PTRE';
-            if (GM_getValue(ptreUseAGRList)){
+            if (GM_getValue(ptreUseAGRList) == "true"){
                type = 'AGR';
                 // On maj la liste AGR avant chaque envoi
                 updateLocalAGRList();
             }
             if (isPlayerInList(player_id, player_name, type)){
-
                 var ina = infoPos.positionFilters;
 
                 if (player_id != 99999 && !/inactive_filter/.test(ina)){
