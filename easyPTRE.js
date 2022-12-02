@@ -36,6 +36,12 @@ var listenerGala          = false;
 var lastActivitiesGalaSent = 0;
 var lastActivitiesSysSent = 0;
 
+// GM keys
+var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
+var ptreUseAGRList = "ptre-" + country + "-" + universe + "-UseAGRList";
+var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
+var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
+
 // Images
 var imgPTRE      = 'https://i.ibb.co/qpLLSD4/PTREicon.png';
 var imgPTREgreen = 'https://i.ibb.co/nrprJWj/sendREOK.png';
@@ -85,7 +91,7 @@ if (/page=ingame&component=galaxy/.test(location.href)){
 
     if (mode == 1) {
         var interSendActi = setInterval(sendGalaxieActi, 1000);
-        if (GM_getValue('PTREuseAGR' + serveur + userPlayerID) != 'true'){
+        if (GM_getValue(ptreUseAGRList) != 'true'){
             var interListePlayer = setInterval(setListePlayer, 800);
         }
     } else {
@@ -97,7 +103,7 @@ if (/page=ingame&component=galaxy/.test(location.href)){
 // Add PTRE send SR button to messages page
 if (/page=messages/.test(location.href))
 {
-    if (GM_getValue('PTREKey' + serveur + userPlayerID, '') != '') {
+    if (GM_getValue(ptreTeamKey) != '') {
         var interGetRE = setInterval(setBtnSendRE, 800);
     }
 }
@@ -147,7 +153,7 @@ function displayPTRETeamKeyMenu() {
 
     if (!document.getElementById('btnSaveOptPTRE')) {
         var useAGR = '';
-        var ptreStoredTK = GM_getValue('PTREKey' + serveur + userPlayerID, '');
+        var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         var divPTRE = '<div id="boxPTREsetOpt" style="padding:10px;z-index: 1000;position: fixed; bottom: 30px; left: 10px; border: solid black 2px; background:rgba(0,26,52,0.8);"><table border="1">';
         divPTRE += '<tr><td><b>PTRE PANNEL (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" style="cursor:pointer;" /></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
@@ -157,7 +163,7 @@ function displayPTRETeamKeyMenu() {
 
         // If AGR is detected
         if (isAGREnabled()) {
-            useAGR = (GM_getValue('PTREuseAGR' + serveur + userPlayerID, 'true') == 'true' ? 'checked' : '');
+            useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
             divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
             divPTRE += '<td align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
             divPTRE += useAGR;
@@ -168,7 +174,7 @@ function displayPTRETeamKeyMenu() {
         divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Targets list</div></td></tr>';
         // If PTRE Player list is used instead of AGR player list
         if (useAGR != 'checked') {
-            var jsonJoueurCheck = GM_getValue('ptrePlayerListJSON' + serveur + userPlayerID, '');
+            var jsonJoueurCheck = GM_getValue(ptrePTREPlayerListJSON, '');
             if (jsonJoueurCheck != '') {
                 var listeJoueurCheck = JSON.parse(jsonJoueurCheck);
             }
@@ -214,10 +220,10 @@ function displayPTRETeamKeyMenu() {
             if (newTK.replace(/-/g, '').length == 18 && newTK.substr(0,2) == 'TM') {
                 // If new TK, store it
                 if (newTK != ptreStoredTK) {
-                    GM_setValue('PTREKey' + serveur + userPlayerID , document.getElementById('ptreTK').value);
+                    GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
                 }
                 // Update AGR setting
-                GM_setValue('PTREuseAGR' + serveur + userPlayerID, document.getElementById('PTREuseAGRCheck').checked + '');
+                GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
                 // Update menu image and remove it after 3 sec
                 document.getElementById('imgPTREmenu').src = imgPTREgreen;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
@@ -239,9 +245,9 @@ function deleteJoueurListe(playerId, playerPseudo, type) {
         // Get list content depending on if its PTRE or AGR list
         var jsonJoueurCheck = '';
         if (type == 'PTRE') {
-            jsonJoueurCheck = GM_getValue('ptrePlayerListJSON' + serveur + userPlayerID, '');
+            jsonJoueurCheck = GM_getValue(ptrePTREPlayerListJSON, '');
         } else if (type == 'AGR') {
-            jsonJoueurCheck = GM_getValue('ptreAGRPlayerListJSON' + serveur + userPlayerID, '');
+            jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
         }
         var listeJoueurCheck = [];
         var idASup = '_';
@@ -266,10 +272,10 @@ function deleteJoueurListe(playerId, playerPseudo, type) {
         // Save list
         jsonJoueurCheck = JSON.stringify(listeJoueurCheck);
         if (type == 'PTRE') {
-            GM_setValue('ptrePlayerListJSON' + serveur + userPlayerID , jsonJoueurCheck);
+            GM_setValue(ptrePTREPlayerListJSON, jsonJoueurCheck);
         }
         else if (type == 'AGR') {
-            GM_setValue('ptreAGRPlayerListJSON' + serveur + userPlayerID , jsonJoueurCheck);
+            GM_setValue(ptreAGRPlayerListJSON, jsonJoueurCheck);
         }
 
         return 'Player was remove from PTRE list';
@@ -306,9 +312,9 @@ function addJoueurListe(playerId, playerPseudo, type) {
             // Save list
             jsonJoueurCheck = JSON.stringify(listeJoueurCheck);
             if (type == 'PTRE') {
-                GM_setValue('ptrePlayerListJSON' + serveur + userPlayerID , jsonJoueurCheck);
+                GM_setValue(ptrePTREPlayerListJSON, jsonJoueurCheck);
             } else if (type == 'AGR') {
-                GM_setValue('ptreAGRPlayerListJSON' + serveur + userPlayerID , jsonJoueurCheck);
+                GM_setValue(ptreAGRPlayerListJSON, jsonJoueurCheck);
             }
 
             return 'Player has been added to PTRE list';
@@ -340,7 +346,7 @@ function setBtnSendRE() {
                         msgI.getElementsByClassName('msg_actions clearfix')[0].appendChild(spanBtnPTRE);
                         document.getElementById('sendRE-' + apiKeyRE).addEventListener("click", function (event) { 
                             apiKeyRE = this.getAttribute("apikey");
-                            var TKey = GM_getValue('PTREKey' + serveur + userPlayerID, '');
+                            var TKey = GM_getValue(ptreTeamKey, '');
                             if (TKey != '') {
                                 var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
                                 $.ajax({
@@ -512,9 +518,9 @@ function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
     //listeJoueurCheck = GM_getValue(); Nom valeur a déterminer stockage aussi
     var jsonJoueurCheck = '';
     if (type == 'PTRE') {
-        jsonJoueurCheck = GM_getValue('ptrePlayerListJSON' + serveur + userPlayerID, '');
+        jsonJoueurCheck = GM_getValue(ptrePTREPlayerListJSON, '');
     } else if (type == 'AGR') {
-        jsonJoueurCheck = GM_getValue('ptreAGRPlayerListJSON' + serveur + userPlayerID, '');
+        jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
     }
 
     var ret = false;
@@ -538,7 +544,7 @@ function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
 function setListeCheckAGR() {
     var tabAgo = document.getElementsByClassName('ago_panel_overview');
     var listeJoueurAGR = [];
-    var jsonJoueurCheck = GM_getValue('ptreAGRPlayerListJSON' + serveur + userPlayerID, '');
+    var jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
     var listeJoueurCheck = [];
     var idASup = [];
     if (jsonJoueurCheck != '') {
@@ -583,7 +589,7 @@ function setListeCheckAGR() {
 
     if (joueurAGRSup) {
         jsonJoueurCheck = JSON.stringify(listeJoueurCheck);
-        GM_setValue('ptreAGRPlayerListJSON' + serveur + userPlayerID , jsonJoueurCheck);
+        GM_setValue(ptreAGRPlayerListJSON, jsonJoueurCheck);
     }
 }
 
@@ -604,7 +610,7 @@ function afficheRenderGala(data){
     var galaxy = "";
     var system = "";
     var jsonSystem = '';
-    var ptreStoredTK = GM_getValue('ptreKey' + serveur + userPlayerID, '');
+    var ptreStoredTK = GM_getValue(ptreTeamKey, '');
     $.each(systemPos, function(pos, infoPos){
 
         if (infoPos.player){
@@ -612,7 +618,7 @@ function afficheRenderGala(data){
             var player_name = infoPos.player['playerName'];
             //console.log(infoPos);
             var type = 'PTRE';
-            if (GM_getValue('PTREuseAGR' + serveur + userPlayerID)){
+            if (GM_getValue(ptreUseAGRList)){
                type = 'AGR';
                 // On maj la liste AGR avant chaque envoi
                 setListeCheckAGR();
