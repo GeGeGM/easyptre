@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.1.5
+// @version      0.2.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -56,7 +56,9 @@ var URLapiSendActiPTRE = "https://ptre.chez.gg/scripts/oglight_import_player_act
 // TODO: DELETE
 var urlAPIPlayerOgame = "https://"+serveur+"/api/playerData.xml?id=123886"
 
-
+// *** *** ***
+// MAIN EXEC
+// *** *** ***
 
 // Update main pages
 if (!/page=standalone&component=empire/.test(location.href))
@@ -112,7 +114,7 @@ if (/page=messages/.test(location.href))
 
 
 // *** *** ***
-// FUNCTIONS
+// NOTIFICATIONS FUNCTIONS
 // *** *** ***
 
 // Displays PTRE responses messages
@@ -139,6 +141,10 @@ function displayPTREGalaxyMessage(message) {
     }
 }
 
+// *** *** ***
+// MINI FUNCTIONS
+// *** *** ***
+
 // Detects if AGR is enabled
 function isAGREnabled() {
     if (document.getElementById('ago_panel_Player')) {
@@ -147,111 +153,15 @@ function isAGREnabled() {
     return false;
 }
 
-// This function adds PTRE link to AGR pinned target
-function addPTRELinkToAGRPinnedTarget() {
-    pseudoAGR = document.getElementById('ago_box_title').innerHTML;
-    playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
-    if (playerID != 0) {
-        document.getElementById('ago_box_title').innerHTML = pseudoAGR + ' [<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PTRE</a>]';
-    }
-}
-
 function buildPTRELinkToPlayer(playerID) {
     return 'https://ptre.chez.gg/?country=' + country + '&univers=' + universe + '&player_id=' + playerID;
 }
 
-// Displays PTRE settings
-function displayPTRETeamKeyMenu() {
+// *** *** ***
+// PTRE/AGR LIST RELATED
+// *** *** ***
 
-    if (!document.getElementById('btnSaveOptPTRE')) {
-        var useAGR = '';
-        var ptreStoredTK = GM_getValue(ptreTeamKey, '');
-        var divPTRE = '<div id="boxPTREsetOpt" style="padding:10px;z-index: 1000;position: fixed; bottom: 30px; left: 10px; border: solid black 2px; background:rgba(0,26,52,0.8);"><table border="1">';
-        divPTRE += '<tr><td><b>PTRE PANNEL (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" style="cursor:pointer;" /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Settings</div></td></tr>';
-        divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input style="width:160px;" type="text" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
-
-        divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
-        // If AGR is detected
-        if (isAGREnabled()) {
-            useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<td align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
-            divPTRE += useAGR;
-            divPTRE += ' /></td></tr>';
-        } else {
-            divPTRE += '<td align="center"><span style="color:red;font-weight:bold;">AGR is not enabled!</span></td></tr>';
-        }
-
-        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Targets list</div></td></tr>';
-        // If PTRE Player list is used instead of AGR player list
-        if (useAGR != 'checked') {
-            var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-            if (targetJSON != '') {
-                var targetList = JSON.parse(targetJSON);
-            }
-            if (!targetList) {
-                divPTRE += '<tr><td align="center" colspan="2"><div style="margin-left:30px;">Empty: Add player via galaxy view</div></td></tr>';
-            } else {
-                $.each(targetList, function(i, PlayerCheck) {
-                    //console.log(PlayerCheck);
-                    divPTRE += '<tr><td><a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" style="margin-left:3px;cursor:pointer;">- '+PlayerCheck.pseudo+'</a></td><td align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td></tr>';
-                });
-            }
-        } else {
-            divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">You are using AGR target list</div></td></tr>';
-        }
-
-        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
-
-        //fin div table tr
-        divPTRE += '</table></div>';
-
-        var eletementSetPTRE = document.createElement("div");
-        eletementSetPTRE.innerHTML = divPTRE;
-        eletementSetPTRE.id = 'divPTRESetOpt';
-
-        if (document.getElementById('links')) {
-            document.getElementById('links').appendChild(eletementSetPTRE);
-        }
-
-        if (useAGR != 'checked') {
-            $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('checkedPlayer'+PlayerCheck.id).addEventListener("click", function (event)
-                { // On affiche les coords du joueur
-                    afficheCoordJoueur();
-                });
-            });
-        }
-
-        document.getElementById('btnSaveOptPTRE').addEventListener("click", function (event)
-        { // Save PTRE Team Key
-            var newTK = document.getElementById('ptreTK').value;
-            // Check PTRE Team Key Format
-            if (newTK.replace(/-/g, '').length == 18 && newTK.substr(0,2) == 'TM') {
-                // If new TK, store it
-                if (newTK != ptreStoredTK) {
-                    GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
-                }
-                // Update AGR setting
-                GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
-                // Update menu image and remove it after 3 sec
-                document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
-                setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
-                // Display OK message and remove div after 5 sec
-                document.getElementById('msgErrorPTRESettings').innerHTML = 'Team Key Format OK';
-                setTimeout(function() {document.getElementById('boxPTREsetOpt').parentNode.removeChild(document.getElementById('boxPTREsetOpt'));}, ptreMenuDisplayTime * 1000);
-            } else {
-                document.getElementById('msgErrorPTRESettings').innerHTML = 'Wrong Team Key Format';
-            }
-        });
-    }
-}
-
-// Remove player from PTRE list
+// Remove player from PTRE/AGR list
 function deletePlayerFromList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
@@ -298,7 +208,7 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
     }
 }
 
-// Add player to PTRE list
+// Add player to PTRE/AGR list
 function addPlayerToList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
@@ -336,162 +246,6 @@ function addPlayerToList(playerId, playerPseudo, type) {
     } else {
         return 'Player is already in ' + type + ' list';
     }
-}
-
-// Add PTRE button to spy reports
-function addPTRESendSRButtonToMessagesPage() {
-
-    if (document.getElementById('subtabs-nfFleet20')) {
-        if (/ui-tabs-active/.test(document.getElementById('subtabs-nfFleet20').className) && !document.getElementById('PTREspan')) {
-            var listMsg = $("li.msg ");
-            var tabMsg = [];
-            if (listMsg.length > 0) {
-                //clearInterval(interGetRE);
-                jQuery.each(listMsg, function(i, msgI) {
-                    //console.log(i +' val: '+ element.innetHTML);
-                    var idMsg = msgI.getAttributeNode("data-msg-id").value;
-                    if (msgI.getElementsByClassName('icon_nf icon_apikey')[0]) {
-                        var apiKeyRE = /((sr)-[a-z]{2}-[0-9]+-[0-9a-z]+)/.exec(msgI.getElementsByClassName('icon_nf icon_apikey')[0].title)[0];
-                        //console.log(apiKeyRE);
-                        var spanBtnPTRE = document.createElement("span"); // Create new div
-                        spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Envoyer le rapport sur '+toolName+'"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
-                        spanBtnPTRE.id = 'PTREspan';
-                        msgI.getElementsByClassName('msg_actions clearfix')[0].appendChild(spanBtnPTRE);
-                        document.getElementById('sendRE-' + apiKeyRE).addEventListener("click", function (event) { 
-                            apiKeyRE = this.getAttribute("apikey");
-                            var TKey = GM_getValue(ptreTeamKey, '');
-                            if (TKey != '') {
-                                var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
-                                $.ajax({
-                                    dataType: "json",
-                                    url: urlPTRESpy,
-                                    success: function(reponse) {
-                                        console.log(reponse);
-                                        if (reponse.code == 1) {
-                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREOK;
-                                        } else {
-                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREKO;
-                                        }
-                                        displayPTREMessage(reponse.message_verbose);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    }
-}
-
-// Add buttons to galaxy
-function addPTREStuffsToGalaxyPage() {
-    //console.log("addPTREStuffsToGalaxyPage: Updating galaxy");
-
-    // Add PTRE debug message Div
-    if (!document.getElementById("ptreGalaxyMessageD")) {
-        var spanPTREGalaxyMessageD = '<span id="ptreSpanGalaxyMessageD" style="color:green;font-weight:bold;"></span>';
-        var divPTREGalaxyMessageD = document.createElement("div");
-        divPTREGalaxyMessageD.innerHTML = spanPTREGalaxyMessageD;
-        divPTREGalaxyMessageD.id = 'ptreGalaxyMessageD';
-        document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
-        console.log("ADD DEBUG DIV");
-    }
-
-    if (GM_getValue(ptreUseAGRList) == 'true'){
-        return;
-    }
-
-    var galaxy = document.getElementsByClassName('galaxyRow ctContentRow ');
-    var nbBtnPTRE = 0;
-    if (!document.getElementById('spanAddPlayer0') && !document.getElementById('spanSuppPlayer0')) {
-        $.each(galaxy, function(nb, lignePosition) {
-            if (lignePosition.children[7] != '') {
-                var actionPos = lignePosition.children[7];
-                if (actionPos.innerHTML != '') {
-                    //clearInterval(interListePlayer);
-                    var playerId = actionPos.children[1].getAttributeNode('data-playerid').value;
-                    var playerInfo = lignePosition.children[5];
-                    if (playerInfo.children[0]) {
-                        var playerPseudo = playerInfo.children[0].innerText;
-                        var notIna = true;
-                        var inaPlayer = playerInfo.children[1].innerText;
-                        if (playerPseudo == '') {
-                            playerPseudo = playerInfo.children[1].innerText;
-                            inaPlayer = playerInfo.children[2].innerText;
-                        }
-                        if (isAGREnabled()) {
-                            inaPlayer = playerInfo.children[0].innerText;
-                            inaPlayer = inaPlayer.substr(-4, 4);
-                            var indexPseudo = playerPseudo.search(/\n/);
-                            playerPseudo = playerPseudo.substr(0, indexPseudo);
-                        }
-                        if (inaPlayer == ' (i)' || inaPlayer == ' (I)') {
-                            notIna = false;
-                        }
-                        //console.log('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
-                        var isInList = isPlayerInList(playerId, playerPseudo);
-                        if (!isInList && notIna) {
-                            var AddPlayerCheck = '<a class="tooltip" id="addcheckptr_'+nbBtnPTRE+'" title="Ajouter ce joueur a la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgAddPlayer + '" height="20" width="20"></a>';
-                            var btnAddPlayer = document.createElement("span");
-                            btnAddPlayer.innerHTML = AddPlayerCheck;
-                            btnAddPlayer.id = 'spanAddPlayer'+nbBtnPTRE;
-                            lignePosition.children[7].appendChild(btnAddPlayer);//
-                            document.getElementById('addcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
-                            {
-                                //alert('J ajoute le joueur '+playerPseudo+' '+playerId);
-                                var retAdd = addPlayerToList(playerId, playerPseudo, 'PTRE');
-                                displayPTREMessage(retAdd);
-                            }, true);
-                            nbBtnPTRE++;
-                        } else if (isInList) {
-                            var SupPlayerCheck = '<a class="tooltip" id="suppcheckptr_'+nbBtnPTRE+'" title="Retirer ce joueur de la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="20" width="20"></a>';
-                            var btnSupPlayer = document.createElement("span");
-                            btnSupPlayer.innerHTML = SupPlayerCheck;
-                            btnSupPlayer.id = 'spanSuppPlayer'+nbBtnPTRE;
-                            lignePosition.children[7].appendChild(btnSupPlayer);//
-                            document.getElementById('suppcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
-                            {
-                                var retSupp = deletePlayerFromList(playerId, playerPseudo, 'PTRE');
-                                displayPTREMessage(retSupp);
-                            }, true);
-                            nbBtnPTRE++;
-                        }
-                    }
-                }
-            }
-        });
-    }
-}
-
-// Function called on galaxy page
-function sendGalaxyActivities(){
-
-    var systemElem = $("input#system_input")[0];
-    var galaxyElem = $("input#galaxy_input")[0];
-    var galaxy = galaxyElem.value;
-    var system = systemElem.value;
-    var newSs = galaxy+':'+system;
-
-    if (galaxy == lastActivitiesGalaSent && system == lastActivitiesSysSent) {
-        return;
-    }
-
-    lastActivitiesGalaSent = galaxy;
-    lastActivitiesSysSent = system;
-
-    console.log("Checking system " + galaxy + '.' + system);
-
-    if (0 === galaxy.length || $.isNumeric(+galaxy) === false) {
-        galaxy = 1;
-    }
-    if (0 === system.length || $.isNumeric(+system) === false) {
-        system = 1;
-    }
-    console.log('[' + galaxy + ':' + system + "] Checking targets activities");
-    displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
-    recupGalaRender(galaxy, system);
-
 }
 
 function debugListContent(type = 'PTRE') {
@@ -602,6 +356,273 @@ function updateLocalAGRList() {
     }
 }
 
+// *** *** ***
+// IMPROVE MAIN VIEWS
+// *** *** ***
+
+// This function adds PTRE link to AGR pinned target
+function addPTRELinkToAGRPinnedTarget() {
+    pseudoAGR = document.getElementById('ago_box_title').innerHTML;
+    playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
+    if (playerID != 0) {
+        document.getElementById('ago_box_title').innerHTML = pseudoAGR + ' [<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PTRE</a>]';
+    }
+}
+
+// Displays PTRE settings
+function displayPTRETeamKeyMenu() {
+
+    if (!document.getElementById('btnSaveOptPTRE')) {
+        var useAGR = '';
+        var ptreStoredTK = GM_getValue(ptreTeamKey, '');
+        var divPTRE = '<div id="boxPTREsetOpt" style="padding:10px;z-index: 1000;position: fixed; bottom: 30px; left: 10px; border: solid black 2px; background:rgba(0,26,52,0.8);"><table border="1">';
+        divPTRE += '<tr><td><b>PTRE PANNEL (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" style="cursor:pointer;" /></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Settings</div></td></tr>';
+        divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input style="width:160px;" type="text" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
+
+        divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
+        // If AGR is detected
+        if (isAGREnabled()) {
+            useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
+            divPTRE += '<td align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
+            divPTRE += useAGR;
+            divPTRE += ' /></td></tr>';
+        } else {
+            divPTRE += '<td align="center"><span style="color:red;font-weight:bold;">AGR is not enabled!</span></td></tr>';
+        }
+
+        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Targets list</div></td></tr>';
+        // If PTRE Player list is used instead of AGR player list
+        if (useAGR != 'checked') {
+            var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+            if (targetJSON != '') {
+                var targetList = JSON.parse(targetJSON);
+            }
+            if (!targetList) {
+                divPTRE += '<tr><td align="center" colspan="2"><div style="margin-left:30px;">Empty: Add player via galaxy view</div></td></tr>';
+            } else {
+                $.each(targetList, function(i, PlayerCheck) {
+                    //console.log(PlayerCheck);
+                    divPTRE += '<tr><td><a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" style="margin-left:3px;cursor:pointer;">- '+PlayerCheck.pseudo+'</a></td><td align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td></tr>';
+                });
+            }
+        } else {
+            divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">You are using AGR target list</div></td></tr>';
+        }
+
+        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
+
+        //fin div table tr
+        divPTRE += '</table></div>';
+
+        var eletementSetPTRE = document.createElement("div");
+        eletementSetPTRE.innerHTML = divPTRE;
+        eletementSetPTRE.id = 'divPTRESetOpt';
+
+        if (document.getElementById('links')) {
+            document.getElementById('links').appendChild(eletementSetPTRE);
+        }
+
+        if (useAGR != 'checked') {
+            $.each(targetList, function(i, PlayerCheck) {
+                document.getElementById('checkedPlayer'+PlayerCheck.id).addEventListener("click", function (event)
+                { // On affiche les coords du joueur
+                    afficheCoordJoueur();
+                });
+            });
+        }
+
+        document.getElementById('btnSaveOptPTRE').addEventListener("click", function (event)
+        { // Save PTRE Team Key
+            var newTK = document.getElementById('ptreTK').value;
+            // Check PTRE Team Key Format
+            if (newTK.replace(/-/g, '').length == 18 && newTK.substr(0,2) == 'TM') {
+                // If new TK, store it
+                if (newTK != ptreStoredTK) {
+                    GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
+                }
+                // Update AGR setting
+                GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
+                // Update menu image and remove it after 3 sec
+                document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
+                setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
+                // Display OK message and remove div after 5 sec
+                document.getElementById('msgErrorPTRESettings').innerHTML = 'Team Key Format OK';
+                setTimeout(function() {document.getElementById('boxPTREsetOpt').parentNode.removeChild(document.getElementById('boxPTREsetOpt'));}, ptreMenuDisplayTime * 1000);
+            } else {
+                document.getElementById('msgErrorPTRESettings').innerHTML = 'Wrong Team Key Format';
+            }
+        });
+    }
+}
+
+// Add PTRE button to spy reports
+function addPTRESendSRButtonToMessagesPage() {
+
+    if (document.getElementById('subtabs-nfFleet20')) {
+        if (/ui-tabs-active/.test(document.getElementById('subtabs-nfFleet20').className) && !document.getElementById('PTREspan')) {
+            var listMsg = $("li.msg ");
+            var tabMsg = [];
+            if (listMsg.length > 0) {
+                //clearInterval(interGetRE);
+                jQuery.each(listMsg, function(i, msgI) {
+                    //console.log(i +' val: '+ element.innetHTML);
+                    var idMsg = msgI.getAttributeNode("data-msg-id").value;
+                    if (msgI.getElementsByClassName('icon_nf icon_apikey')[0]) {
+                        var apiKeyRE = /((sr)-[a-z]{2}-[0-9]+-[0-9a-z]+)/.exec(msgI.getElementsByClassName('icon_nf icon_apikey')[0].title)[0];
+                        //console.log(apiKeyRE);
+                        var spanBtnPTRE = document.createElement("span"); // Create new div
+                        spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Envoyer le rapport sur '+toolName+'"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
+                        spanBtnPTRE.id = 'PTREspan';
+                        msgI.getElementsByClassName('msg_actions clearfix')[0].appendChild(spanBtnPTRE);
+                        document.getElementById('sendRE-' + apiKeyRE).addEventListener("click", function (event) { 
+                            apiKeyRE = this.getAttribute("apikey");
+                            var TKey = GM_getValue(ptreTeamKey, '');
+                            if (TKey != '') {
+                                var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
+                                $.ajax({
+                                    dataType: "json",
+                                    url: urlPTRESpy,
+                                    success: function(reponse) {
+                                        console.log(reponse);
+                                        if (reponse.code == 1) {
+                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREOK;
+                                        } else {
+                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREKO;
+                                        }
+                                        displayPTREMessage(reponse.message_verbose);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }
+}
+
+// *** *** ***
+// IMPROVE GALAXY VIEW
+// *** *** ***
+
+// Add buttons to galaxy
+function addPTREStuffsToGalaxyPage() {
+    //console.log("addPTREStuffsToGalaxyPage: Updating galaxy");
+
+    // Add PTRE debug message Div
+    if (!document.getElementById("ptreGalaxyMessageD")) {
+        var spanPTREGalaxyMessageD = '<span id="ptreSpanGalaxyMessageD" style="color:green;font-weight:bold;"></span>';
+        var divPTREGalaxyMessageD = document.createElement("div");
+        divPTREGalaxyMessageD.innerHTML = spanPTREGalaxyMessageD;
+        divPTREGalaxyMessageD.id = 'ptreGalaxyMessageD';
+        document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
+        console.log("ADD DEBUG DIV");
+    }
+
+    if (GM_getValue(ptreUseAGRList) == 'true'){
+        return;
+    }
+
+    var galaxy = document.getElementsByClassName('galaxyRow ctContentRow ');
+    var nbBtnPTRE = 0;
+    if (!document.getElementById('spanAddPlayer0') && !document.getElementById('spanSuppPlayer0')) {
+        $.each(galaxy, function(nb, lignePosition) {
+            if (lignePosition.children[7] != '') {
+                var actionPos = lignePosition.children[7];
+                if (actionPos.innerHTML != '') {
+                    //clearInterval(interListePlayer);
+                    var playerId = actionPos.children[1].getAttributeNode('data-playerid').value;
+                    var playerInfo = lignePosition.children[5];
+                    if (playerInfo.children[0]) {
+                        var playerPseudo = playerInfo.children[0].innerText;
+                        var notIna = true;
+                        var inaPlayer = playerInfo.children[1].innerText;
+                        if (playerPseudo == '') {
+                            playerPseudo = playerInfo.children[1].innerText;
+                            inaPlayer = playerInfo.children[2].innerText;
+                        }
+                        if (isAGREnabled()) {
+                            inaPlayer = playerInfo.children[0].innerText;
+                            inaPlayer = inaPlayer.substr(-4, 4);
+                            var indexPseudo = playerPseudo.search(/\n/);
+                            playerPseudo = playerPseudo.substr(0, indexPseudo);
+                        }
+                        if (inaPlayer == ' (i)' || inaPlayer == ' (I)') {
+                            notIna = false;
+                        }
+                        //console.log('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
+                        var isInList = isPlayerInList(playerId, playerPseudo);
+                        if (!isInList && notIna) {
+                            var AddPlayerCheck = '<a class="tooltip" id="addcheckptr_'+nbBtnPTRE+'" title="Ajouter ce joueur a la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgAddPlayer + '" height="20" width="20"></a>';
+                            var btnAddPlayer = document.createElement("span");
+                            btnAddPlayer.innerHTML = AddPlayerCheck;
+                            btnAddPlayer.id = 'spanAddPlayer'+nbBtnPTRE;
+                            lignePosition.children[7].appendChild(btnAddPlayer);//
+                            document.getElementById('addcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
+                            {
+                                //alert('J ajoute le joueur '+playerPseudo+' '+playerId);
+                                var retAdd = addPlayerToList(playerId, playerPseudo, 'PTRE');
+                                displayPTREMessage(retAdd);
+                            }, true);
+                            nbBtnPTRE++;
+                        } else if (isInList) {
+                            var SupPlayerCheck = '<a class="tooltip" id="suppcheckptr_'+nbBtnPTRE+'" title="Retirer ce joueur de la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="20" width="20"></a>';
+                            var btnSupPlayer = document.createElement("span");
+                            btnSupPlayer.innerHTML = SupPlayerCheck;
+                            btnSupPlayer.id = 'spanSuppPlayer'+nbBtnPTRE;
+                            lignePosition.children[7].appendChild(btnSupPlayer);//
+                            document.getElementById('suppcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
+                            {
+                                var retSupp = deletePlayerFromList(playerId, playerPseudo, 'PTRE');
+                                displayPTREMessage(retSupp);
+                            }, true);
+                            nbBtnPTRE++;
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// *** *** ***
+// GALAXY EXEC STUFFS
+// *** *** ***
+
+// Function called on galaxy page
+function sendGalaxyActivities(){
+
+    var systemElem = $("input#system_input")[0];
+    var galaxyElem = $("input#galaxy_input")[0];
+    var galaxy = galaxyElem.value;
+    var system = systemElem.value;
+    var newSs = galaxy+':'+system;
+
+    if (galaxy == lastActivitiesGalaSent && system == lastActivitiesSysSent) {
+        return;
+    }
+
+    lastActivitiesGalaSent = galaxy;
+    lastActivitiesSysSent = system;
+
+    console.log("Checking system " + galaxy + '.' + system);
+
+    if (0 === galaxy.length || $.isNumeric(+galaxy) === false) {
+        galaxy = 1;
+    }
+    if (0 === system.length || $.isNumeric(+system) === false) {
+        system = 1;
+    }
+    console.log('[' + galaxy + ':' + system + "] Checking targets activities");
+    displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
+    recupGalaRender(galaxy, system);
+
+}
 
 function recupGalaRender(galaxy, system){
 
