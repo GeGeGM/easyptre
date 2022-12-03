@@ -1,11 +1,14 @@
 // ==UserScript==
 // @name         EasyPTRE
-// @namespace    http://tampermonkey.net/
-// @include     *.ogame*gameforge.com/game/index.php*
-// @version      0.1
-// @description  Plugin to use PTRE with AGR. CHeck https://ptre.chez.gg/
-// @author       GeGe
-// @match        http://*/*
+// @namespace    https://openuserjs.org/users/GeGe_GM
+// @version      0.1.1
+// @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
+// @author       GeGe_GM
+// @license      MIT
+// @copyright    2022, GeGe_GM
+// @match        https://*.ogame.gameforge.com/game/*
+// @updateURL    https://openuserjs.org/meta/GeGe_GM/easyptre.meta.js
+// @downloadURL  https://openuserjs.org/install/GeGe_GM/easyptre.user.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_getValue
