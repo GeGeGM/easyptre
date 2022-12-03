@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.1
+// @version      0.2.2
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -77,17 +77,21 @@ if (!/page=standalone&component=empire/.test(location.href))
         displayPTRETeamKeyMenu();
     }, true);
 
-    // Add PTRE link to AGR pinned player
-    addPTRELinkToAGRPinnedTarget();
-    // Check if pinned player is updated
-    let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
-    var node = document.getElementById('ago_box_title');
-    observer.observe(node, {
-        attributes: true,
-        childList: true, // observer les enfants directs
-        subtree: true, // et les descendants aussi
-        characterDataOldValue: true // transmettre les anciennes données au callback
-    });
+    if (isAGREnabled()) {
+        if (document.getElementById('ago_box_title')) {
+            // Add PTRE link to AGR pinned player
+            addPTRELinkToAGRPinnedTarget();
+            // Check if pinned player is updated
+            let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
+            var node = document.getElementById('ago_box_title');
+            observer.observe(node, {
+                attributes: true,
+                childList: true, // observer les enfants directs
+                subtree: true, // et les descendants aussi
+                characterDataOldValue: true // transmettre les anciennes données au callback
+            });
+        }
+    }
 }
 
 // Galaxy page: Send activities
@@ -362,10 +366,12 @@ function updateLocalAGRList() {
 
 // This function adds PTRE link to AGR pinned target
 function addPTRELinkToAGRPinnedTarget() {
-    pseudoAGR = document.getElementById('ago_box_title').innerHTML;
-    playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
-    if (playerID != 0) {
-        document.getElementById('ago_box_title').innerHTML = pseudoAGR + ' [<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PTRE</a>]';
+    if (document.getElementById('ago_box_title')) {
+        pseudoAGR = document.getElementById('ago_box_title').innerHTML;
+        playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
+        if (playerID != 0) {
+            document.getElementById('ago_box_title').innerHTML = pseudoAGR + ' [<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PTRE</a>]';
+        }
     }
 }
 
