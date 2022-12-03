@@ -178,14 +178,14 @@ function displayPTRETeamKeyMenu() {
         divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Targets list</div></td></tr>';
         // If PTRE Player list is used instead of AGR player list
         if (useAGR != 'checked') {
-            var jsonJoueurCheck = GM_getValue(ptrePTREPlayerListJSON, '');
-            if (jsonJoueurCheck != '') {
-                var listeJoueurCheck = JSON.parse(jsonJoueurCheck);
+            var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+            if (targetJSON != '') {
+                var targetList = JSON.parse(targetJSON);
             }
-            if (!listeJoueurCheck) {
+            if (!targetList) {
                 divPTRE += '<tr><td align="center" colspan="2"><div style="margin-left:30px;">Empty: Add player via galaxy view</div></td></tr>';
             } else {
-                $.each(listeJoueurCheck, function(i, PlayerCheck) {
+                $.each(targetList, function(i, PlayerCheck) {
                     //console.log(PlayerCheck);
                     divPTRE += '<tr><td><a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" style="margin-left:3px;cursor:pointer;">- '+PlayerCheck.pseudo+'</a></td><td align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td></tr>';
                 });
@@ -209,7 +209,7 @@ function displayPTRETeamKeyMenu() {
         }
 
         if (useAGR != 'checked') {
-            $.each(listeJoueurCheck, function(i, PlayerCheck) {
+            $.each(targetList, function(i, PlayerCheck) {
                 document.getElementById('checkedPlayer'+PlayerCheck.id).addEventListener("click", function (event)
                 { // On affiche les coords du joueur
                     afficheCoordJoueur();
@@ -247,19 +247,19 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
     // Check if player is part of the list
     if (isPlayerInList(playerId, playerPseudo)) {
         // Get list content depending on if its PTRE or AGR list
-        var jsonJoueurCheck = '';
+        var targetJSON = '';
         if (type == 'PTRE') {
-            jsonJoueurCheck = GM_getValue(ptrePTREPlayerListJSON, '');
+            targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
         } else if (type == 'AGR') {
-            jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
+            targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
         }
-        var listeJoueurCheck = [];
+        var targetList = [];
         var idASup = '_';
-        if (jsonJoueurCheck != '') {
-            listeJoueurCheck = JSON.parse(jsonJoueurCheck);
+        if (targetJSON != '') {
+            targetList = JSON.parse(targetJSON);
         }
 
-        $.each(listeJoueurCheck, function(i, PlayerCheck) {
+        $.each(targetList, function(i, PlayerCheck) {
             if (PlayerCheck.id == playerId) {
                 idASup = i;
             } else if (PlayerCheck.pseudo == playerPseudo) {
@@ -270,21 +270,21 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
         });
 
         if (idASup != '_') {
-            listeJoueurCheck.splice(idASup, 1);
+            targetList.splice(idASup, 1);
         }
 
         // Save list
-        jsonJoueurCheck = JSON.stringify(listeJoueurCheck);
+        targetJSON = JSON.stringify(targetList);
         if (type == 'PTRE') {
-            GM_setValue(ptrePTREPlayerListJSON, jsonJoueurCheck);
+            GM_setValue(ptrePTREPlayerListJSON, targetJSON);
+        } else if (type == 'AGR') {
+            GM_setValue(ptreAGRPlayerListJSON, targetJSON);
         }
-        else if (type == 'AGR') {
-            GM_setValue(ptreAGRPlayerListJSON, jsonJoueurCheck);
-        }
+        //console.log(type + " list updated (deletePlayerFromList fct)");
 
-        return 'Player was remove from PTRE list';
+        return 'Player was remove from ' + type + ' list';
     } else {
-        return 'Player is not part of PTRE list';
+        return 'Player is not part of ' + type + ' list';
     }
 }
 
@@ -294,37 +294,37 @@ function addPlayerToList(playerId, playerPseudo, type) {
     // Check if player is part of the list
     if (!isPlayerInList(playerId, playerPseudo, type)) {
         // Get list content depending on if its PTRE or AGR list
-        var jsonJoueurCheck = '';
+        var targetJSON = '';
         if (type == 'PTRE') {
-            jsonJoueurCheck = GM_getValue('ptrePlayerListJSON' + serveur + userPlayerID, '');
+            targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
         } else if (type == 'AGR') {
-            jsonJoueurCheck = GM_getValue('ptreAGRPlayerListJSON' + serveur + userPlayerID, '');
-
+            targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
         }
 
-        var listeJoueurCheck = [];
-        if (jsonJoueurCheck != '') {
-            listeJoueurCheck = JSON.parse(jsonJoueurCheck);
+        var targetList = [];
+        if (targetJSON != '') {
+            targetList = JSON.parse(targetJSON);
         }
-        if (type == 'PTRE' && listeJoueurCheck.length >= ptreTargetListMaxSize) {
-            return 'List is full, please remove a target';
+        if (type == 'PTRE' && targetList.length >= ptreTargetListMaxSize) {
+            return type + ' targets list is full, please remove a target';
         } else {
             // Add player to list
-            var player = {id : playerId, pseudo :playerPseudo};
-            listeJoueurCheck.push(player);
+            var player = {id: playerId, pseudo: playerPseudo};
+            targetList.push(player);
 
             // Save list
-            jsonJoueurCheck = JSON.stringify(listeJoueurCheck);
+            targetJSON = JSON.stringify(targetList);
             if (type == 'PTRE') {
-                GM_setValue(ptrePTREPlayerListJSON, jsonJoueurCheck);
+                GM_setValue(ptrePTREPlayerListJSON, targetJSON);
             } else if (type == 'AGR') {
-                GM_setValue(ptreAGRPlayerListJSON, jsonJoueurCheck);
+                GM_setValue(ptreAGRPlayerListJSON, targetJSON);
             }
-
-            return 'Player has been added to PTRE list';
+            //console.log('Player ' + playerPseudo + ' has been added to ' + type + ' list');
+            //console.log(type + " list updated (addPlayerToList fct)");
+            return 'Player has been added to ' + type + ' list';
         }
     } else {
-        return 'Player is already in PTRE list';
+        return 'Player is already in ' + type + ' list';
     }
 }
 
@@ -484,22 +484,34 @@ function sendGalaxyActivities(){
 
 }
 
+function debugListContent(type = 'PTRE') {
+
+    var targetJSON = '';
+    if (type == 'PTRE') {
+        targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+    } else if (type == 'AGR') {
+        targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+    }
+    var targetList = JSON.parse(targetJSON);
+    console.log(type + "list: ");
+    console.log(targetList);
+}
+
 // Check is player is in list
 function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
 
-    //listeJoueurCheck = GM_getValue(); Nom valeur a déterminer stockage aussi
-    var jsonJoueurCheck = '';
+    var targetJSON = '';
     if (type == 'PTRE') {
-        jsonJoueurCheck = GM_getValue(ptrePTREPlayerListJSON, '');
+        targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
     } else if (type == 'AGR') {
-        jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
+        targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
     }
 
     var ret = false;
-    if (jsonJoueurCheck != '') {
-        var listeJoueurCheck = JSON.parse(jsonJoueurCheck);
+    if (targetJSON != '') {
+        var targetList = JSON.parse(targetJSON);
 
-        $.each(listeJoueurCheck, function(i, PlayerCheck) {
+        $.each(targetList, function(i, PlayerCheck) {
             if (PlayerCheck.id == playerId) {
                 ret = true;
             } else if (PlayerCheck.pseudo == playerPseudo) {
@@ -514,11 +526,11 @@ function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
 function updateLocalAGRList() {
     var tabAgo = document.getElementsByClassName('ago_panel_overview');
     var listeJoueurAGR = [];
-    var jsonJoueurCheck = GM_getValue(ptreAGRPlayerListJSON, '');
-    var listeJoueurCheck = [];
+    var targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+    var targetList = [];
     var idASup = [];
-    if (jsonJoueurCheck != '') {
-        listeJoueurCheck = JSON.parse(jsonJoueurCheck);
+    if (targetJSON != '') {
+        targetList = JSON.parse(targetJSON);
     }
 
     $.each(tabAgo[1].children, function(i, ligneJoueurAGR) {
@@ -527,8 +539,8 @@ function updateLocalAGRList() {
             var jsonDataAgo = JSON.parse(txtjsonDataAgo);
             var IdPlayer = jsonDataAgo.action.id;
             var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
-            //console.log('id '+IdPlayer+' pseudo : '+PseudoPlayer);
-            var playerAGR = {id : IdPlayer, pseudo :PseudoPlayer};
+            //console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')');
+            var playerAGR = {id: IdPlayer, pseudo: PseudoPlayer};
             listeJoueurAGR.push(playerAGR);
 
             if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
@@ -538,15 +550,15 @@ function updateLocalAGRList() {
         }
     });
 
+    // Remove targets from AGR list if not present in AGR native list
     var joueurAGRSup = false;
-    $.each(listeJoueurCheck, function(i, PlayerCheck) {
+    $.each(targetList, function(i, PlayerCheck) {
         var find = false;
         $.each(listeJoueurAGR, function(j, PlayerListActu) {
             if (PlayerListActu.id == PlayerCheck.id) {
                 find = true;
             }
         });
-
         if (!find) {
             idASup.push(i);
             joueurAGRSup = true;
@@ -554,12 +566,13 @@ function updateLocalAGRList() {
     });
 
     $.each(idASup, function(i, val) {
-        listeJoueurCheck.splice(val, 1);
+        targetList.splice(val, 1);
     });
 
     if (joueurAGRSup) {
-        jsonJoueurCheck = JSON.stringify(listeJoueurCheck);
-        GM_setValue(ptreAGRPlayerListJSON, jsonJoueurCheck);
+        targetJSON = JSON.stringify(targetList);
+        GM_setValue(ptreAGRPlayerListJSON, targetJSON);
+        //console.log(type + " list updated (updateLocalAGRList fct)");
     }
 }
 
@@ -581,18 +594,21 @@ function displayGalaxyRender(data){
     var system = "";
     var jsonSystem = '';
     var ptreStoredTK = GM_getValue(ptreTeamKey, '');
+
+    var type = 'PTRE';
+    if (GM_getValue(ptreUseAGRList) == "true"){
+        type = 'AGR';
+        // Update AGR local list
+        updateLocalAGRList();
+    }
+    debugListContent(type);
+
     $.each(systemPos, function(pos, infoPos){
 
         if (infoPos.player){
             var player_id = infoPos.player['playerId'];
             var player_name = infoPos.player['playerName'];
             //console.log(infoPos);
-            var type = 'PTRE';
-            if (GM_getValue(ptreUseAGRList) == "true"){
-               type = 'AGR';
-                // On maj la liste AGR avant chaque envoi
-                updateLocalAGRList();
-            }
             if (isPlayerInList(player_id, player_name, type)){
                 var ina = infoPos.positionFilters;
 
