@@ -469,8 +469,8 @@ function sendGalaxyActivities(){
     if (0 === system.length || $.isNumeric(+system) === false) {
         system = 1;
     }
-    console.log("Sending Activities for: " + galaxy + '.' + system);
-    displayPTREGalaxyMessage("Sending Activities for: " + galaxy + '.' + system);
+    console.log('[' + galaxy + ':' + system + "] Checking targets activities");
+    displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
     recupGalaRender(galaxy, system);
 
 }
@@ -483,9 +483,11 @@ function debugListContent(type = 'PTRE') {
     } else if (type == 'AGR') {
         targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
     }
-    var targetList = JSON.parse(targetJSON);
-    console.log(type + "list: ");
-    console.log(targetList);
+    if (targetJSON != '') {
+        var targetList = JSON.parse(targetJSON);
+        console.log(type + "list: ");
+        console.log(targetList);
+    }
 }
 
 // Check is player is in list
@@ -701,6 +703,6 @@ function displayGalaxyRender(data){
             }
         });
     } else {
-        displayPTREGalaxyMessage("No data to send to PTRE");
+        displayPTREGalaxyMessage("No target in this system");
     }
 }
