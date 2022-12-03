@@ -633,7 +633,7 @@ function displayGalaxyRender(data){
                         var moonIndex = -1;
                         if (planete[1]['planetType'] == 3) {
                             moonIndex = 1;
-                        } else if (planete[2]['planetType'] == 3) {
+                        } else if (planete.length == 3 && planete[2]['planetType'] == 3) {
                             moonIndex = 2;
                         }
                         if (moonIndex != -1) {
@@ -653,7 +653,7 @@ function displayGalaxyRender(data){
                             //jsonLune = JSON.stringify(jsonLune);
                             //console.log("MOON: " + jsonLune);
                         } else {
-                            console.log("[PTRE] Error: Cant find moon (it should exists)");
+                            //console.log("[PTRE] Error: Cant find moon");
                         }
                     } else {
                         //console.log("NO MOON");
