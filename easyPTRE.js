@@ -17,16 +17,6 @@
 // ==/UserScript==
 
 
-// TODO:
-// - Fixer liste PTRE
-// - Fixer le push d'activité mode AGR (les lunes ne sont pas envoyées, à priori)
-// - Fixer le push d'activité mode PTRE (refresh en boucle de la page)
-// - Get player Infos
-// - Changer les images pour des base64 dans le script
-// - Ajouter bouton pour virer une cible depuis la liste PTRE
-// - Ajouter un bouton dans la barre AGR
-// - Ajouter lien PTRE sur le panneau AGR
-
 var toolName              = 'EasyPTRE';
 var serveur               = document.getElementsByName('ogame-universe')[0].content;
 var splitted = serveur.split('-');
