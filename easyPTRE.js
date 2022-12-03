@@ -7,8 +7,8 @@
 // @license      MIT
 // @copyright    2022, GeGe_GM
 // @match        https://*.ogame.gameforge.com/game/*
-// @updateURL    https://openuserjs.org/meta/GeGe_GM/easyptre.meta.js
-// @downloadURL  https://openuserjs.org/install/GeGe_GM/easyptre.user.js
+// @updateURL    https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js
+// @downloadURL  https://openuserjs.org/install/GeGe_GM/EasyPTRE.user.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_getValue
