@@ -36,11 +36,11 @@ var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerLi
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
 
 // Images
-var imgPTRE      = 'https://i.ibb.co/qpLLSD4/PTREicon.png';
-var imgPTREgreen = 'https://i.ibb.co/nrprJWj/sendREOK.png';
-var imgAddPlayer = 'https://i.ibb.co/ZXhMk4v/ajouter-Joueur-Liste.png';
-var imgSupPlayer = 'https://i.ibb.co/D9m73bm/retirer-Joueur-Liste.png';
-var imgPTREred   = 'https://i.ibb.co/fCZwdB2/PTREicon-Rouge.png';
+var imgPTRE      = 'https://ptre.chez.gg/img/easyptre/easyptre_icon.png';
+var imgPTREOK    = 'https://ptre.chez.gg/img/easyptre/easyptre_sendok.png';
+var imgPTREKO    = 'https://ptre.chez.gg/img/easyptre/easyptre_sendko.png';
+var imgAddPlayer = 'https://ptre.chez.gg/img/easyptre/easyptre_addplayer.png';
+var imgSupPlayer = 'https://ptre.chez.gg/img/easyptre/easyptre_removeplayer.png';
 
 // Settings
 var ptreMessageDisplayTime = 5;
@@ -219,7 +219,7 @@ function displayPTRETeamKeyMenu() {
                 // Update AGR setting
                 GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
                 // Update menu image and remove it after 3 sec
-                document.getElementById('imgPTREmenu').src = imgPTREgreen;
+                document.getElementById('imgPTREmenu').src = imgPTREOK;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
                 // Display OK message and remove div after 5 sec
                 document.getElementById('msgErrorPTRESettings').innerHTML = 'Team Key Format OK';
@@ -348,9 +348,9 @@ function addPTRESendSRButtonToMessagesPage() {
                                     success: function(reponse) {
                                         console.log(reponse);
                                         if (reponse.code == 1) {
-                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREgreen;
+                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREOK;
                                         } else {
-                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREred;
+                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREKO;
                                         }
                                         displayPTREMessage(reponse.message);
                                     }
