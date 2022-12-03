@@ -14,6 +14,7 @@ Your spy reports will be shared only with your team mates. PTRE can also create 
 
 **EasyPTRE** is a script providing PTRE basic features **working with AGR extention**.
 You may check [PTRE website](https://ptre.chez.gg/) for details.
+EasyPTRE is not yet a Gameforge tolerated tool.
 
 ## Features
 
