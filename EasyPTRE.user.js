@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.2
+// @version      0.2.3
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -382,11 +382,11 @@ function displayPTRETeamKeyMenu() {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         var divPTRE = '<div id="boxPTREsetOpt" style="padding:10px;z-index: 1000;position: fixed; bottom: 30px; left: 10px; border: solid black 2px; background:rgba(0,26,52,0.8);"><table border="1">';
-        divPTRE += '<tr><td><b>PTRE PANNEL (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" style="cursor:pointer;" /></td></tr>';
+        divPTRE += '<tr><td><b>EasyPTRE PANNEL (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" style="cursor:pointer;" /></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Settings</div></td></tr>';
-        divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input style="width:160px;" type="text" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
+        divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
         divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
         // If AGR is detected
