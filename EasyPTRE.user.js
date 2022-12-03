@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.3
+// @version      0.2.4
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -367,8 +367,9 @@ function updateLocalAGRList() {
 // This function adds PTRE link to AGR pinned target
 function addPTRELinkToAGRPinnedTarget() {
     if (document.getElementById('ago_box_title')) {
-        pseudoAGR = document.getElementById('ago_box_title').innerHTML;
-        playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
+        var pseudoAGR = document.getElementById('ago_box_title').innerHTML;
+        updateLocalAGRList();
+        var playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
         if (playerID != 0) {
             document.getElementById('ago_box_title').innerHTML = pseudoAGR + ' [<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PTRE</a>]';
         }
