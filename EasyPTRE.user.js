@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.1.3
+// @version      0.1.5
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -58,7 +58,7 @@ var urlAPIPlayerOgame = "https://"+serveur+"/api/playerData.xml?id=123886"
 
 
 
-// Add PTRE menu to OGame menu
+// Update main pages
 if (!/page=standalone&component=empire/.test(location.href))
 {
     // Bouton options
@@ -74,14 +74,24 @@ if (!/page=standalone&component=empire/.test(location.href))
     {
         displayPTRETeamKeyMenu();
     }, true);
+
+    // Add PTRE link to AGR pinned player
+    addPTRELinkToAGRPinnedTarget();
+    // Check if pinned player is updated
+    let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
+    var node = document.getElementById('ago_box_title');
+    observer.observe(node, {
+        attributes: true,
+        childList: true, // observer les enfants directs
+        subtree: true, // et les descendants aussi
+        characterDataOldValue: true // transmettre les anciennes données au callback
+    });
 }
 
 // Galaxy page: Send activities
 if (/page=ingame&component=galaxy/.test(location.href)){
     console.log("Galaxy detected");
     var mode = 1;
-
-    
 
     if (mode == 1) {
         var interSendActi = setInterval(sendGalaxyActivities, 1000);
@@ -135,6 +145,15 @@ function isAGREnabled() {
         return true;
     }
     return false;
+}
+
+// This function adds PTRE link to AGR pinned target
+function addPTRELinkToAGRPinnedTarget() {
+    pseudoAGR = document.getElementById('ago_box_title').innerHTML;
+    playerID = getAGRPlayerIDFromPseudo(pseudoAGR);
+    if (playerID != 0) {
+        document.getElementById('ago_box_title').innerHTML = pseudoAGR + ' [<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PTRE</a>]';
+    }
 }
 
 function buildPTRELinkToPlayer(playerID) {
@@ -509,6 +528,20 @@ function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
                 ret = true;
             } else if (PlayerCheck.pseudo == playerPseudo) {
                 ret = true;
+            }
+        });
+    }
+    return ret;
+}
+
+function getAGRPlayerIDFromPseudo(playerPseudo) {
+    ret = 0;
+    targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+    if (targetJSON != '') {
+        var targetList = JSON.parse(targetJSON);
+        $.each(targetList, function(i, PlayerCheck) {
+            if (PlayerCheck.pseudo == playerPseudo) {
+                ret = PlayerCheck.id;
             }
         });
     }
