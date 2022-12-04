@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.4
+// @version      0.2.5
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -46,7 +46,7 @@ var imgSupPlayer  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAA
 // Settings
 var ptreMessageDisplayTime = 5;
 var menuImageDisplayTime   = 3;
-var ptreMenuDisplayTime    = 3;
+var ptreMenuDisplayTime    = 1;
 var ptreTargetListMaxSize  = 15;
 
 // PTRE URLs
@@ -393,12 +393,16 @@ function displayPTRETeamKeyMenu() {
         // If AGR is detected
         if (isAGREnabled()) {
             useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<td align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
+            divPTRE += '<td style="margin-top:5px;" align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
             divPTRE += useAGR;
-            divPTRE += ' /></td></tr>';
+            divPTRE += ' />';
+            if (useAGR != 'checked') {
+                divPTRE += ' <span style="color:green;">(recommended)</span>';
+            }
         } else {
-            divPTRE += '<td align="center"><span style="color:red;font-weight:bold;">AGR is not enabled!</span></td></tr>';
+            divPTRE += '<td align="center"><span style="color:red;font-weight:bold;">AGR is not enabled!</span>';
         }
+        divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Targets list</div></td></tr>';
@@ -421,7 +425,7 @@ function displayPTRETeamKeyMenu() {
         }
 
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | EasyPTRE  v' + GM_info.script.version + ' | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
 
         //fin div table tr
         divPTRE += '</table></div>';
