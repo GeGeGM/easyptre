@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.5
+// @version      0.2.6
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -11,6 +11,7 @@
 // @downloadURL  https://openuserjs.org/install/GeGe_GM/EasyPTRE.user.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
@@ -116,6 +117,58 @@ if (/page=messages/.test(location.href))
     }
 }
 
+// *** *** ***
+// Add PTRE styles
+// Ugly style... yes!
+// *** *** ***
+GM_addStyle(`
+.status_positif {
+    color:#508d0e;
+    font-weight:bold;
+}
+.status_negatif {
+    color: #bb2e15;
+    font-weight:bold;
+}
+.status_warning {
+    color:#bb6715;
+    font-weight:bold;
+}
+#boxPTREsetOpt {
+    padding:10px;
+    z-index: 1000;
+    position: fixed;
+    bottom: 30px;
+    left: 10px;
+    border: solid black 2px;
+    background:rgba(0,26,52,0.8);
+}
+#boxPTREMessage {
+    padding:10px;
+    z-index: 1000;
+    position: fixed;
+    bottom: 30px;
+    left: 10px;
+    border: solid black 2px;
+    background:rgba(0,26,52,0.8);"
+}
+#btnSaveOptPTRE {
+    cursor:pointer;
+}
+#ptreSpanGalaxyMessageD {
+    color:green;
+    font-weight:bold;"
+}
+.ptre_maintitle {
+    color: #299f9b;
+    font-weight:bold;
+    text-decoration: underline;
+}
+.ptre_title {
+    color: #299f9b;
+    font-weight:bold;
+}
+`);
 
 // *** *** ***
 // NOTIFICATIONS FUNCTIONS
@@ -124,7 +177,7 @@ if (/page=messages/.test(location.href))
 // Displays PTRE responses messages
 // Responses from server
 function displayPTREMessage(message) {
-    var divPTREMessage = '<div id="boxPTREMessage" style="padding:10px;z-index: 1000;position: fixed; bottom: 30px; left: 10px; border: solid black 2px; background:rgba(0,26,52,0.8);">PTRE: <span id="ptreMessage">' + message + '</span></div>';
+    var divPTREMessage = '<div id="boxPTREMessage">PTRE: <span id="ptreMessage">' + message + '</span></div>';
 
     var boxPTREMessage = document.createElement("div");
     boxPTREMessage.innerHTML = divPTREMessage;
@@ -382,11 +435,11 @@ function displayPTRETeamKeyMenu() {
     if (!document.getElementById('btnSaveOptPTRE')) {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
-        var divPTRE = '<div id="boxPTREsetOpt" style="padding:10px;z-index: 1000;position: fixed; bottom: 30px; left: 10px; border: solid black 2px; background:rgba(0,26,52,0.8);"><table border="1">';
-        divPTRE += '<tr><td><b>EasyPTRE PANNEL (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" style="cursor:pointer;" /></td></tr>';
+        var divPTRE = '<div id="boxPTREsetOpt"><table border="1">';
+        divPTRE += '<tr><td><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Settings</div></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;" class="ptre_title">PTRE Settings</div></td></tr>';
         divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
         divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
@@ -397,15 +450,15 @@ function displayPTRETeamKeyMenu() {
             divPTRE += useAGR;
             divPTRE += ' />';
             if (useAGR != 'checked') {
-                divPTRE += ' <span style="color:green;">(recommended)</span>';
+                divPTRE += ' <span class="status_warning">(recommended)</span>';
             }
         } else {
-            divPTRE += '<td align="center"><span style="color:red;font-weight:bold;">AGR is not enabled!</span>';
+            divPTRE += '<td align="center"><span class="status_negatif">AGR is not enabled!</span>';
         }
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">PTRE Targets list</div></td></tr>';
+        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;" class="ptre_title">PTRE Targets list</div></td></tr>';
         // If PTRE Player list is used instead of AGR player list
         if (useAGR != 'checked') {
             var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
@@ -421,7 +474,7 @@ function displayPTRETeamKeyMenu() {
                 });
             }
         } else {
-            divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;">You are using AGR target list</div></td></tr>';
+            divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;" class="status_positif">You are using AGR target list</div></td></tr>';
         }
 
         divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
@@ -527,7 +580,7 @@ function addPTREStuffsToGalaxyPage() {
 
     // Add PTRE debug message Div
     if (!document.getElementById("ptreGalaxyMessageD")) {
-        var spanPTREGalaxyMessageD = '<span id="ptreSpanGalaxyMessageD" style="color:green;font-weight:bold;"></span>';
+        var spanPTREGalaxyMessageD = '<span id="ptreSpanGalaxyMessageD"></span>';
         var divPTREGalaxyMessageD = document.createElement("div");
         divPTREGalaxyMessageD.innerHTML = spanPTREGalaxyMessageD;
         divPTREGalaxyMessageD.id = 'ptreGalaxyMessageD';
