@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.6
+// @version      0.2.7
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -167,6 +167,9 @@ GM_addStyle(`
 .ptre_title {
     color: #299f9b;
     font-weight:bold;
+}
+.td_cell {
+    padding: 3px;
 }
 `);
 
@@ -436,29 +439,29 @@ function displayPTRETeamKeyMenu() {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         var divPTRE = '<div id="boxPTREsetOpt"><table border="1">';
-        divPTRE += '<tr><td><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td align="right"><input style="margin-top:5px;" id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;" class="ptre_title">PTRE Settings</div></td></tr>';
-        divPTRE += '<tr><td><div style="margin-top:10px;">PTRE Team Key:</div></td><td align="center"><div style="margin-top:10px;"><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">PTRE Settings</div></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
-        divPTRE += '<tr><td style="margin-top:5px;">Use AGR Targets List:</td>';
+        divPTRE += '<tr><td class="td_cell">Use AGR Targets List:</td>';
         // If AGR is detected
         if (isAGREnabled()) {
             useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<td style="margin-top:5px;" align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
+            divPTRE += '<td class="td_cell" align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
             divPTRE += useAGR;
             divPTRE += ' />';
             if (useAGR != 'checked') {
                 divPTRE += ' <span class="status_warning">(recommended)</span>';
             }
         } else {
-            divPTRE += '<td align="center"><span class="status_negatif">AGR is not enabled!</span>';
+            divPTRE += '<td class="td_cell" align="center"><span class="status_negatif">AGR is not enabled!</span>';
         }
         divPTRE += '</td></tr>';
 
-        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;" class="ptre_title">PTRE Targets list</div></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">PTRE Targets list</div></td></tr>';
         // If PTRE Player list is used instead of AGR player list
         if (useAGR != 'checked') {
             var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
@@ -466,19 +469,19 @@ function displayPTRETeamKeyMenu() {
                 var targetList = JSON.parse(targetJSON);
             }
             if (!targetList) {
-                divPTRE += '<tr><td align="center" colspan="2"><div style="margin-left:30px;">Empty: Add player via galaxy view</div></td></tr>';
+                divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div>Empty: Add player via galaxy view</div></td></tr>';
             } else {
                 $.each(targetList, function(i, PlayerCheck) {
                     //console.log(PlayerCheck);
-                    divPTRE += '<tr><td><a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" style="margin-left:3px;cursor:pointer;">- '+PlayerCheck.pseudo+'</a></td><td align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td></tr>';
+                    divPTRE += '<tr><td class="td_cell"><a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">- '+PlayerCheck.pseudo+'</a></td><td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td></tr>';
                 });
             }
         } else {
-            divPTRE += '<tr><td align="center" colspan="2"><div style="margin-top:10px;" class="status_positif">You are using AGR target list</div></td></tr>';
+            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div></td></tr>';
         }
 
-        divPTRE += '<tr><td align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | EasyPTRE  v' + GM_info.script.version + ' | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | EasyPTRE  v' + GM_info.script.version + ' | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
 
         //fin div table tr
         divPTRE += '</table></div>';
