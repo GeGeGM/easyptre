@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.7
+// @version      0.2.8
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -462,8 +462,8 @@ function displayPTRETeamKeyMenu() {
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">PTRE Targets list</div></td></tr>';
-        // If PTRE Player list is used instead of AGR player list
-        if (useAGR != 'checked') {
+        // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
+        if (useAGR == '' || !isAGREnabled()) {
             var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
             if (targetJSON != '') {
                 var targetList = JSON.parse(targetJSON);
@@ -512,8 +512,10 @@ function displayPTRETeamKeyMenu() {
                 if (newTK != ptreStoredTK) {
                     GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
                 }
-                // Update AGR setting
-                GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
+                if (isAGREnabled()) {
+                    // Update AGR setting
+                    GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
+                }
                 // Update menu image and remove it after 3 sec
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
@@ -710,7 +712,7 @@ function displayGalaxyRender(data){
     var ptreStoredTK = GM_getValue(ptreTeamKey, '');
 
     var type = 'PTRE';
-    if (GM_getValue(ptreUseAGRList) == "true"){
+    if (isAGREnabled() && GM_getValue(ptreUseAGRList) == "true") {
         type = 'AGR';
         // Update AGR local list
         updateLocalAGRList();
