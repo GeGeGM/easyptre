@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.10
+// @version      0.2.13
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -439,7 +439,7 @@ function displayPTRETeamKeyMenu() {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         var divPTRE = '<div id="boxPTREsetOpt"><table border="1">';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">Settings</div></td></tr>';
@@ -506,7 +506,8 @@ function displayPTRETeamKeyMenu() {
         }
 
         document.getElementById('btnSaveOptPTRE').addEventListener("click", function (event)
-        { // Save PTRE Team Key
+        {
+            // Save PTRE Team Key
             var newTK = document.getElementById('ptreTK').value;
             // Check PTRE Team Key Format
             if (newTK.replace(/-/g, '').length == 18 && newTK.substr(0,2) == 'TM') {
@@ -523,10 +524,15 @@ function displayPTRETeamKeyMenu() {
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
                 // Display OK message and remove div after 5 sec
                 document.getElementById('msgErrorPTRESettings').innerHTML = 'Team Key Format OK';
-                setTimeout(function() {document.getElementById('boxPTREsetOpt').parentNode.removeChild(document.getElementById('boxPTREsetOpt'));}, ptreMenuDisplayTime * 1000);
+                setTimeout(function() {document.getElementById('divPTRESetOpt').parentNode.removeChild(document.getElementById('divPTRESetOpt'));}, ptreMenuDisplayTime * 1000);
             } else {
                 document.getElementById('msgErrorPTRESettings').innerHTML = 'Wrong Team Key Format';
             }
+        });
+        document.getElementById('btnRefreshOptPTRE').addEventListener("click", function (event)
+        {
+            document.getElementById('divPTRESetOpt').parentNode.removeChild(document.getElementById('divPTRESetOpt'));
+            setTimeout(function() {displayPTRETeamKeyMenu();}, 100);
         });
     }
 }
