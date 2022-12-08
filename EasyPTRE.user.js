@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.13
+// @version      0.2.15
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -49,6 +49,7 @@ var ptreMessageDisplayTime = 5;
 var menuImageDisplayTime   = 3;
 var ptreMenuDisplayTime    = 1;
 var ptreTargetListMaxSize  = 15;
+// TODO: Set ptreAGRTargetListMaxSize
 
 // PTRE URLs
 var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool='+toolName;
@@ -391,29 +392,27 @@ function updateLocalAGRList() {
     });
 
     // Remove targets from AGR list if not present in AGR native list
-    var joueurAGRSup = false;
-    $.each(targetList, function(i, PlayerCheck) {
-        var find = false;
-        $.each(listeJoueurAGR, function(j, PlayerListActu) {
-            if (PlayerListActu.id == PlayerCheck.id) {
-                find = true;
-            }
-        });
-        if (!find) {
-            idASup.push(i);
-            joueurAGRSup = true;
-        }
-    });
-
-    $.each(idASup, function(i, val) {
-        targetList.splice(val, 1);
-    });
-
-    if (joueurAGRSup) {
-        targetJSON = JSON.stringify(targetList);
-        GM_setValue(ptreAGRPlayerListJSON, targetJSON);
+    //var joueurAGRSup = false;
+    //$.each(targetList, function(i, PlayerCheck) {
+    //    var find = false;
+    //    $.each(listeJoueurAGR, function(j, PlayerListActu) {
+    //        if (PlayerListActu.id == PlayerCheck.id) {
+    //            find = true;
+    //        }
+    //    });
+    //    if (!find) {
+    //        idASup.push(i);
+    //        joueurAGRSup = true;
+    //    }
+    //});
+    //$.each(idASup, function(i, val) {
+    //    targetList.splice(val, 1);
+    //});
+    //if (joueurAGRSup) {
+    //    targetJSON = JSON.stringify(targetList);
+    //    GM_setValue(ptreAGRPlayerListJSON, targetJSON);
         //console.log(type + " list updated (updateLocalAGRList fct)");
-    }
+    //}
 }
 
 // *** *** ***
