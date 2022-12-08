@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.9
+// @version      0.2.10
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -442,7 +442,7 @@ function displayPTRETeamKeyMenu() {
         divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">PTRE Settings</div></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">Settings</div></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
         divPTRE += '<tr><td class="td_cell">Use AGR Targets List:</td>';
@@ -461,23 +461,25 @@ function displayPTRETeamKeyMenu() {
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">PTRE Targets list</div></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="ptre_title">Targets list</div></td></tr>';
         // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
-        if (useAGR == '' || !isAGREnabled()) {
-            var targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-            if (targetJSON != '') {
-                var targetList = JSON.parse(targetJSON);
-            }
-            if (!targetList) {
-                divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div>Empty: Add player via galaxy view</div></td></tr>';
-            } else {
+        var targetJSON = '';
+        if (useAGR == 'checked' && isAGREnabled()) {
+            updateLocalAGRList();
+            targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div><div>Add targets via AGR lists</div></div></td></tr>';
+        } else {
+            targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using PTRE target lists</div><div>Add targets via galaxy view</div></td></tr>';
+        }
+        if (targetJSON != '') {
+            var targetList = JSON.parse(targetJSON);
+            if (targetList) {
                 $.each(targetList, function(i, PlayerCheck) {
                     //console.log(PlayerCheck);
                     divPTRE += '<tr><td class="td_cell"><a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">- '+PlayerCheck.pseudo+'</a></td><td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td></tr>';
                 });
             }
-        } else {
-            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div></td></tr>';
         }
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
