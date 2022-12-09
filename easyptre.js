@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.16
+// @version      0.2.17
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -53,7 +53,7 @@ var ptreTargetListMaxSize  = 15;
 
 // PTRE URLs
 var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool='+toolName;
-var URLapiSendActiPTRE = "https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool="+toolName
+var urlPTREPushActivity = "https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool="+toolName
 
 // TODO: DELETE
 var urlAPIPlayerOgame = "https://"+serveur+"/api/playerData.xml?id=123886"
@@ -76,7 +76,7 @@ if (!/page=standalone&component=empire/.test(location.href))
 
     document.getElementById('affOptionsPTRE').addEventListener("click", function (event)
     {
-        displayPTRETeamKeyMenu();
+        displayPTREMenu();
     }, true);
 
     if (isAGREnabled()) {
@@ -135,7 +135,7 @@ GM_addStyle(`
     color:#bb6715;
     font-weight:bold;
 }
-#boxPTREsetOpt {
+#boxPTRESettings {
     padding:10px;
     z-index: 1000;
     position: fixed;
@@ -432,12 +432,12 @@ function addPTRELinkToAGRPinnedTarget() {
 }
 
 // Displays PTRE settings
-function displayPTRETeamKeyMenu() {
+function displayPTREMenu() {
 
     if (!document.getElementById('btnSaveOptPTRE')) {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
-        var divPTRE = '<div id="boxPTREsetOpt"><table border="1">';
+        var divPTRE = '<div id="boxPTRESettings"><table border="1">';
         divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span> (' + country + '-' + universe + ')</b></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
@@ -489,7 +489,7 @@ function displayPTRETeamKeyMenu() {
 
         var eletementSetPTRE = document.createElement("div");
         eletementSetPTRE.innerHTML = divPTRE;
-        eletementSetPTRE.id = 'divPTRESetOpt';
+        eletementSetPTRE.id = 'divPTRESettings';
 
         if (document.getElementById('links')) {
             document.getElementById('links').appendChild(eletementSetPTRE);
@@ -509,7 +509,7 @@ function displayPTRETeamKeyMenu() {
             // Save PTRE Team Key
             var newTK = document.getElementById('ptreTK').value;
             // Check PTRE Team Key Format
-            if (newTK.replace(/-/g, '').length == 18 && newTK.substr(0,2) == 'TM') {
+            if (newTK.replace(/-/g, "").length == 18 && newTK.substr(0,2) == "TM") {
                 // If new TK, store it
                 if (newTK != ptreStoredTK) {
                     GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
@@ -523,15 +523,15 @@ function displayPTRETeamKeyMenu() {
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
                 // Display OK message and remove div after 5 sec
                 document.getElementById('msgErrorPTRESettings').innerHTML = 'Team Key Format OK';
-                setTimeout(function() {document.getElementById('divPTRESetOpt').parentNode.removeChild(document.getElementById('divPTRESetOpt'));}, ptreMenuDisplayTime * 1000);
+                setTimeout(function() {document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));}, ptreMenuDisplayTime * 1000);
             } else {
                 document.getElementById('msgErrorPTRESettings').innerHTML = 'Wrong Team Key Format';
             }
         });
         document.getElementById('btnRefreshOptPTRE').addEventListener("click", function (event)
         {
-            document.getElementById('divPTRESetOpt').parentNode.removeChild(document.getElementById('divPTRESetOpt'));
-            setTimeout(function() {displayPTRETeamKeyMenu();}, 100);
+            document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
+            setTimeout(function() {displayPTREMenu();}, 100);
         });
     }
 }
@@ -823,7 +823,7 @@ function displayGalaxyRender(data){
 
     if (jsonSystem != ''){
         $.ajax({
-            url : URLapiSendActiPTRE,
+            url : urlPTREPushActivity,
             type : 'POST',
             data: dataPost,
             cache: false,
