@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.2.17
+// @version      0.2.18
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -226,7 +226,7 @@ function buildPTRELinkToPlayer(playerID) {
 function deletePlayerFromList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
-    if (isPlayerInList(playerId, playerPseudo)) {
+    if (isPlayerInList(playerId, playerPseudo, type)) {
         // Get list content depending on if its PTRE or AGR list
         var targetJSON = '';
         if (type == 'PTRE') {
