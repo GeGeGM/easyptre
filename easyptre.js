@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.3.1
+// @version      0.3.2
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -244,7 +244,7 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
             if (PlayerCheck.id == playerId) {
                 idASup = i;
             } else if (PlayerCheck.pseudo == playerPseudo) {
-                // TOTO: Pourquoi est ce qu'on test le pseudo ? 
+                // TODO: Pourquoi est ce qu'on test le pseudo ?
                 // On ne devrait se baser que sur l'ID
                 idASup = i;
             }
@@ -438,7 +438,7 @@ function displayPTREMenu() {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         var divPTRE = '<div id="boxPTRESettings"><table border="1">';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span class="ptre_maintitle">EasyPTRE PANNEL</span></b></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></b></td><td class="td_cell" align="right"><input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
@@ -481,7 +481,7 @@ function displayPTREMenu() {
                     //console.log(PlayerCheck);
                     divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">';
                     divPTRE += '- <a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">'+PlayerCheck.pseudo+'</a></td><td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a>';
-                    divPTRE += ' <a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="16" width="16"></a>';
+                    divPTRE += ' <a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a>';
                     divPTRE += '</td></tr>';
                 });
             }
@@ -513,16 +513,13 @@ function displayPTREMenu() {
             });
         }
 
-        // TODO
-        if (useAGR != 'checked') {
-            $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('checkedPlayer'+PlayerCheck.id).addEventListener("click", function (event)
-                { // On affiche les coords du joueur
-                    afficheCoordJoueur();
-                });
-            });
-        }
+        // Action: Close
+        document.getElementById('btnCloseOptPTRE').addEventListener("click", function (event)
+        {
+            document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
+        });
 
+        // Action: Save
         document.getElementById('btnSaveOptPTRE').addEventListener("click", function (event)
         {
             // Save PTRE Team Key
@@ -552,6 +549,16 @@ function displayPTREMenu() {
             document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
             setTimeout(function() {displayPTREMenu();}, 100);
         });
+
+        // TODO
+        if (useAGR != 'checked') {
+            $.each(targetList, function(i, PlayerCheck) {
+                document.getElementById('checkedPlayer'+PlayerCheck.id).addEventListener("click", function (event)
+                { // On affiche les coords du joueur
+                    afficheCoordJoueur();
+                });
+            });
+        }
     }
 }
 
