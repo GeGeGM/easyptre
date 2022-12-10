@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.4.1
+// @version      0.5.0
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -114,7 +114,7 @@ if (/page=ingame&component=galaxy/.test(location.href)){
 if (/page=messages/.test(location.href))
 {
     if (GM_getValue(ptreTeamKey) != '') {
-        setTimeout(addPTRESendSRButtonToMessagesPage, 800);
+        setTimeout(addPTREStuffsToMessagesPage, 800);
     }
 }
 
@@ -606,8 +606,52 @@ function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
     }
 }
 
+// This function adds PTRE send SR button to AGR Spy Table
+function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
+    if (document.getElementById('spyTable')) {
+        var TKey = GM_getValue(ptreTeamKey, '');
+        if (TKey != '') {
+            console.log("[PTRE] Updating AGR Spy Table");
+            var table = document.getElementById("spyTable");
+            for (var i = 0, row; row = table.rows[i]; i++) {
+                var nbCol = row.cells.length;
+                if (row.cells[0].tagName == "TD") {
+                    var rowCurrent = table.getElementsByTagName("tr")[i];
+                    var messageID = rowCurrent.id.slice(2);
+                    if (document.getElementById("m"+messageID)) {
+                        var apiKeyRE = document.getElementById("m"+messageID).getAttribute("data-api-key");
+                        var tdAGRButtons = rowCurrent.getElementsByTagName("td")[nbCol-1];
+                        tdAGRButtons.style.width = "110px";
+                        tdAGRButtons.innerHTML += '<a id="sendSRFromAGRTable-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="spyTableIcon icon_galaxy mouseSwitch">P</a>';
+                        document.getElementById('sendSRFromAGRTable-' + apiKeyRE).addEventListener("click", function (event) {
+                            apiKeyRE = this.getAttribute("apikey");
+                            var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
+                            $.ajax({
+                                dataType: "json",
+                                url: urlPTRESpy,
+                                success: function(reponse) {
+                                    if (reponse.code == 1) {
+                                        document.getElementById('sendSRFromAGRTable-'+apiKeyRE).remove();
+                                    }
+                                    displayPTREMessage(reponse.message_verbose);
+                                }
+                            });
+                        });
+                    } else {
+                        console.log("Error. Cant find data element: m" + messageID);
+                    }
+                }
+            }
+            observer.disconnect();
+        } else {
+            displayPTREMessage("Error. Add Team Key to PTRE settings");
+            observer.disconnect();
+        }
+    }
+}
+
 // Add PTRE button to spy reports
-function addPTRESendSRButtonToMessagesPage() {
+function addPTREStuffsToMessagesPage() {
 
     // Check message pop-up
     let observer = new MutationObserver(addPTRESendSRButtonToMessagePopup);
@@ -615,6 +659,18 @@ function addPTRESendSRButtonToMessagesPage() {
     observer.observe(node, {
         childList: true, // observer les enfants directs
     });
+
+    // Check AGR Table
+    if (isAGREnabled()) {
+        let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
+        var nodeSpyTable = document.getElementById('fleetsTab');
+        spyTableObserver.observe(nodeSpyTable, {
+            attributes: true,
+            childList: true, // observer les enfants directs
+            subtree: true, // et les descendants aussi
+            characterDataOldValue: true // transmettre les anciennes données au callback
+        });
+    }
 
     // Add PTRE button to messages
     if (document.getElementById('subtabs-nfFleet20')) {
