@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.0
+// @version      0.5.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -33,6 +33,7 @@ var lastActivitiesSysSent = 0;
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
 var ptreUseAGRList = "ptre-" + country + "-" + universe + "-UseAGRList";
+var ptreImproveAGRSpyTable = "ptre-" + country + "-" + universe + "-ImproveAGRSpyTable";
 var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
 
@@ -444,20 +445,32 @@ function displayPTREMenu() {
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
-        divPTRE += '<tr><td class="td_cell">Use AGR Targets List:</td>';
+
         // If AGR is detected
         if (isAGREnabled()) {
+            // AGR Target List
+            divPTRE += '<tr><td class="td_cell">Use AGR Targets List:</td>';
             useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<td class="td_cell" align"="center"><input id="PTREuseAGRCheck" type="checkbox" ';
+            divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREuseAGRCheck" type="checkbox" ';
             divPTRE += useAGR;
             divPTRE += ' />';
             if (useAGR != 'checked') {
                 divPTRE += ' <span class="status_warning">(recommended)</span>';
             }
+            divPTRE += '</td></tr>';
+            // AGR Spy Table Improvement
+            divPTRE += '<tr><td class="td_cell">Improve AGR Spy Table:</td>';
+            improveAGRSpyTable = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
+            divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREImproveAGRSpyTable" type="checkbox" ';
+            divPTRE += improveAGRSpyTable;
+            divPTRE += ' />';
+            if (improveAGRSpyTable != 'checked') {
+                divPTRE += ' <span class="status_warning">(recommended)</span>';
+            }
+            divPTRE += '</td></tr>';
         } else {
-            divPTRE += '<td class="td_cell" align="center"><span class="status_negatif">AGR is not enabled!</span>';
+            divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled!</span></td></tr>';
         }
-        divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Targets list</div></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /></td></tr>';
@@ -531,8 +544,9 @@ function displayPTREMenu() {
                     GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
                 }
                 if (isAGREnabled()) {
-                    // Update AGR setting
+                    // Update AGR settings
                     GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
+                    GM_setValue(ptreImproveAGRSpyTable, document.getElementById('PTREImproveAGRSpyTable').checked + '');
                 }
                 // Update menu image and remove it after 3 sec
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
@@ -661,7 +675,7 @@ function addPTREStuffsToMessagesPage() {
     });
 
     // Check AGR Table
-    if (isAGREnabled()) {
+    if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
         let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
         var nodeSpyTable = document.getElementById('fleetsTab');
         spyTableObserver.observe(nodeSpyTable, {
