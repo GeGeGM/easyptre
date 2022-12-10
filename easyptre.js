@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.3.2
+// @version      0.4.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -114,7 +114,7 @@ if (/page=ingame&component=galaxy/.test(location.href)){
 if (/page=messages/.test(location.href))
 {
     if (GM_getValue(ptreTeamKey) != '') {
-        var interGetRE = setInterval(addPTRESendSRButtonToMessagesPage, 800);
+        setTimeout(addPTRESendSRButtonToMessagesPage, 800);
     }
 }
 
@@ -562,9 +562,61 @@ function displayPTREMenu() {
     }
 }
 
+// This is a callback function called when user open a message pop-up
+function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
+    if (document.getElementsByClassName('ui-dialog').length > 0) {
+        if (document.getElementsByClassName('msg_actions').length > 0) {
+            if (document.getElementsByClassName('ui-dialog-content').length > 0) {
+                console.log("Message Pop-up!");
+                var head = document.getElementsByClassName('detail_msg_head')[0];
+                if (head && head.getElementsByClassName('msg_actions clearfix') && head.getElementsByClassName('msg_actions clearfix').length > 0) {
+                    var apikey_elem = document.getElementsByClassName('ui-dialog-content')[0].innerHTML;
+                    var regex = /sr-.*?\'/gm;
+                    var matches = apikey_elem.match(regex);
+                    var apiKeyRE = matches[0].slice(0, -1);
+                    var spanBtnPTRE = document.createElement("span");
+                    spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendSRFromPopup-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
+                    spanBtnPTRE.id = 'PTREspan';
+                    var actions_content = head.getElementsByClassName('msg_actions clearfix')[0].innerHTML;
+                    head.getElementsByClassName('msg_actions clearfix')[0].innerHTML = actions_content + spanBtnPTRE.innerHTML;
+                    if (document.getElementById('sendSRFromPopup-' + apiKeyRE)) {
+                        document.getElementById('sendSRFromPopup-' + apiKeyRE).addEventListener("click", function (event) {
+                            //apiKeyRE = this.getAttribute("apikey");
+                            var TKey = GM_getValue(ptreTeamKey, '');
+                            if (TKey != '') {
+                                var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
+                                $.ajax({
+                                    dataType: "json",
+                                    url: urlPTRESpy,
+                                    success: function(reponse) {
+                                        if (reponse.code == 1) {
+                                            document.getElementById('sendSRFromPopup-'+apiKeyRE).src = imgPTREOK;
+                                        } else {
+                                            document.getElementById('sendSRFromPopup-'+apiKeyRE).src = imgPTREKO;
+                                        }
+                                        displayPTREMessage(reponse.message_verbose);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Add PTRE button to spy reports
 function addPTRESendSRButtonToMessagesPage() {
 
+    // Check message pop-up
+    let observer = new MutationObserver(addPTRESendSRButtonToMessagePopup);
+    var node = document.getElementById('messages');
+    observer.observe(node, {
+        childList: true, // observer les enfants directs
+    });
+
+    // Add PTRE button to messages
     if (document.getElementById('subtabs-nfFleet20')) {
         if (/ui-tabs-active/.test(document.getElementById('subtabs-nfFleet20').className) && !document.getElementById('PTREspan')) {
             var listMsg = $("li.msg ");
@@ -578,7 +630,7 @@ function addPTRESendSRButtonToMessagesPage() {
                         var apiKeyRE = /((sr)-[a-z]{2}-[0-9]+-[0-9a-z]+)/.exec(msgI.getElementsByClassName('icon_nf icon_apikey')[0].title)[0];
                         //console.log(apiKeyRE);
                         var spanBtnPTRE = document.createElement("span"); // Create new div
-                        spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Envoyer le rapport sur '+toolName+'"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
+                        spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
                         spanBtnPTRE.id = 'PTREspan';
                         msgI.getElementsByClassName('msg_actions clearfix')[0].appendChild(spanBtnPTRE);
                         document.getElementById('sendRE-' + apiKeyRE).addEventListener("click", function (event) { 
