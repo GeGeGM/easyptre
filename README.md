@@ -1,6 +1,6 @@
 # PTRE - Paye Ton RE
 
-PTRE is an easy-to-use tool to save and share spy reports for OGame browser game. You can save spy reports from:
+PTRE is an easy-to-use [tolerated tool](https://forum.origin.ogame.gameforge.com/forum/thread/37-ptre-spy-report-sharing-tool-over-discord-oglight-infinity/) to save and share spy reports for OGame browser game. You can save spy reports from:
 - Discord, by installing the [PTRE bot](https://discordapp.com/oauth2/authorize?&client_id=512294332058042388&scope=bot)
 - [OGLight script](https://openuserjs.org/scripts/nullNaN/OGLight), by installing the add-on into your browser
 - [OGame Infinity](https://ogameinfinity.com/)
@@ -16,9 +16,15 @@ Your spy reports will be shared only with your team mates. PTRE can also create 
 **EasyPTRE** is a browser script providing PTRE basic features **working with** [AGR extention](https://www.antiga.me).
 You may check [PTRE website](https://ptre.chez.gg/) or [OGame Origin post](https://forum.origin.ogame.gameforge.com/forum/thread/60-easyptre-ig-script-for-ptre-compatible-with-agr/) for details.
 
-## Disclamer
+## Tolerated tool
 
-PTRE (website) is a Gameforge tolerated tool, but **EasyPTRE is not yet a Gameforge tolerated tool.** Review process is ongoing. Please wait for toleration via [OGame Origin post](https://forum.origin.ogame.gameforge.com/forum/thread/60-easyptre-ig-script-for-ptre-compatible-with-agr/).
+**EasyPTRE is a Gameforge tolerated tool**. You may check official post here: [OGame Origin post](https://forum.origin.ogame.gameforge.com/forum/thread/60-easyptre-ig-script-for-ptre-compatible-with-agr/).
+
+## Setup
+
+- Install Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=fr) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/)
+- Install [EasyPTRE](https://openuserjs.org/scripts/GeGe_GM/EasyPTRE)
+- Login to you OGame account and add your PTRE TeamKey to EasyPTRE settings
 
 ## Features
 
