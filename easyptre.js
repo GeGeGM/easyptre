@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.1
+// @version      0.5.2
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -264,7 +264,7 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
         }
         //console.log(type + " list updated (deletePlayerFromList fct)");
 
-        return 'Player was remove from ' + type + ' list';
+        return 'Player was removed from ' + type + ' list';
     } else {
         return 'Player is not part of ' + type + ' list';
     }
@@ -460,7 +460,7 @@ function displayPTREMenu() {
             divPTRE += '</td></tr>';
             // AGR Spy Table Improvement
             divPTRE += '<tr><td class="td_cell">Improve AGR Spy Table:</td>';
-            improveAGRSpyTable = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
+            var improveAGRSpyTable = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
             divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREImproveAGRSpyTable" type="checkbox" ';
             divPTRE += improveAGRSpyTable;
             divPTRE += ' />';
@@ -636,7 +636,15 @@ function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
                         var apiKeyRE = document.getElementById("m"+messageID).getAttribute("data-api-key");
                         var tdAGRButtons = rowCurrent.getElementsByTagName("td")[nbCol-1];
                         tdAGRButtons.style.width = "110px";
-                        tdAGRButtons.innerHTML += '<a id="sendSRFromAGRTable-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="spyTableIcon icon_galaxy mouseSwitch">P</a>';
+                        // Create PTRE button
+                        var PTREbutton = document.createElement('a');
+                        PTREbutton.style.cursor = 'pointer';
+                        PTREbutton.className = "spyTableIcon icon_galaxy mouseSwitch";
+                        PTREbutton.id = "sendSRFromAGRTable-" + apiKeyRE;
+                        PTREbutton.setAttribute('apikey', apiKeyRE);
+                        PTREbutton.innerHTML = "P";
+                        tdAGRButtons.append(PTREbutton);
+                        // Add event to button
                         document.getElementById('sendSRFromAGRTable-' + apiKeyRE).addEventListener("click", function (event) {
                             apiKeyRE = this.getAttribute("apikey");
                             var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
