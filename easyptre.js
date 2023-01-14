@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.2
+// @version      0.5.3
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -375,22 +375,24 @@ function updateLocalAGRList() {
         targetList = JSON.parse(targetJSON);
     }
 
-    $.each(tabAgo[1].children, function(i, ligneJoueurAGR) {
-        if (ligneJoueurAGR.getAttributeNode('ago-data')) {
-            var txtjsonDataAgo = ligneJoueurAGR.getAttributeNode('ago-data').value;
-            var jsonDataAgo = JSON.parse(txtjsonDataAgo);
-            var IdPlayer = jsonDataAgo.action.id;
-            var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
-            //console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')');
-            var playerAGR = {id: IdPlayer, pseudo: PseudoPlayer};
-            listeJoueurAGR.push(playerAGR);
+    if (tabAgo && tabAgo[1] && tabAgo[1].children) {
+        $.each(tabAgo[1].children, function(i, ligneJoueurAGR) {
+            if (ligneJoueurAGR.getAttributeNode('ago-data')) {
+                var txtjsonDataAgo = ligneJoueurAGR.getAttributeNode('ago-data').value;
+                var jsonDataAgo = JSON.parse(txtjsonDataAgo);
+                var IdPlayer = jsonDataAgo.action.id;
+                var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
+                //console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')');
+                var playerAGR = {id: IdPlayer, pseudo: PseudoPlayer};
+                listeJoueurAGR.push(playerAGR);
 
-            if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
-                var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
-                //alert(retAdd);
+                if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
+                    var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
+                    //alert(retAdd);
+                }
             }
-        }
-    });
+        });
+    }
 
     // Remove targets from AGR list if not present in AGR native list
     //var joueurAGRSup = false;
