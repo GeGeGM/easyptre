@@ -342,8 +342,6 @@ function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
         $.each(targetList, function(i, PlayerCheck) {
             if (PlayerCheck.id == playerId) {
                 ret = true;
-            } else if (PlayerCheck.pseudo == playerPseudo) {
-                ret = true;
             }
         });
     }
