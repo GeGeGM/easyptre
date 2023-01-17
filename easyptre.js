@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.3
+// @version      0.5.4
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -81,6 +81,16 @@ if (!/page=standalone&component=empire/.test(location.href))
     }, true);
 
     if (isAGREnabled()) {
+        if (document.getElementById('ago_panel_Player') && document.getElementById('ago_panel_Player')) {
+            let observer2 = new MutationObserver(updateLocalAGRList);
+            var node2 = document.getElementById('ago_panel_Player');
+            observer2.observe(node2, {
+                attributes: true,
+                childList: true, // observer les enfants directs
+                subtree: true, // et les descendants aussi
+                characterDataOldValue: true // transmettre les anciennes données au callback
+            });
+        }
         if (document.getElementById('ago_box_title')) {
             // Add PTRE link to AGR pinned player
             addPTRELinkToAGRPinnedTarget();
