@@ -365,6 +365,13 @@ function getAGRPlayerIDFromPseudo(playerPseudo) {
 }
 
 // Copy AGR internal players list to local AGR list
+// AGR list IDs
+// Friend: 52
+// Trader: 55
+// Watch: 62 => YES
+// Miner: 64 => YES
+// Target: 66 => YES
+// To attack: 67 => YES
 function updateLocalAGRList() {
     var tabAgo = document.getElementsByClassName('ago_panel_overview');
     var listeJoueurAGR = [];
@@ -380,15 +387,19 @@ function updateLocalAGRList() {
             if (ligneJoueurAGR.getAttributeNode('ago-data')) {
                 var txtjsonDataAgo = ligneJoueurAGR.getAttributeNode('ago-data').value;
                 var jsonDataAgo = JSON.parse(txtjsonDataAgo);
-                var IdPlayer = jsonDataAgo.action.id;
-                var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
-                //console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')');
-                var playerAGR = {id: IdPlayer, pseudo: PseudoPlayer};
-                listeJoueurAGR.push(playerAGR);
+                var token = jsonDataAgo.action.token;
+                // Do not add friends to target list
+                if (token == 55 || token == 62 || token == 64 || token == 66 || token == 67) {
+                    var IdPlayer = jsonDataAgo.action.id;
+                    var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
+                    console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')'+ ' | token:' + token + ')');
+                    var playerAGR = {id: IdPlayer, pseudo: PseudoPlayer};
+                    listeJoueurAGR.push(playerAGR);
 
-                if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
-                    var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
-                    //alert(retAdd);
+                    if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
+                        var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
+                        //alert(retAdd);
+                    }
                 }
             }
         });
