@@ -367,7 +367,7 @@ function getAGRPlayerIDFromPseudo(playerPseudo) {
 // Copy AGR internal players list to local AGR list
 // AGR list IDs
 // Friend: 52
-// Trader: 55
+// Trader: 55 => YES
 // Watch: 62 => YES
 // Miner: 64 => YES
 // Target: 66 => YES
@@ -386,10 +386,7 @@ function updateLocalAGRList() {
                     var IdPlayer = jsonDataAgo.action.id;
                     var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
                     console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')'+ ' | token:' + token + ')');
-                    if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
-                        var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
-                        //alert(retAdd);
-                    }
+                    addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
                 }
             }
         });
