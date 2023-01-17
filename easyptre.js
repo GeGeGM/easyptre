@@ -374,13 +374,6 @@ function getAGRPlayerIDFromPseudo(playerPseudo) {
 // To attack: 67 => YES
 function updateLocalAGRList() {
     var tabAgo = document.getElementsByClassName('ago_panel_overview');
-    var listeJoueurAGR = [];
-    var targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
-    var targetList = [];
-    var idASup = [];
-    if (targetJSON != '') {
-        targetList = JSON.parse(targetJSON);
-    }
 
     if (tabAgo && tabAgo[1] && tabAgo[1].children) {
         $.each(tabAgo[1].children, function(i, ligneJoueurAGR) {
@@ -393,9 +386,6 @@ function updateLocalAGRList() {
                     var IdPlayer = jsonDataAgo.action.id;
                     var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
                     console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ')'+ ' | token:' + token + ')');
-                    var playerAGR = {id: IdPlayer, pseudo: PseudoPlayer};
-                    listeJoueurAGR.push(playerAGR);
-
                     if (!isPlayerInList(IdPlayer, PseudoPlayer, 'AGR')) {
                         var retAdd = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
                         //alert(retAdd);
@@ -404,29 +394,6 @@ function updateLocalAGRList() {
             }
         });
     }
-
-    // Remove targets from AGR list if not present in AGR native list
-    //var joueurAGRSup = false;
-    //$.each(targetList, function(i, PlayerCheck) {
-    //    var find = false;
-    //    $.each(listeJoueurAGR, function(j, PlayerListActu) {
-    //        if (PlayerListActu.id == PlayerCheck.id) {
-    //            find = true;
-    //        }
-    //    });
-    //    if (!find) {
-    //        idASup.push(i);
-    //        joueurAGRSup = true;
-    //    }
-    //});
-    //$.each(idASup, function(i, val) {
-    //    targetList.splice(val, 1);
-    //});
-    //if (joueurAGRSup) {
-    //    targetJSON = JSON.stringify(targetList);
-    //    GM_setValue(ptreAGRPlayerListJSON, targetJSON);
-        //console.log(type + " list updated (updateLocalAGRList fct)");
-    //}
 }
 
 // *** *** ***
