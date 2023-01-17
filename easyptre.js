@@ -441,7 +441,7 @@ function displayPTREMenu() {
         var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         var divPTRE = '<div id="boxPTRESettings"><table border="1">';
-        divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></b></td><td class="td_cell" align="right"><input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
