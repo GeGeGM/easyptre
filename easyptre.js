@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.5
+// @version      0.5.6
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -576,8 +576,7 @@ function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
                     var spanBtnPTRE = document.createElement("span");
                     spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendSRFromPopup-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
                     spanBtnPTRE.id = 'PTREspan';
-                    var actions_content = head.getElementsByClassName('msg_actions clearfix')[0].innerHTML;
-                    head.getElementsByClassName('msg_actions clearfix')[0].innerHTML = actions_content + spanBtnPTRE.innerHTML;
+                    head.getElementsByClassName('msg_actions clearfix')[0].append(spanBtnPTRE);
                     if (document.getElementById('sendSRFromPopup-' + apiKeyRE)) {
                         document.getElementById('sendSRFromPopup-' + apiKeyRE).addEventListener("click", function (event) {
                             //apiKeyRE = this.getAttribute("apikey");
