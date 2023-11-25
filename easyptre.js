@@ -103,7 +103,7 @@ if (!/page=standalone&component=empire/.test(location.href))
 }
 
 // Galaxy page: Send activities
-if (/page=ingame&component=galaxy/.test(location.href)){
+if (/component=galaxy/.test(location.href)){
     console.log("Galaxy detected");
     var mode = 1;
 
