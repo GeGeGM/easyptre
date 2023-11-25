@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.6.1
+// @version      0.6.2
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -138,7 +138,7 @@ if (/page=messages/.test(location.href))
 // In order to not display the autorisation window during an inappropriate moment
 // It will be enabled when user opens the PTRE menu
 if (GM_getValue(ptreLastAvailableVersionRefresh, 0) != 0) {
-    updateLastAvailableVersion();
+    updateLastAvailableVersion(false);
 } else {
     consoleDebug("Version Check not initialized: open settings to initialize it");
 }
@@ -249,13 +249,13 @@ function consoleDebug(message) {
     }
 }
 
-function updateLastAvailableVersion() {
+function updateLastAvailableVersion(force) {
     // Only check once a day
 
     var lastCheckTime = GM_getValue(ptreLastAvailableVersionRefresh, 0);
     var currentTime = serverTime.getTime() / 1000;
 
-    if (currentTime > lastCheckTime + versionCheckTimeout) {
+    if (force === true || currentTime > lastCheckTime + versionCheckTimeout) {
         consoleDebug("Checking last version available");
         GM_xmlhttpRequest({
             method:'GET',
@@ -271,7 +271,7 @@ function updateLastAvailableVersion() {
                 GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
                 if (availableVersion !== GM_info.script.version) {
                     if (document.getElementById('ptreVersion')) {
-                        document.getElementById('ptreVersion').innerHTML = '<span class="status_negatif">You should update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + availableVersion + '</a></span>';
+                        document.getElementById('ptreVersion').innerHTML = '<span class="status_negatif">Update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + availableVersion + '</a></span>';
                     }
                     if (document.getElementById('ptreMenuName')) {
                         document.getElementById('ptreMenuName').innerHTML = 'UPDATE ME';
@@ -554,13 +554,13 @@ function displayPTREMenu() {
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreVersion">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
-            divPTRE += '<span class="status_negatif">You should update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + lastAvailableVersion + '</a></span>';
+            divPTRE += '<span class="status_negatif">Update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + lastAvailableVersion + '</a></span>';
         } else {
-            divPTRE += 'EasyPTRE  v' + GM_info.script.version;
+            divPTRE += '<b>EasyPTRE  v' + GM_info.script.version + '</b>';
         }
-        divPTRE += '</span></td></tr>';
+        divPTRE += '</span> <input id="forceCheckVersionButton" type="button" value="CHECK" /></td></tr>';
         // Check last script version
-        updateLastAvailableVersion();
+        updateLastAvailableVersion(false);
 
         //fin div table tr
         divPTRE += '</table></div>';
@@ -584,6 +584,12 @@ function displayPTREMenu() {
                 });
             });
         }
+
+        // Action: Check version
+        document.getElementById('forceCheckVersionButton').addEventListener("click", function (event)
+        {
+            updateLastAvailableVersion(true);
+        });
 
         // Action: Close
         document.getElementById('btnCloseOptPTRE').addEventListener("click", function (event)
