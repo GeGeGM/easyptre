@@ -146,7 +146,7 @@ GM_addStyle(`
     z-index: 1000;
     position: fixed;
     bottom: 30px;
-    left: 10px;
+    right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.8);
 }
@@ -155,7 +155,7 @@ GM_addStyle(`
     z-index: 1000;
     position: fixed;
     bottom: 30px;
-    left: 10px;
+    right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.8);"
 }
