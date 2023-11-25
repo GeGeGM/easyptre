@@ -481,7 +481,7 @@ function displayPTREMenu() {
         }
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | EasyPTRE  v' + GM_info.script.version + ' | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2">EasyPTRE  v' + GM_info.script.version + ' | <a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
 
         //fin div table tr
         divPTRE += '</table></div>';
