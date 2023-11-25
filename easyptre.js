@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.8
+// @version      0.6.0
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -27,6 +27,7 @@ var country = splitted2[0];
 var galaxyContentLinkTest = "https:\/\/"+serveur+"\/game\/index.php?page=ingame&component=galaxy&action=fetchGalaxyContent&ajax=1&asJson=1";
 var lastActivitiesGalaSent = 0;
 var lastActivitiesSysSent = 0;
+var versionCheckTimeout = 86400;
 
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
@@ -35,6 +36,8 @@ var ptreImproveAGRSpyTable = "ptre-" + country + "-" + universe + "-ImproveAGRSp
 var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
 var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsoleDebug";
+var ptreLastAvailableVersion = "ptre-" + country + "-" + universe + "-LastAvailableVersion";
+var ptreLastAvailableVersionRefresh = "ptre-" + country + "-" + universe + "-LastAvailableVersionRefresh";
 
 // Images
 var imgPTRE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB1FBMVEUAAEAAAEE1IjwvHTsEA0GBTCquYhxbNjINCUAFBEEqGjwyIDsAAUAYED+kXR++aBS7aBaKUCctHDwTDUBDKTeBSymwYxuYVyQPCkA8JTm4Zxi7ZxW9aBSrYR2fWyG+aRS8ZxS2Zhg6JDlqPzC+aRW8ZxV1RCwBAkEMCEGUVSW8aBSlXh8bET8oGj27aBdNLzZSMjW8aBaHTigGBUEXDz5kOS1qOymbWCG9aRayZBt0QihnOisiFj0PCj9FKjdKLDVIKzVGKjZHKjZILDYXDz8BAUENCD4OCD4KBj8OCT4MCD8CAkEiFj6MUSadWB+fWR2NUSYVDj8HBUBqPzGJTyeYViGeWB6fWR8+JzkFA0AWDj4kFz2ITiazZBl2RSwIBkASDD8ZED5hOTCwYhqbWSIHBD80IDodEz4PCT8kFjsKB0AhFDwTDD8DA0E1IToQCTybVh6pYB6ETSlWNDQrGzwHBUEjFj1PMDV+SSqoXhwfETmdVhyxZBuWViRrPy8DAkFjOzGPUiarXhgeETm9aBWiXCB9SSp4RiyeWiG1ZRm9aRW8aBWrXhmdVxysXhgPCT2UVCKzZRyxZByyZRyiXB8dEDoDAkAhFj4oGj4kGD4GBED///9i6fS4AAAAAWJLR0Sb79hXhAAAAAlwSFlzAAAOwgAADsIBFShKgAAAAAd0SU1FB+YMAw4EFzatfRkAAAE3SURBVCjPY2AgDBhxSzEx45JkYWVj5wDq5eTi5kGT4uXjFxAUEhYRFROXQLNJUkpaWkZWTkpeQVEJ1WRGZRVpaWlVGSChoqaOIqWhCRIFAy1tHRQpXTFVmJS0nj6yiYwGhnAZaX4jY7iEiamZuYUAHBhaWlnbQKVs7ewdHEHAyQlC2Tu7wM1jdHVzd3PzYGT08HRz8/JmRLbMh9XXzz8gMCg4JDQsPALFY5FR0TGxcfEMCYlJySnRcOHUtHROoLqMzCywouwcxlzePDewVH5BYVFxCQfUAsbSsvIKvsoqiFS1vLxhTW2dpEu9q3BeQyOboTx/UzNUqgUUfCpSrW3tHZ1d/MBw6e5BkgIBGXl5aEhiSCEAXKqXXxUNyPRBpPonTJyEBiZPmQqWmjZ9BgaYOYuIRIgVAABizF3wXn23IAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowNDoxNyswMDowMEeHM70AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDQ6MTcrMDA6MDA22osBAAAAAElFTkSuQmCC';
@@ -54,6 +57,7 @@ var ptreTargetListMaxSize = 15;
 // PTRE URLs
 var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool='+toolName;
 var urlPTREPushActivity = "https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool="+toolName
+var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js'
 
 // *** *** ***
 // MAIN EXEC
@@ -63,8 +67,13 @@ var urlPTREPushActivity = "https://ptre.chez.gg/scripts/oglight_import_player_ac
 if (!/page=standalone&component=empire/.test(location.href))
 {
     // Bouton options
+    var ptreMenuName = toolName;
+    var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
+    if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
+        ptreMenuName = "UPDATE ME";
+    }
     var aff_option = '<span class="menu_icon"><a id="iconeUpdate" href="https://ptre.chez.gg" target="blank_" ><img id="imgPTREmenu" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a></span>';
-    aff_option += '<a id="affOptionsPTRE" class="menubutton " href="#" accesskey="" target="_self"><span  class="textlabel">' + toolName + '</span></a>';
+    aff_option += '<a id="affOptionsPTRE" class="menubutton " href="#" accesskey="" target="_self"><span class="textlabel" id="ptreMenuName">' + ptreMenuName + '</span></a>';
 
     var tab = document.createElement("li");
     tab.innerHTML = aff_option;
@@ -123,6 +132,15 @@ if (/page=messages/.test(location.href))
     if (GM_getValue(ptreTeamKey) != '') {
         setTimeout(addPTREStuffsToMessagesPage, 800);
     }
+}
+
+// Check for new version only if we already did the check once
+// In order to not display the autorisation window during an inappropriate moment
+// It will be enabled when user opens the PTRE menu
+if (GM_getValue(ptreLastAvailableVersionRefresh, 0) != 0) {
+    updateLastAvailableVersion();
+} else {
+    consoleDebug("Version Check not initialized: open settings to initialize it");
 }
 
 // *** *** ***
@@ -228,6 +246,43 @@ function buildPTRELinkToPlayer(playerID) {
 function consoleDebug(message) {
     if (GM_getValue(ptreEnableConsoleDebug, 'false') == 'true') {
         console.log(message);
+    }
+}
+
+function updateLastAvailableVersion() {
+    // Only check once a day
+
+    var lastCheckTime = GM_getValue(ptreLastAvailableVersionRefresh, 0);
+    var currentTime = serverTime.getTime() / 1000;
+
+    if (currentTime > lastCheckTime + versionCheckTimeout) {
+        consoleDebug("Checking last version available");
+        GM_xmlhttpRequest({
+            method:'GET',
+            url:urlToScriptMetaInfos,
+            onload:result => {
+                //consoleDebug(result.responseText);
+                var tab = result.responseText.split('//');
+                var availableVersion = tab[2].match(/\d+\.\d+.\d+/);
+                availableVersion = availableVersion[0];
+                consoleDebug("Current version: " + GM_info.script.version);
+                consoleDebug("Last version: " + availableVersion);
+                GM_setValue(ptreLastAvailableVersion, availableVersion);
+                GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
+                if (availableVersion !== GM_info.script.version) {
+                    if (document.getElementById('ptreVersion')) {
+                        document.getElementById('ptreVersion').innerHTML = '<span class="status_negatif">You should update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + availableVersion + '</a></span>';
+                    }
+                    if (document.getElementById('ptreMenuName')) {
+                        document.getElementById('ptreMenuName').innerHTML = 'UPDATE ME';
+                    }
+                    consoleDebug('Version ' + availableVersion + ' is available');
+                }
+            }
+        });
+    } else {
+        var temp = lastCheckTime + versionCheckTimeout - currentTime;
+        consoleDebug("Skipping last version check. Next check in " + temp + " sec min");
     }
 }
 
@@ -495,7 +550,17 @@ function displayPTREMenu() {
         }
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2">EasyPTRE  v' + GM_info.script.version + ' | <a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreVersion">';
+        var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
+        if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
+            divPTRE += '<span class="status_negatif">You should update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + lastAvailableVersion + '</a></span>';
+        } else {
+            divPTRE += 'EasyPTRE  v' + GM_info.script.version;
+        }
+        divPTRE += '</span></td></tr>';
+        // Check last script version
+        updateLastAvailableVersion();
 
         //fin div table tr
         divPTRE += '</table></div>';
