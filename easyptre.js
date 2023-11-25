@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.5.7
+// @version      0.5.8
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -34,6 +34,7 @@ var ptreUseAGRList = "ptre-" + country + "-" + universe + "-UseAGRList";
 var ptreImproveAGRSpyTable = "ptre-" + country + "-" + universe + "-ImproveAGRSpyTable";
 var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
+var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsoleDebug";
 
 // Images
 var imgPTRE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB1FBMVEUAAEAAAEE1IjwvHTsEA0GBTCquYhxbNjINCUAFBEEqGjwyIDsAAUAYED+kXR++aBS7aBaKUCctHDwTDUBDKTeBSymwYxuYVyQPCkA8JTm4Zxi7ZxW9aBSrYR2fWyG+aRS8ZxS2Zhg6JDlqPzC+aRW8ZxV1RCwBAkEMCEGUVSW8aBSlXh8bET8oGj27aBdNLzZSMjW8aBaHTigGBUEXDz5kOS1qOymbWCG9aRayZBt0QihnOisiFj0PCj9FKjdKLDVIKzVGKjZHKjZILDYXDz8BAUENCD4OCD4KBj8OCT4MCD8CAkEiFj6MUSadWB+fWR2NUSYVDj8HBUBqPzGJTyeYViGeWB6fWR8+JzkFA0AWDj4kFz2ITiazZBl2RSwIBkASDD8ZED5hOTCwYhqbWSIHBD80IDodEz4PCT8kFjsKB0AhFDwTDD8DA0E1IToQCTybVh6pYB6ETSlWNDQrGzwHBUEjFj1PMDV+SSqoXhwfETmdVhyxZBuWViRrPy8DAkFjOzGPUiarXhgeETm9aBWiXCB9SSp4RiyeWiG1ZRm9aRW8aBWrXhmdVxysXhgPCT2UVCKzZRyxZByyZRyiXB8dEDoDAkAhFj4oGj4kGD4GBED///9i6fS4AAAAAWJLR0Sb79hXhAAAAAlwSFlzAAAOwgAADsIBFShKgAAAAAd0SU1FB+YMAw4EFzatfRkAAAE3SURBVCjPY2AgDBhxSzEx45JkYWVj5wDq5eTi5kGT4uXjFxAUEhYRFROXQLNJUkpaWkZWTkpeQVEJ1WRGZRVpaWlVGSChoqaOIqWhCRIFAy1tHRQpXTFVmJS0nj6yiYwGhnAZaX4jY7iEiamZuYUAHBhaWlnbQKVs7ewdHEHAyQlC2Tu7wM1jdHVzd3PzYGT08HRz8/JmRLbMh9XXzz8gMCg4JDQsPALFY5FR0TGxcfEMCYlJySnRcOHUtHROoLqMzCywouwcxlzePDewVH5BYVFxCQfUAsbSsvIKvsoqiFS1vLxhTW2dpEu9q3BeQyOboTx/UzNUqgUUfCpSrW3tHZ1d/MBw6e5BkgIBGXl5aEhiSCEAXKqXXxUNyPRBpPonTJyEBiZPmQqWmjZ9BgaYOYuIRIgVAABizF3wXn23IAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowNDoxNyswMDowMEeHM70AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDQ6MTcrMDA6MDA22osBAAAAAElFTkSuQmCC';
@@ -104,7 +105,7 @@ if (!/page=standalone&component=empire/.test(location.href))
 
 // Galaxy page: Send activities
 if (/component=galaxy/.test(location.href)){
-    console.log("Galaxy detected");
+    consoleDebug("Galaxy detected");
     var mode = 1;
 
     if (mode == 1) {
@@ -224,6 +225,12 @@ function buildPTRELinkToPlayer(playerID) {
     return 'https://ptre.chez.gg/?country=' + country + '&univers=' + universe + '&player_id=' + playerID;
 }
 
+function consoleDebug(message) {
+    if (GM_getValue(ptreEnableConsoleDebug, 'false') == 'true') {
+        console.log(message);
+    }
+}
+
 // *** *** ***
 // PTRE/AGR LIST RELATED
 // *** *** ***
@@ -306,7 +313,7 @@ function addPlayerToList(playerId, playerPseudo, type) {
             } else if (type == 'AGR') {
                 GM_setValue(ptreAGRPlayerListJSON, targetJSON);
             }
-            //console.log('Player ' + playerPseudo + ' has been added to ' + type + ' list');
+            consoleDebug('Player ' + playerPseudo + ' has been added to ' + type + ' list');
             //console.log(type + " list updated (addPlayerToList fct)");
             return 'Player has been added to ' + type + ' list';
         }
@@ -325,8 +332,8 @@ function debugListContent(type = 'PTRE') {
     }
     if (targetJSON != '') {
         var targetList = JSON.parse(targetJSON);
-        console.log(type + "list: ");
-        console.log(targetList);
+        consoleDebug(type + " list: ");
+        consoleDebug(targetList);
     }
 }
 
@@ -388,7 +395,7 @@ function updateLocalAGRList() {
                 if (token == 55 || token == 62 || token == 64 || token == 66 || token == 67) {
                     var IdPlayer = jsonDataAgo.action.id;
                     var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
-                    console.log('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ') | token:' + token + ')');
+                    consoleDebug('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ') | token:' + token + ')');
                     addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
                 }
             }
@@ -451,6 +458,13 @@ function displayPTREMenu() {
         } else {
             divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled!</span></td></tr>';
         }
+        // Console Debug mode
+        divPTRE += '<tr><td class="td_cell">Enable Console Debug:</td>';
+        debugMode = (GM_getValue(ptreEnableConsoleDebug, 'false') == 'true' ? 'checked' : '');
+        divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREEnableConsoleDebug" type="checkbox" ';
+        divPTRE += debugMode;
+        divPTRE += ' />';
+        divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Targets list</div></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /></td></tr>';
@@ -528,6 +542,8 @@ function displayPTREMenu() {
                     GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
                     GM_setValue(ptreImproveAGRSpyTable, document.getElementById('PTREImproveAGRSpyTable').checked + '');
                 }
+                // Update Console Debug Mode
+                GM_setValue(ptreEnableConsoleDebug, document.getElementById('PTREEnableConsoleDebug').checked + '');
                 // Update menu image and remove it after 3 sec
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
@@ -561,7 +577,7 @@ function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
     if (document.getElementsByClassName('ui-dialog').length > 0) {
         if (document.getElementsByClassName('msg_actions').length > 0) {
             if (document.getElementsByClassName('ui-dialog-content').length > 0) {
-                console.log("Message Pop-up!");
+                consoleDebug("Message Pop-up!");
                 var head = document.getElementsByClassName('detail_msg_head')[0];
                 if (head && head.getElementsByClassName('msg_actions clearfix') && head.getElementsByClassName('msg_actions clearfix').length > 0) {
                     var apikey_elem = document.getElementsByClassName('ui-dialog-content')[0].innerHTML;
@@ -723,7 +739,7 @@ function addPTREStuffsToMessagesPage() {
 
 // Add buttons to galaxy
 function addPTREStuffsToGalaxyPage() {
-    //console.log("addPTREStuffsToGalaxyPage: Updating galaxy");
+    consoleDebug("addPTREStuffsToGalaxyPage: Updating galaxy");
 
     // Add PTRE debug message Div
     if (!document.getElementById("ptreGalaxyMessageD")) {
@@ -732,7 +748,7 @@ function addPTREStuffsToGalaxyPage() {
         divPTREGalaxyMessageD.innerHTML = spanPTREGalaxyMessageD;
         divPTREGalaxyMessageD.id = 'ptreGalaxyMessageD';
         document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
-        console.log("ADD DEBUG DIV");
+        consoleDebug("ADD DEBUG DIV");
     }
 
     if (GM_getValue(ptreUseAGRList) == 'true'){
@@ -821,7 +837,7 @@ function sendGalaxyActivities(){
     lastActivitiesGalaSent = galaxy;
     lastActivitiesSysSent = system;
 
-    console.log("Checking system " + galaxy + '.' + system);
+    consoleDebug("Checking system " + galaxy + '.' + system);
 
     if (0 === galaxy.length || $.isNumeric(+galaxy) === false) {
         galaxy = 1;
@@ -876,7 +892,7 @@ function displayGalaxyRender(data){
                     var position = infoPos.position;
                     var coords = galaxy+":"+system+":"+position;
 
-                    console.log(infoPos);
+                    consoleDebug(infoPos);
                     var planete = infoPos.planets;
                     var planet_id = planete[0]['planetId'];
                     var planet_name = planete[0]['planetName'];
