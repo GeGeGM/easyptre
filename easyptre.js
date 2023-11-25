@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.6.0
+// @version      0.6.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -245,7 +245,7 @@ function buildPTRELinkToPlayer(playerID) {
 
 function consoleDebug(message) {
     if (GM_getValue(ptreEnableConsoleDebug, 'false') == 'true') {
-        console.log(message);
+        console.log('[PTRE] ' + message);
     }
 }
 
@@ -329,7 +329,7 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
         } else if (type == 'AGR') {
             GM_setValue(ptreAGRPlayerListJSON, targetJSON);
         }
-        //console.log(type + " list updated (deletePlayerFromList fct)");
+        //consoleDebug(type + " list updated (deletePlayerFromList fct)");
 
         return 'Player was removed from ' + type + ' list';
     } else {
@@ -369,7 +369,7 @@ function addPlayerToList(playerId, playerPseudo, type) {
                 GM_setValue(ptreAGRPlayerListJSON, targetJSON);
             }
             consoleDebug('Player ' + playerPseudo + ' has been added to ' + type + ' list');
-            //console.log(type + " list updated (addPlayerToList fct)");
+            //consoleDebug(type + " list updated (addPlayerToList fct)");
             return 'Player has been added to ' + type + ' list';
         }
     } else {
@@ -540,7 +540,7 @@ function displayPTREMenu() {
             targetList = JSON.parse(targetJSON);
             if (targetList) {
                 $.each(targetList, function(i, PlayerCheck) {
-                    //console.log(PlayerCheck);
+                    //consoleDebug(PlayerCheck);
                     divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">';
                     divPTRE += '- <a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">'+PlayerCheck.pseudo+'</a></td><td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a>';
                     divPTRE += ' <a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a>';
@@ -720,7 +720,7 @@ function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
                             });
                         });
                     } else {
-                        console.log("Error. Cant find data element: m" + messageID);
+                        console.log("[PTRE] Error. Cant find data element: m" + messageID);
                     }
                 }
             }
@@ -762,11 +762,11 @@ function addPTREStuffsToMessagesPage() {
             if (listMsg.length > 0) {
                 //clearInterval(interGetRE);
                 jQuery.each(listMsg, function(i, msgI) {
-                    //console.log(i +' val: '+ element.innetHTML);
+                    //consoleDebug(i +' val: '+ element.innetHTML);
                     var idMsg = msgI.getAttributeNode("data-msg-id").value;
                     if (msgI.getElementsByClassName('icon_nf icon_apikey')[0]) {
                         var apiKeyRE = /((sr)-[a-z]{2}-[0-9]+-[0-9a-z]+)/.exec(msgI.getElementsByClassName('icon_nf icon_apikey')[0].title)[0];
-                        //console.log(apiKeyRE);
+                        //consoleDebug(apiKeyRE);
                         var spanBtnPTRE = document.createElement("span"); // Create new div
                         spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
                         spanBtnPTRE.id = 'PTREspan';
@@ -780,7 +780,7 @@ function addPTREStuffsToMessagesPage() {
                                     dataType: "json",
                                     url: urlPTRESpy,
                                     success: function(reponse) {
-                                        console.log(reponse);
+                                        console.log('[PTRE] ' + reponse);
                                         if (reponse.code == 1) {
                                             document.getElementById('sendRE-'+apiKeyRE).src = imgPTREOK;
                                         } else {
@@ -847,7 +847,7 @@ function addPTREStuffsToGalaxyPage() {
                             if (inaPlayer == ' (i)' || inaPlayer == ' (I)') {
                                 notIna = false;
                             }
-                            //console.log('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
+                            //consoleDebug('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
                             var isInList = isPlayerInList(playerId, playerPseudo);
                             if (!isInList && notIna) {
                                 var AddPlayerCheck = '<a class="tooltip" id="addcheckptr_'+nbBtnPTRE+'" title="Ajouter ce joueur a la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgAddPlayer + '" height="20" width="20"></a>';
@@ -910,7 +910,7 @@ function sendGalaxyActivities(){
     if (0 === system.length || $.isNumeric(+system) === false) {
         system = 1;
     }
-    console.log('[' + galaxy + ':' + system + "] Checking targets activities");
+    console.log('[PTRE][' + galaxy + ':' + system + "] Checking targets activities");
     displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
     recupGalaRender(galaxy, system);
 
@@ -947,7 +947,7 @@ function displayGalaxyRender(data){
         if (infoPos.player){
             var player_id = infoPos.player['playerId'];
             var player_name = infoPos.player['playerName'];
-            //console.log(infoPos);
+            //consoleDebug(infoPos);
             if (isPlayerInList(player_id, player_name, type)){
                 var ina = infoPos.positionFilters;
 
@@ -971,7 +971,7 @@ function displayGalaxyRender(data){
                     } else if (!planet_acti) {
                         planet_acti = '60';
                     }
-                    //console.log("PLANET: " + planete);
+                    //consoleDebug("PLANET: " + planete);
 
                     // If their is a debris fiel AND/OR a moon
                     if (planete.length > 1) {
@@ -983,7 +983,7 @@ function displayGalaxyRender(data){
                             moonIndex = 2;
                         }
                         if (moonIndex != -1) {
-                            //console.log("MOON => " + planete[1]);
+                            //consoleDebug("MOON => " + planete[1]);
                             var lune_id = planete[moonIndex]['planetId'];
                             var lune_size = planete[moonIndex]['size'];
                             var lune_acti = planete[moonIndex]['activity']['showActivity'];
@@ -997,12 +997,12 @@ function displayGalaxyRender(data){
                             }
                             var jsonLune = {id:lune_id, size:lune_size, activity:lune_acti};
                             //jsonLune = JSON.stringify(jsonLune);
-                            //console.log("MOON: " + jsonLune);
+                            //consoleDebug("MOON: " + jsonLune);
                         } else {
-                            //console.log("[PTRE] Error: Cant find moon");
+                            //consoleDebug("[PTRE] Error: Cant find moon");
                         }
                     } else {
-                        //console.log("NO MOON");
+                        //consoleDebug("NO MOON");
                     }
 
                     var jsonActiPos = {player_id : player_id,
@@ -1026,14 +1026,14 @@ function displayGalaxyRender(data){
             jsonSystem = '{';
             $.each(tabActiPos, function(nb, jsonPos){
                 jsonSystem += '"'+jsonPos.coords+'":'+JSON.stringify(jsonPos)+',';
-                //console.log(jsonSystem);
+                //consoleDebug(jsonSystem);
             });
             jsonSystem = jsonSystem.substr(0,jsonSystem.length-1);
             jsonSystem += '}';
         }
 
     });
-    //console.log("DATAS: " + jsonSystem);
+    //consoleDebug("DATAS: " + jsonSystem);
     var dataPost = jsonSystem;
 
     if (jsonSystem != ''){
