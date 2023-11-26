@@ -51,7 +51,7 @@ var imgSupPlayer = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAA
 var ptreMessageDisplayTime = 5;
 var menuImageDisplayTime = 3;
 var ptreMenuDisplayTime = 1;
-var ptreTargetListMaxSize = 15;
+var ptreTargetListMaxSize = 100;
 // TODO: Set ptreAGRTargetListMaxSize
 
 // PTRE URLs
