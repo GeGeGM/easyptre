@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.6.4
+// @version      0.7.0
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -31,7 +31,6 @@ var versionCheckTimeout = 86400;
 
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
-var ptreUseAGRList = "ptre-" + country + "-" + universe + "-UseAGRList";
 var ptreImproveAGRSpyTable = "ptre-" + country + "-" + universe + "-ImproveAGRSpyTable";
 var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
@@ -277,7 +276,7 @@ function updateLastAvailableVersion(force) {
                     GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
                     if (availableVersion !== GM_info.script.version) {
                         if (document.getElementById('ptreUpdateVersionMessage')) {
-                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + availableVersion + '</a></span>';
+                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</span>';
                         }
                         if (document.getElementById('ptreMenuName')) {
                             document.getElementById('ptreMenuName').innerHTML = 'UPDATE ME';
@@ -299,6 +298,12 @@ function updateLastAvailableVersion(force) {
     }
 }
 
+function displayMessageInSettings(message) {
+    if (document.getElementById('messageDivInSettings')) {
+        document.getElementById('messageDivInSettings').innerHTML = message;
+    }
+}
+
 // *** *** ***
 // PTRE/AGR LIST RELATED
 // *** *** ***
@@ -307,9 +312,10 @@ function updateLastAvailableVersion(force) {
 function deletePlayerFromList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
-    if (isPlayerInList(playerId, playerPseudo, type)) {
+    if (isPlayerInTheList(playerId, type)) {
         // Get list content depending on if its PTRE or AGR list
         var targetJSON = '';
+        var pseudo = '';
         if (type == 'PTRE') {
             targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
         } else if (type == 'AGR') {
@@ -324,10 +330,7 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
         $.each(targetList, function(i, PlayerCheck) {
             if (PlayerCheck.id == playerId) {
                 idASup = i;
-            } else if (PlayerCheck.pseudo == playerPseudo) {
-                // TODO: Pourquoi est ce qu'on test le pseudo ?
-                // On ne devrait se baser que sur l'ID
-                idASup = i;
+                pseudo = PlayerCheck.pseudo;
             }
         });
 
@@ -342,9 +345,8 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
         } else if (type == 'AGR') {
             GM_setValue(ptreAGRPlayerListJSON, targetJSON);
         }
-        //consoleDebug(type + " list updated (deletePlayerFromList fct)");
 
-        return 'Player was removed from ' + type + ' list';
+        return 'Player ' + pseudo + ' was removed from ' + type + ' list';
     } else {
         return 'Player is not part of ' + type + ' list';
     }
@@ -354,7 +356,7 @@ function deletePlayerFromList(playerId, playerPseudo, type) {
 function addPlayerToList(playerId, playerPseudo, type) {
 
     // Check if player is part of the list
-    if (!isPlayerInList(playerId, playerPseudo, type)) {
+    if (!isPlayerInTheList(playerId, type)) {
         // Get list content depending on if its PTRE or AGR list
         var targetJSON = '';
         if (type == 'PTRE') {
@@ -390,23 +392,30 @@ function addPlayerToList(playerId, playerPseudo, type) {
     }
 }
 
-function debugListContent(type = 'PTRE') {
+function debugListContent() {
 
     var targetJSON = '';
-    if (type == 'PTRE') {
-        targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-    } else if (type == 'AGR') {
-        targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
-    }
-    if (targetJSON != '') {
-        var targetList = JSON.parse(targetJSON);
-        consoleDebug(type + " list: ");
-        consoleDebug(targetList);
-    }
+
+    targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+    var targetList = JSON.parse(targetJSON);
+    console.log("AGR list: ");
+    console.log(targetList);
+
+    targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+    targetList = JSON.parse(targetJSON);
+    console.log("PTRE list: ");
+    console.log(targetList);
 }
 
 // Check is player is in list
-function isPlayerInList(playerId, playerPseudo, type = 'PTRE') {
+function isPlayerInLists(playerId) {
+    if (isPlayerInTheList(playerId, 'AGR') || isPlayerInTheList(playerId, 'PTRE')) {
+        return true;
+    }
+    return false;
+}
+
+function isPlayerInTheList(playerId, type = 'PTRE') {
 
     var targetJSON = '';
     if (type == 'PTRE') {
@@ -488,31 +497,34 @@ function addPTRELinkToAGRPinnedTarget() {
 }
 
 // Displays PTRE settings
-function displayPTREMenu() {
+function displayPTREMenu(mode = 'AGR') {
 
     if (!document.getElementById('btnSaveOptPTRE')) {
-        var useAGR = '';
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
+        // Get menu mode (what we will display)
+        var other_mode = 'PTRE';
+        if (mode == 'PTRE') {
+            other_mode = 'AGR';
+        }
+        // Check if AGR is enabled
+        var isAGROn;
+        if (isAGREnabled()) {
+            isAGROn = true;
+        } else {
+            isAGROn = false;
+            mode = 'PTRE';
+            other_mode = 'AGR';
+        }
         var divPTRE = '<div id="boxPTRESettings"><table border="1">';
-        divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
-
         // If AGR is detected
-        if (isAGREnabled()) {
-            // AGR Target List
-            divPTRE += '<tr><td class="td_cell">Use AGR Targets List:</td>';
-            useAGR = (GM_getValue(ptreUseAGRList, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREuseAGRCheck" type="checkbox" ';
-            divPTRE += useAGR;
-            divPTRE += ' />';
-            if (useAGR != 'checked') {
-                divPTRE += ' <span class="status_warning">(recommended)</span>';
-            }
-            divPTRE += '</td></tr>';
+        if (isAGROn) {
             // AGR Spy Table Improvement
             divPTRE += '<tr><td class="td_cell">Improve AGR Spy Table:</td>';
             var improveAGRSpyTable = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
@@ -523,8 +535,6 @@ function displayPTREMenu() {
                 divPTRE += ' <span class="status_warning">(recommended)</span>';
             }
             divPTRE += '</td></tr>';
-        } else {
-            divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled!</span></td></tr>';
         }
         // Console Debug mode
         divPTRE += '<tr><td class="td_cell">Enable Console Debug:</td>';
@@ -535,20 +545,27 @@ function displayPTREMenu() {
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Targets list</div></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">' + mode + ' Targets list</div></td><td class="td_cell" align="right">';
+        if (isAGROn) {
+            divPTRE += '<input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /> ';
+        }
+        divPTRE += '<input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
+        if (isAGROn) {
+            divPTRE += '<tr><td class="td_cell" align="center" colspan="2">(Both lists are used at same time)</td></tr>';
+        } else {
+            divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
+        }
         // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
         var targetJSON = '';
         var targetList = '';
-        var type = "PTRE";
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table>';
-        if (useAGR == 'checked' && isAGREnabled()) {
+        if (mode == 'AGR' && isAGROn) {
             updateLocalAGRList();
-            type = "AGR";
             targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
-            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div><div>Add targets via AGR lists</div></div></td></tr>';
+            //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div><div>Add targets via AGR lists</div></div></td></tr>';
         } else {
             targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using PTRE target lists</div><div>Add targets via galaxy view</div></td></tr>';
+            //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using PTRE target lists</div><div>Add targets via galaxy view</div></td></tr>';
         }
         if (targetJSON != '') {
             targetList = JSON.parse(targetJSON);
@@ -570,7 +587,7 @@ function displayPTREMenu() {
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
-            divPTRE += '<span class="status_negatif">Update EasyPTRE to <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">version ' + lastAvailableVersion + '</a></span>';
+            divPTRE += '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</a></span>';
         }
         divPTRE += '</span></td></tr>';
         // Check last script version
@@ -587,13 +604,51 @@ function displayPTREMenu() {
             document.getElementById('links').appendChild(eletementSetPTRE);
         }
 
+         // Action: Sync targets
+        document.getElementById('synctTargetsWithPTRE').addEventListener("click", function (event)
+        {
+            var AGRList = GM_getValue(ptreAGRPlayerListJSON, '');
+            var PTREList = GM_getValue(ptrePTREPlayerListJSON, '');
+            var targetJSON;
+            if (AGRList != '' && PTREList != '') {
+                targetJSON = JSON.parse(AGRList);
+                var targetJSONPTRE = JSON.parse(PTREList);
+                targetJSON = targetJSON.concat(targetJSONPTRE);
+            } else if (AGRList != '') {
+                targetJSON = JSON.parse(AGRList);
+            } else if (PTREList != '') {
+                targetJSON = JSON.parse(PTREList);
+            } else {
+                targetJSON = '{}';
+            }
+            fetch('https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK, 
+            { method:'POST', body:JSON.stringify(targetJSON) })
+            .then(response => response.json())
+            .then(data => {
+                if(data.code == 1) {
+                    var count = 0;
+                    var newTargetList = JSON.parse(JSON.stringify(data.targets_array));
+                    $.each(newTargetList, function(i, incomingPlayer) {
+                        if (!isPlayerInLists(incomingPlayer.player_id)) {
+                            addPlayerToList(incomingPlayer.player_id, incomingPlayer.pseudo, 'PTRE');
+                            count++;
+                        }
+                    });
+                    displayMessageInSettings(data.message + ' ' + count + ' added');
+                } else {
+                    displayMessageInSettings("Error during sync");
+                }
+            });
+        });
+
         // Action: Delete player
         if (targetList) {
             $.each(targetList, function(i, PlayerCheck) {
                 document.getElementById('removePlayerFromListBySettings_'+PlayerCheck.id).addEventListener("click", function (event)
                 {
                     // Delete player from list
-                    deletePlayerFromList(PlayerCheck.id, PlayerCheck.pseudo, type);
+                    var mess = deletePlayerFromList(PlayerCheck.id, PlayerCheck.pseudo, mode);
+                    displayMessageInSettings(mess);
                     document.getElementById('rawPLayer_'+PlayerCheck.id).remove();
                 });
             });
@@ -623,9 +678,8 @@ function displayPTREMenu() {
                 if (newTK != ptreStoredTK) {
                     GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
                 }
-                if (isAGREnabled()) {
-                    // Update AGR settings
-                    GM_setValue(ptreUseAGRList, document.getElementById('PTREuseAGRCheck').checked + '');
+                if (isAGROn) {
+                    // Update settings
                     GM_setValue(ptreImproveAGRSpyTable, document.getElementById('PTREImproveAGRSpyTable').checked + '');
                 }
                 // Update Console Debug Mode
@@ -645,14 +699,11 @@ function displayPTREMenu() {
             document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
             setTimeout(function() {displayPTREMenu();}, 100);
         });
-
-        // TODO
-        if (useAGR != 'checked') {
-            $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('checkedPlayer'+PlayerCheck.id).addEventListener("click", function (event)
-                { // On affiche les coords du joueur
-                    afficheCoordJoueur();
-                });
+        if (isAGROn) {
+            document.getElementById('btnRefreshOptPTRESwitchList').addEventListener("click", function (event)
+            {
+                document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
+                setTimeout(function() {displayPTREMenu(other_mode);}, 100);
             });
         }
     }
@@ -837,7 +888,7 @@ function addPTREStuffsToGalaxyPage() {
         consoleDebug("ADD DEBUG DIV");
     }
 
-    if (GM_getValue(ptreUseAGRList) == 'true'){
+    if (isAGREnabled()){
         return;
     }
 
@@ -869,7 +920,7 @@ function addPTREStuffsToGalaxyPage() {
                                 notIna = false;
                             }
                             //consoleDebug('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
-                            var isInList = isPlayerInList(playerId, playerPseudo);
+                            var isInList = isPlayerInTheList(playerId, 'PTRE');
                             if (!isInList && notIna) {
                                 var AddPlayerCheck = '<a class="tooltip" id="addcheckptr_'+nbBtnPTRE+'" title="Ajouter ce joueur a la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgAddPlayer + '" height="20" width="20"></a>';
                                 var btnAddPlayer = document.createElement("span");
@@ -955,13 +1006,11 @@ function displayGalaxyRender(data){
     var jsonSystem = '';
     var ptreStoredTK = GM_getValue(ptreTeamKey, '');
 
-    var type = 'PTRE';
-    if (isAGREnabled() && GM_getValue(ptreUseAGRList) == "true") {
-        type = 'AGR';
+    if (isAGREnabled()) {
         // Update AGR local list
         updateLocalAGRList();
     }
-    debugListContent(type);
+    //debugListContent();
 
     $.each(systemPos, function(pos, infoPos){
 
@@ -969,7 +1018,7 @@ function displayGalaxyRender(data){
             var player_id = infoPos.player['playerId'];
             var player_name = infoPos.player['playerName'];
             //consoleDebug(infoPos);
-            if (isPlayerInList(player_id, player_name, type)){
+            if (isPlayerInLists(player_id)){
                 var ina = infoPos.positionFilters;
 
                 if (player_id != 99999 && !/inactive_filter/.test(ina)){
