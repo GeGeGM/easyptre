@@ -160,6 +160,18 @@ GM_addStyle(`
     color:#bb6715;
     font-weight:bold;
 }
+.ptre_maintitle {
+    color: #299f9b;
+    font-weight:bold;
+    text-decoration: underline;
+}
+.ptre_title {
+    color: #299f9b;
+    font-weight:bold;
+}
+.td_cell {
+    padding: 3px;
+}
 #boxPTRESettings {
     padding:10px;
     z-index: 1000;
@@ -184,18 +196,6 @@ GM_addStyle(`
 #ptreSpanGalaxyMessageD {
     color:green;
     font-weight:bold;"
-}
-.ptre_maintitle {
-    color: #299f9b;
-    font-weight:bold;
-    text-decoration: underline;
-}
-.ptre_title {
-    color: #299f9b;
-    font-weight:bold;
-}
-.td_cell {
-    padding: 3px;
 }
 `);
 
