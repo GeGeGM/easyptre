@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.6.3
+// @version      0.6.4
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -197,6 +197,10 @@ GM_addStyle(`
     color:green;
     font-weight:bold;"
 }
+#targetDivSettings {
+    height: 400px;
+    overflow-y: scroll;
+  }
 `);
 
 // *** *** ***
@@ -536,6 +540,7 @@ function displayPTREMenu() {
         var targetJSON = '';
         var targetList = '';
         var type = "PTRE";
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table>';
         if (useAGR == 'checked' && isAGREnabled()) {
             updateLocalAGRList();
             type = "AGR";
@@ -557,6 +562,7 @@ function displayPTREMenu() {
                 });
             }
         }
+        divPTRE += '</table></div><td><tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
