@@ -618,7 +618,7 @@ function displayPTREMenu(mode = 'AGR') {
             } else {
                 targetJSON = '{}';
             }
-            fetch('https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK, 
+            fetch('https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&version=' + GM_info.script.version + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK, 
             { method:'POST', body:JSON.stringify(targetJSON) })
             .then(response => response.json())
             .then(data => {
