@@ -172,6 +172,7 @@ GM_addStyle(`
     padding: 3px;
 }
 #boxPTRESettings {
+    width: 400px;
     padding:10px;
     z-index: 1000;
     position: fixed;
@@ -515,9 +516,9 @@ function displayPTREMenu(mode = 'AGR') {
             mode = 'PTRE';
             other_mode = 'AGR';
         }
-        var divPTRE = '<div id="boxPTRESettings"><table border="1">';
-        divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings></div></td></tr>';
+        var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="status_warning"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
@@ -544,20 +545,16 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">' + mode + ' Targets list</div></td><td class="td_cell" align="right">';
+        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">' + mode + ' Targets list</div></td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
         if (isAGROn) {
-            divPTRE += '<input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /> ';
-        }
-        divPTRE += '<input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
-        if (isAGROn) {
-            divPTRE += '<tr><td class="td_cell" align="center" colspan="2">(Both lists are used at same time)</td></tr>';
+            divPTRE += '<tr><td class="td_cell"><i>Both lists are used at the same time</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
         } else {
             divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
         }
         // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
         var targetJSON = '';
         var targetList = '';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table width="90%">';
         if (mode == 'AGR' && isAGROn) {
             updateLocalAGRList();
             targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
@@ -572,9 +569,10 @@ function displayPTREMenu(mode = 'AGR') {
                 $.each(targetList, function(i, PlayerCheck) {
                     //consoleDebug(PlayerCheck);
                     divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">';
-                    divPTRE += '- <a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">'+PlayerCheck.pseudo+'</a></td><td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a>';
-                    divPTRE += ' <a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a>';
-                    divPTRE += '</td></tr>';
+                    divPTRE += '- <a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">'+PlayerCheck.pseudo+'</a></td>';
+                    divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td>';
+                    divPTRE += '<td class="td_cell" align="center"><a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a></td>';
+                    divPTRE += '</tr>';
                 });
             }
         }
@@ -1113,7 +1111,7 @@ function displayGalaxyRender(data){
             cache: false,
             success : function(reponse){
                 var reponseDecode = jQuery.parseJSON(reponse);
-                  displayPTREMessage(reponseDecode.message);
+                displayPTREMessage(reponseDecode.message);
                 displayPTREGalaxyMessage(reponseDecode.message);
             }
         });
