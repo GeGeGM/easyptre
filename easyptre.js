@@ -51,6 +51,7 @@ var ptreMessageDisplayTime = 5;
 var menuImageDisplayTime = 3;
 var ptreMenuDisplayTime = 1;
 var ptreTargetListMaxSize = 100;
+var ptreGalaxyLock = 0;
 // TODO: Set ptreAGRTargetListMaxSize
 
 // PTRE URLs
@@ -117,7 +118,7 @@ if (/component=galaxy/.test(location.href)){
     var mode = 1;
 
     if (mode == 1) {
-        var interSendActi = setInterval(sendGalaxyActivities, 1000);
+        //var interSendActi = setInterval(sendGalaxyActivities, 1000);
         var interListePlayer = setInterval(addPTREStuffsToGalaxyPage, 800);
     } else {
         setTimeout(addPTREStuffsToGalaxyPage, 800);
@@ -873,6 +874,10 @@ function addPTREStuffsToMessagesPage() {
 
 // Add buttons to galaxy
 function addPTREStuffsToGalaxyPage() {
+    if (ptreGalaxyLock == 1) {
+        return;
+    }
+    ptreGalaxyLock = 1;
     consoleDebug("addPTREStuffsToGalaxyPage: Updating galaxy");
 
     // Add PTRE debug message Div
@@ -882,74 +887,67 @@ function addPTREStuffsToGalaxyPage() {
         divPTREGalaxyMessageD.innerHTML = spanPTREGalaxyMessageD;
         divPTREGalaxyMessageD.id = 'ptreGalaxyMessageD';
         document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
-        consoleDebug("ADD DEBUG DIV");
+        consoleDebug("Adding Galaxy Message Div");
     }
 
-    if (isAGREnabled()){
+    /*if (isAGREnabled()){
         return;
-    }
+    }*/
+    //galaxyRow1
+    
+    for (let i = 1; i <= 15; i++) {
+        var line = document.getElementById('galaxyRow' + i);
+        console.log('Checking line ' + i);
+        //console.log(line);
+        var name_line = line.getElementsByClassName('ago_playername');
+        //console.log('ago_playername:');
+        //console.log(name_line);
+        for (let item of name_line) {
+            //console.log(item);
+            var name_line2 = item.getElementsByClassName('tooltipRel');
+            //console.log('name:');
+            //console.log(name_line2);
+            console.log(name_line2[0].innerText);
+        }
 
-    var galaxy = document.getElementsByClassName('galaxyRow ctContentRow ');
-    var nbBtnPTRE = 0;
-    if (!document.getElementById('spanAddPlayer0') && !document.getElementById('spanSuppPlayer0')) {
-        $.each(galaxy, function(nb, lignePosition) {
-            if (lignePosition.children[7] != '') {
-                var actionPos = lignePosition.children[7];
-                if (actionPos.innerHTML != '') {
-                    if (actionPos.children[1] && actionPos.children[1].getAttributeNode('data-playerid')) {
-                        var playerId = actionPos.children[1].getAttributeNode('data-playerid').value;
-                        var playerInfo = lignePosition.children[5];
-                        if (playerInfo.children[0]) {
-                            var playerPseudo = playerInfo.children[0].innerText;
-                            var notIna = true;
-                            var inaPlayer = playerInfo.children[1].innerText;
-                            if (playerPseudo == '') {
-                                playerPseudo = playerInfo.children[1].innerText;
-                                inaPlayer = playerInfo.children[2].innerText;
-                            }
-                            if (isAGREnabled()) {
-                                inaPlayer = playerInfo.children[0].innerText;
-                                inaPlayer = inaPlayer.substr(-4, 4);
-                                var indexPseudo = playerPseudo.search(/\n/);
-                                playerPseudo = playerPseudo.substr(0, indexPseudo);
-                            }
-                            if (inaPlayer == ' (i)' || inaPlayer == ' (I)') {
-                                notIna = false;
-                            }
-                            //consoleDebug('id : '+playerId+' pseudo :'+playerPseudo+' ina :'+inaPlayer);
-                            var isInList = isPlayerInTheList(playerId, 'PTRE');
-                            if (!isInList && notIna) {
-                                var AddPlayerCheck = '<a class="tooltip" id="addcheckptr_'+nbBtnPTRE+'" title="Ajouter ce joueur a la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgAddPlayer + '" height="20" width="20"></a>';
-                                var btnAddPlayer = document.createElement("span");
-                                btnAddPlayer.innerHTML = AddPlayerCheck;
-                                btnAddPlayer.id = 'spanAddPlayer'+nbBtnPTRE;
-                                lignePosition.children[7].appendChild(btnAddPlayer);//
-                                document.getElementById('addcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
-                                {
-                                    //alert('J ajoute le joueur '+playerPseudo+' '+playerId);
-                                    var retAdd = addPlayerToList(playerId, playerPseudo, 'PTRE');
-                                    displayPTREMessage(retAdd);
-                                }, true);
-                                nbBtnPTRE++;
-                            } else if (isInList) {
-                                var SupPlayerCheck = '<a class="tooltip" id="suppcheckptr_'+nbBtnPTRE+'" title="Retirer ce joueur de la liste PTRE" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="20" width="20"></a>';
-                                var btnSupPlayer = document.createElement("span");
-                                btnSupPlayer.innerHTML = SupPlayerCheck;
-                                btnSupPlayer.id = 'spanSuppPlayer'+nbBtnPTRE;
-                                lignePosition.children[7].appendChild(btnSupPlayer);//
-                                document.getElementById('suppcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
-                                {
-                                    var retSupp = deletePlayerFromList(playerId, playerPseudo, 'PTRE');
-                                    displayPTREMessage(retSupp);
-                                }, true);
-                                nbBtnPTRE++;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        name_line = line.getElementsByClassName('cellPlanet');
+        console.log('cellPlanet:');
+        console.log(name_line);
+
+        var activity = name_line[0].getElementsByClassName('activity');
+        console.log('activity:');
+        console.log(activity);
+        console.log(activity.innerText);
+        if (activity.lenght > 0) {
+            console.log(activity[0].innerText);
+        }
+        //console.log('ago_playername:');
+        //console.log(name_line);
+        /*for (let item of name_line) {
+            //console.log(item);
+            name_line2 = item.getElementsByClassName('activity');
+            //console.log('name:');
+            console.log(name_line2);
+            console.log(name_line2[0].innerText);
+        }*/
+
+
+
+
+        // https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
+        // const article = document.querySelector("#electric-cars");
+        // .getAttributeNode('data-playerid').value
+
+        /*var name_line2 = name_line.getElementsByClassName('tooltipRel')
+        console.log('name:');
+        console.log(name_line2);
+        console.log(name_line2.innerText);
+        console.log(name_line2.innerHTML);*/
+
     }
+    
+exit();
+    
 }
 
 // *** *** ***
