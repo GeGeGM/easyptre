@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.7.1
+// @version      0.7.2
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -28,6 +28,7 @@ var galaxyContentLinkTest = "https:\/\/"+serveur+"\/game\/index.php?page=ingame&
 var lastActivitiesGalaSent = 0;
 var lastActivitiesSysSent = 0;
 var versionCheckTimeout = 86400;
+var lastPTREActivityPushMicroTS = 0;
 
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
@@ -51,6 +52,7 @@ var ptreMessageDisplayTime = 5;
 var menuImageDisplayTime = 3;
 var ptreMenuDisplayTime = 1;
 var ptreTargetListMaxSize = 100;
+var ptrePushDelayMicroSec = 500;
 // TODO: Set ptreAGRTargetListMaxSize
 
 // PTRE URLs
@@ -115,7 +117,7 @@ if (!/page=standalone&component=empire/.test(location.href))
 if (/component=galaxy/.test(location.href)){
     consoleDebug("Galaxy detected: Setting routines");
     setTimeout(addPTREStuffsToGalaxyPage, 250);
-    setInterval(checkForNewSystem, 500);
+    setTimeout(checkForNewSystem, 500);
 }
 
 // Add PTRE send SR button to messages page
@@ -877,6 +879,18 @@ function addPTREStuffsToGalaxyPage() {
         document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
     }
 
+    // Add new system trigger
+    if (document.getElementById('galaxyHeader')) {
+        let spyTableObserver = new MutationObserver(checkForNewSystem);
+        var nodeSpyTable = document.getElementById('galaxyHeader');
+        spyTableObserver.observe(nodeSpyTable, {
+            attributes: true,
+            childList: true, // observer les enfants directs
+            subtree: true, // et les descendants aussi
+            characterDataOldValue: true // transmettre les anciennes données au callback
+        });
+    }
+
     // If AGR is not enabled: add PTRE stuffs to Galaxy page
     if (!isAGREnabled()){
         var galaxy = document.getElementsByClassName('galaxyRow ctContentRow ');
@@ -951,33 +965,34 @@ function addPTREStuffsToGalaxyPage() {
 // Checks if a new system is displayed
 // If yes, we will push activities
 function checkForNewSystem(){
-
+    // Get current params
     var systemElem = $("input#system_input")[0];
     var galaxyElem = $("input#galaxy_input")[0];
     var galaxy = galaxyElem.value;
     var system = systemElem.value;
 
-    if (galaxy == lastActivitiesGalaSent && system == lastActivitiesSysSent) {
+    // Check for wrong input
+    if (galaxy.length === 0 || $.isNumeric(+galaxy) === false || system.length === 0 || $.isNumeric(+system) === false) {
         return;
     }
 
-    lastActivitiesGalaSent = galaxy;
-    lastActivitiesSysSent = system;
+    var currentMicroTime = serverTime.getTime();
+    if (galaxy != lastActivitiesGalaSent || system != lastActivitiesSysSent || (currentMicroTime > lastPTREActivityPushMicroTS + ptrePushDelayMicroSec)) {
+        lastPTREActivityPushMicroTS = currentMicroTime;
+        lastActivitiesGalaSent = galaxy;
+        lastActivitiesSysSent = system;
+        console.log('[PTRE] [' + galaxy + ':' + system + "] Checking targets activities");
+        displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
 
-    if (0 === galaxy.length || $.isNumeric(+galaxy) === false) {
-        galaxy = 1;
+        // Get Galaxy System JSON
+        $.post(galaxyContentLinkTest, {
+            galaxy: galaxy,
+            system: system
+        }, processGalaxyData);
+    } else {
+        console.log("[PTRE] Cant push. Wait...");
+        displayPTREGalaxyMessage("Cant push. Wait...");
     }
-    if (0 === system.length || $.isNumeric(+system) === false) {
-        system = 1;
-    }
-    console.log('[PTRE][' + galaxy + ':' + system + "] Checking targets activities");
-    displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
-
-    // Get Galaxy System JSON
-    $.post(galaxyContentLinkTest, {
-        galaxy: galaxy,
-        system: system
-    }, processGalaxyData);
 }
 
 function processGalaxyData(data){
@@ -1103,7 +1118,7 @@ function processGalaxyData(data){
                 displayPTREGalaxyMessage(reponseDecode.message);
             }
         });
-        console.log('[PTRE] Pushing activities');
+        console.log('[PTRE] [' + galaxy + ':' + system + '] Pushing activities');
     } else {
         displayPTREGalaxyMessage("No target in this system");
     }
