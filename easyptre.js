@@ -518,7 +518,6 @@ function displayPTREMenu(mode = 'AGR') {
         var divPTRE = '<div id="boxPTRESettings"><table border="1">';
         divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings></div></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="msgErrorPTRESettings"></span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
@@ -684,14 +683,14 @@ function displayPTREMenu(mode = 'AGR') {
                 }
                 // Update Console Debug Mode
                 GM_setValue(ptreEnableConsoleDebug, document.getElementById('PTREEnableConsoleDebug').checked + '');
-                // Update menu image and remove it after 3 sec
+                // Update menu image and remove it after few sec
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
-                // Display OK message and remove div after 5 sec
-                document.getElementById('msgErrorPTRESettings').innerHTML = 'Team Key Format OK';
+                // Display OK message and remove div after few sec
+                displayMessageInSettings('Team Key Format OK');
                 setTimeout(function() {document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));}, ptreMenuDisplayTime * 1000);
             } else {
-                document.getElementById('msgErrorPTRESettings').innerHTML = 'Wrong Team Key Format';
+                displayMessageInSettings('Wrong Team Key Format');
             }
         });
         document.getElementById('btnRefreshOptPTRE').addEventListener("click", function (event)

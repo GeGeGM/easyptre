@@ -36,3 +36,7 @@ Only few PTRE features are available in EasyPTRE which are:
 ## Contribution
 
 If interested, you may contribute to EasyPTRE. You can also contact me here: [PTRE Discord server](https://discord.gg/WsJGC9G).
+
+## Donation
+
+Since November 2023, you may [donate to support PTRE](https://ko-fi.com/ptreforogame). Thanks.
