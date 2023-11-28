@@ -540,7 +540,7 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">' + mode + ' Targets list</div></td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span> (<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage list</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
         if (isAGROn) {
             divPTRE += '<tr><td class="td_cell"><i>Both lists are used at the same time</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
         } else {
