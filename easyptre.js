@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.7.2
+// @version      0.7.3
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -35,6 +35,7 @@ var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
 var ptreImproveAGRSpyTable = "ptre-" + country + "-" + universe + "-ImproveAGRSpyTable";
 var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
+var ptreAGRPrivatePlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPrivatePlayerListJSON";
 var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsoleDebug";
 var ptreLastAvailableVersion = "ptre-" + country + "-" + universe + "-LastAvailableVersion";
 var ptreLastAvailableVersionRefresh = "ptre-" + country + "-" + universe + "-LastAvailableVersionRefresh";
@@ -162,6 +163,9 @@ GM_addStyle(`
 .ptre_title {
     color: #299f9b;
     font-weight:bold;
+}
+.ptre_tab_title {
+    color: #299f9b;
 }
 .td_cell {
     padding: 3px;
@@ -388,6 +392,63 @@ function addPlayerToList(playerId, playerPseudo, type) {
     }
 }
 
+// This list contains targets that should not be shared to PTRE Team
+function tooglePrivatePlayer(playerId) {
+    var targetJSON = '';
+    var targetList = [];
+    var status = '';
+    targetJSON = GM_getValue(ptreAGRPrivatePlayerListJSON , '');
+
+    idASup = -1;
+    if (targetJSON != '') {
+        targetList = JSON.parse(targetJSON);
+
+        $.each(targetList, function(i, PlayerCheck) {
+            if (PlayerCheck.id == playerId) {
+                // Present => Delete
+                idASup = i;
+            }
+        });
+        if (idASup != -1) {
+            targetList.splice(idASup, 1);
+            status = 'shareable (sync to share)';
+            consoleDebug("Deleting private player (" + idASup + "): " + playerId);
+        }
+    }
+    if (idASup == -1) {
+        var player = {id: playerId};
+        targetList.push(player);
+        status = 'private';
+        consoleDebug("Adding private player " + playerId);
+    }
+    // Save new list
+    targetJSON = JSON.stringify(targetList);
+    GM_setValue(ptreAGRPrivatePlayerListJSON, targetJSON);
+
+    return status;
+}
+
+function isTargetPrivate(playerId) {
+    var targetJSON = '';
+    var targetList = [];
+    targetJSON = GM_getValue(ptreAGRPrivatePlayerListJSON , '');
+
+    var found = 0;
+    if (targetJSON != '') {
+        targetList = JSON.parse(targetJSON);
+
+        $.each(targetList, function(i, PlayerCheck) {
+            if (PlayerCheck.id == playerId) {
+                found = 1;
+            }
+        });
+        if (found == 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function debugListContent() {
 
     var targetJSON = '';
@@ -540,9 +601,9 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span> (<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage list</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
         if (isAGROn) {
-            divPTRE += '<tr><td class="td_cell"><i>Both lists are used at the same time</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
+            divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
         } else {
             divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
         }
@@ -550,6 +611,11 @@ function displayPTREMenu(mode = 'AGR') {
         var targetJSON = '';
         var targetList = '';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table width="90%">';
+        if (mode == 'AGR') {
+            divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+        } else {
+            divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+        }
         if (mode == 'AGR' && isAGROn) {
             updateLocalAGRList();
             targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
@@ -566,6 +632,13 @@ function displayPTREMenu(mode = 'AGR') {
                     divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">';
                     divPTRE += '- <a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">'+PlayerCheck.pseudo+'</a></td>';
                     divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td>';
+                    if (mode == 'AGR') {
+                        var checked = '';
+                        if (isTargetPrivate(PlayerCheck.id)) {
+                            checked = ' checked';
+                        }
+                        divPTRE += '<td class="td_cell" align="center"><input class="sharedTargetStatus" id="'+PlayerCheck.id+'" type="checkbox"' + checked + '></td>';
+                    }
                     divPTRE += '<td class="td_cell" align="center"><a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a></td>';
                     divPTRE += '</tr>';
                 });
@@ -596,25 +669,50 @@ function displayPTREMenu(mode = 'AGR') {
             document.getElementById('links').appendChild(eletementSetPTRE);
         }
 
+        var targetStatus = document.getElementsByClassName('sharedTargetStatus');
+        $.each(targetStatus, function(nb, target) {
+            document.getElementById(target.id).addEventListener("click", function (event)
+            {
+                var status = tooglePrivatePlayer(target.id);
+                displayMessageInSettings('Target is now ' + status);
+            });
+        });
+
          // Action: Sync targets
         document.getElementById('synctTargetsWithPTRE').addEventListener("click", function (event)
         {
-            var AGRList = GM_getValue(ptreAGRPlayerListJSON, '');
-            var PTREList = GM_getValue(ptrePTREPlayerListJSON, '');
-            var targetJSON;
-            if (AGRList != '' && PTREList != '') {
-                targetJSON = JSON.parse(AGRList);
-                var targetJSONPTRE = JSON.parse(PTREList);
-                targetJSON = targetJSON.concat(targetJSONPTRE);
-            } else if (AGRList != '') {
-                targetJSON = JSON.parse(AGRList);
-            } else if (PTREList != '') {
-                targetJSON = JSON.parse(PTREList);
+            var AGRJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+            var PTREJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+            var targetList = [];
+            var targetListTemp;
+            var player;
+            var nb_private = 0;
+
+            if (AGRJSON != '' && PTREJSON != '') {
+                targetListTemp = JSON.parse(AGRJSON);
+                var targetListPTRE = JSON.parse(PTREJSON);
+                targetListTemp = targetListTemp.concat(targetListPTRE);
+            } else if (AGRJSON != '') {
+                targetListTemp = JSON.parse(AGRJSON);
+            } else if (PTREJSON != '') {
+                targetListTemp = JSON.parse(PTREJSON);
             } else {
-                targetJSON = '{}';
+                targetListTemp = [];
             }
+
+            targetListTemp.forEach(function(item, index, object) {
+                console.log(item.id + ' ' + item.pseudo);
+                if (isTargetPrivate(item.id)) {
+                    consoleDebug("Ignoring " + item.pseudo);
+                    nb_private++;
+                } else {
+                    player = {id: item.id, pseudo: item.pseudo};
+                    targetList.push(player);
+                }
+            });
+
             fetch('https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&version=' + GM_info.script.version + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK, 
-            { method:'POST', body:JSON.stringify(targetJSON) })
+            { method:'POST', body:JSON.stringify(targetList) })
             .then(response => response.json())
             .then(data => {
                 if(data.code == 1) {
@@ -626,9 +724,9 @@ function displayPTREMenu(mode = 'AGR') {
                             count++;
                         }
                     });
-                    displayMessageInSettings(data.message + ' ' + count + ' added');
+                    displayMessageInSettings(nb_private + ' private targets ignored. ' + data.message + ' ' + count + ' new target added.');
                 } else {
-                    displayMessageInSettings("Error during sync");
+                    displayMessageInSettings(data.message);
                 }
             });
         });
