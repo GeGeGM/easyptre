@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.7.3
+// @version      0.7.4
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -510,8 +510,8 @@ function getAGRPlayerIDFromPseudo(playerPseudo) {
 
 // Copy AGR internal players list to local AGR list
 // AGR list IDs
-// Friend: 52
-// Trader: 55 => YES
+// Friend: 52 => NO
+// Trader: 55 => NO
 // Watch: 62 => YES
 // Miner: 64 => YES
 // Target: 66 => YES
@@ -526,7 +526,7 @@ function updateLocalAGRList() {
                 var jsonDataAgo = JSON.parse(txtjsonDataAgo);
                 var token = jsonDataAgo.action.token;
                 // Do not add friends to target list
-                if (token == 55 || token == 62 || token == 64 || token == 66 || token == 67) {
+                if (token == 62 || token == 64 || token == 66 || token == 67) {
                     var IdPlayer = jsonDataAgo.action.id;
                     var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
                     //consoleDebug('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ') | token:' + token + ')');
@@ -724,7 +724,7 @@ function displayPTREMenu(mode = 'AGR') {
                             count++;
                         }
                     });
-                    displayMessageInSettings(nb_private + ' private targets ignored. ' + data.message + ' ' + count + ' new target added.');
+                    displayMessageInSettings(nb_private + ' private targets ignored. ' + data.message + ' ' + count + ' new targets added.');
                 } else {
                     displayMessageInSettings(data.message);
                 }
