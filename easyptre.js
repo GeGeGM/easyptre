@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.7.4
+// @version      0.7.5
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -58,8 +58,9 @@ var ptrePushDelayMicroSec = 500;
 
 // PTRE URLs
 var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool='+toolName;
-var urlPTREPushActivity = "https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool="+toolName
-var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js'
+var urlPTREPushActivity = 'https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool='+toolName;
+var urlPTRESyncTargets = 'https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName;
+var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js';
 
 // *** *** ***
 // MAIN EXEC
@@ -711,7 +712,7 @@ function displayPTREMenu(mode = 'AGR') {
                 }
             });
 
-            fetch('https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&version=' + GM_info.script.version + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK, 
+            fetch(urlPTRESyncTargets + '&version=' + GM_info.script.version + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK,
             { method:'POST', body:JSON.stringify(targetList) })
             .then(response => response.json())
             .then(data => {
