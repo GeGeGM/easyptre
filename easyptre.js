@@ -243,6 +243,20 @@ function isAGREnabled() {
     return false;
 }
 
+// Convert planets activities to OGL - PTRE format
+function convertActivityToOGLFormat(showActivity, idleTime) {
+    console.log(showActivity + " / " + idleTime);
+    if (showActivity == '15') {
+        return '*';
+    } else if (showActivity == '60') {
+        return idleTime;
+    } else if (!showActivity) {
+        console.log("false");
+        return '60';
+    }
+    return '60';
+}
+
 function buildPTRELinkToPlayer(playerID) {
     return 'https://ptre.chez.gg/?country=' + country + '&univers=' + universe + '&player_id=' + playerID;
 }
@@ -1129,17 +1143,7 @@ function processGalaxyData(data){
                     var planete = infoPos.planets;
                     var planet_id = planete[0]['planetId'];
                     var planet_name = planete[0]['planetName'];
-                    var planet_acti = planete[0]['activity']['showActivity'];
-
-                    // Update activities to OGLight format
-                    if (planet_acti == '15') {
-                        planet_acti = '*';
-                    } else if (planet_acti == '60') {
-                        planet_acti = planete[0]['activity']['idleTime'];
-                    } else if (!planet_acti) {
-                        planet_acti = '60';
-                    }
-                    //consoleDebug("PLANET: " + planete);
+                    var planet_acti = convertActivityToOGLFormat(planete[0]['activity']['showActivity'], planete[0]['activity']['idleTime']);
 
                     // If their is a debris fiel AND/OR a moon
                     if (planete.length > 1) {
@@ -1154,15 +1158,7 @@ function processGalaxyData(data){
                             //consoleDebug("MOON => " + planete[1]);
                             var lune_id = planete[moonIndex]['planetId'];
                             var lune_size = planete[moonIndex]['size'];
-                            var lune_acti = planete[moonIndex]['activity']['showActivity'];
-                            // Update activities to OGLight format
-                            if (lune_acti == '15') {
-                                lune_acti = '*';
-                            } else if (lune_acti == '60') {
-                                lune_acti = planete[moonIndex]['activity']['idleTime'];
-                            } else if (!lune_acti) {
-                                lune_acti = '60';
-                            }
+                            var lune_acti = convertActivityToOGLFormat(planete[moonIndex]['activity']['showActivity'], planete[moonIndex]['activity']['idleTime']);
                             var jsonLune = {id:lune_id, size:lune_size, activity:lune_acti};
                             //jsonLune = JSON.stringify(jsonLune);
                             //consoleDebug("MOON: " + jsonLune);
