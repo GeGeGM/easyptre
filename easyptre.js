@@ -57,9 +57,9 @@ var ptrePushDelayMicroSec = 500;
 // TODO: Set ptreAGRTargetListMaxSize
 
 // PTRE URLs
-var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool='+toolName;
-var urlPTREPushActivity = 'https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool='+toolName;
-var urlPTRESyncTargets = 'https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName;
+var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool=' + toolName;
+var urlPTREPushActivity = 'https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
+var urlPTRESyncTargets = 'https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js';
 
 // *** *** ***
@@ -245,13 +245,11 @@ function isAGREnabled() {
 
 // Convert planets activities to OGL - PTRE format
 function convertActivityToOGLFormat(showActivity, idleTime) {
-    console.log(showActivity + " / " + idleTime);
     if (showActivity == '15') {
         return '*';
     } else if (showActivity == '60') {
         return idleTime;
     } else if (!showActivity) {
-        console.log("false");
         return '60';
     }
     return '60';
@@ -726,7 +724,7 @@ function displayPTREMenu(mode = 'AGR') {
                 }
             });
 
-            fetch(urlPTRESyncTargets + '&version=' + GM_info.script.version + '&country=' + country + '&univers=' + universe + '&team_key=' + ptreStoredTK,
+            fetch(urlPTRESyncTargets + '&version=' + GM_info.script.version + '&team_key=' + ptreStoredTK,
             { method:'POST', body:JSON.stringify(targetList) })
             .then(response => response.json())
             .then(data => {
