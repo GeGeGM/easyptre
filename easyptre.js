@@ -931,6 +931,8 @@ function addPTREStuffsToMessagesPage() {
         });
     }
 
+    console.log("Messages");
+
     // Add PTRE button to messages
     if (document.getElementById('subtabs-nfFleet20')) {
         if (/ui-tabs-active/.test(document.getElementById('subtabs-nfFleet20').className) && !document.getElementById('PTREspan')) {
@@ -971,6 +973,60 @@ function addPTREStuffsToMessagesPage() {
                     }
                 });
             }
+        }
+    }
+
+    // Send counter-spies
+    if (document.getElementsByClassName('espionageDefText')) {
+        
+        espionageDefText = document.getElementsByClassName('ui-tabs-panel');
+        for (var i = 0; i < espionageDefText.length; i++) {
+            console.log(espionageDefText[i]);
+            var temp = espionageDefText[i].querySelector('.msg_date');
+            if (temp) {
+                console.log("Date: " + temp.innerHTML);
+                //msg_date fright
+            }
+            var temp2 = espionageDefText[i].querySelector('.espionageDefText a');
+            if (temp2) {
+                //console.log(temp2);
+                //msg_date fright
+                var params = new URLSearchParams(temp2.getAttribute('href'));
+                var galaxy = params.get('galaxy') || "0";
+                var system = params.get('system') || "0";
+                var position = params.get('position') || "0";
+                console.log("Coord: " + galaxy + ":" + system + ":" + position);
+                
+
+                
+            }
+
+            let playerID = espionageDefText[i].querySelector('[data-playerId]').getAttribute('data-playerId');
+            console.log("PID: " + playerID);
+            /*var temp3 = espionageDefText[i].querySelector('.sendMail a');
+            if (temp3) {
+                console.log(temp3);
+
+                let playerID = temp3.getAttribute('data-playerId');
+                console.log("PID: " + playerID);
+
+            } else {
+                console.log("Cant find elem");
+            }*/
+
+            
+            /*var temp4 = espionageDefText[i].getElementsByClassName('msg_content');
+            if (temp4) {
+                console.log("=>");
+                console.log(temp4);
+                var link = temp4[0].querySelector('a');
+                for (var j = 0; j < link.length; j++) {
+                    console.log(link[j]);
+                }
+
+            } else {
+                console.log("Cant find msg_content");
+            }*/
         }
     }
 }
