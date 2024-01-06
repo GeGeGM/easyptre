@@ -464,7 +464,7 @@ function addPlayerToList(playerId, playerPseudo, type) {
             targetList = JSON.parse(targetJSON);
         }
         if (type == 'PTRE' && targetList.length >= ptreTargetListMaxSize) {
-            return type + ' targets list is full, please remove a target';
+            return [0, type + ' targets list is full, please remove a target'];
         } else {
             // Add player to list
             var player = {id: playerId, pseudo: playerPseudo};
@@ -472,17 +472,19 @@ function addPlayerToList(playerId, playerPseudo, type) {
 
             // Save list
             targetJSON = JSON.stringify(targetList);
+            var ret_code = 0;
             if (type == 'PTRE') {
                 GM_setValue(ptrePTREPlayerListJSON, targetJSON);
             } else if (type == 'AGR') {
                 GM_setValue(ptreAGRPlayerListJSON, targetJSON);
+                // We want to detect and notify when an AGR target is added
+                ret_code = 1;
             }
             consoleDebug('Player ' + playerPseudo + ' has been added to ' + type + ' list');
-            //consoleDebug(type + " list updated (addPlayerToList fct)");
-            return 'Player has been added to ' + type + ' list';
+            return [ret_code, 'Player has been added to ' + type + ' list'];
         }
     } else {
-        return 'Player is already in ' + type + ' list';
+        return [0, 'Player is already in ' + type + ' list'];
     }
 }
 
@@ -613,6 +615,7 @@ function getAGRPlayerIDFromPseudo(playerPseudo) {
 function updateLocalAGRList() {
     var tabAgo = document.getElementsByClassName('ago_panel_overview');
 
+    var count = 0;
     if (tabAgo && tabAgo[1] && tabAgo[1].children) {
         $.each(tabAgo[1].children, function(i, ligneJoueurAGR) {
             if (ligneJoueurAGR.getAttributeNode('ago-data')) {
@@ -624,10 +627,14 @@ function updateLocalAGRList() {
                     var IdPlayer = jsonDataAgo.action.id;
                     var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
                     //consoleDebug('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ') | token:' + token + ')');
-                    addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
+                    var ret = addPlayerToList(IdPlayer, PseudoPlayer, 'AGR');
+                    count+= ret[0];
                 }
             }
         });
+    }
+    if (count > 0) {
+        displayPTREPopUpMessage(count + ' targets added to AGR list');
     }
 }
 
@@ -1125,7 +1132,7 @@ function displayHelp() {
     content+= '<br><br><span class="ptre_tab_title">Team Key setting</span><br><br>To use it, you need to create a Team on <a href="https://ptre.chez.gg?page=team" target="_blank">PTRE website</a> and add Team Key to EasyPTRE settings.<br>PTRE Team Key should look like: TM-XXXX-XXXX-XXXX-XXXX. Create your Team or ask your teammates for it.';
     content+= '<br><br><span class="ptre_tab_title">Spy report push</span><br><br>You can push spy reports from the messages page or when opening a spy report. Spy report will be shared to your Team and over Discord (if <a href="https://ptre.chez.gg/?page=discord_integration" target="_blank">configuration</a> is done).';
     content+= '<br><br><span class="ptre_tab_title">Target lists</span><br><br>EasyPTRE targets lists determines players that will be activity-tracked when exploring the galaxy. ';
-    content+= 'EasyPTRE manages two targets lists that works at same time (both lists are tracked):<br>- AGR target list: it is based on you AGR left pannel: Target, To attack, Watch, Miner. It ignores Friends and traders. To update this list, open your several AGR target pannels<br>- PTRE target list: this list containes targets shared by your team';
+    content+= 'EasyPTRE manages two targets lists that works at same time (both lists are tracked):<br>- AGR target list: it is based on you AGR left pannel: Target, To attack, Watch, Miner. It ignores Friends and traders. To update this list, open your AGR target pannels<br>- PTRE target list: this list containes targets shared by your team';
     content+= '<br><br>You can sync your target lists with your teammates (you may ignore some of your targets in order to NOT share them with friends and keep it to yourself).';
     content+= '<br><br>Common targets list (for your PTRE Team) can be configured <a href="https://ptre.chez.gg/?page=players_list" target="_blank">on PTRE players list page</a>.';
     content+= '<br><br><span class="ptre_tab_title">Need more help?</span><br><br>You can get some help on <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a>, come and ask us.';
@@ -1203,7 +1210,7 @@ function addPTREStuffsToGalaxyPage() {
                                     {
                                         //alert('J ajoute le joueur '+playerPseudo+' '+playerId);
                                         var retAdd = addPlayerToList(playerId, playerPseudo, 'PTRE');
-                                        displayPTREPopUpMessage(retAdd);
+                                        displayPTREPopUpMessage(retAdd[1]);
                                     }, true);
                                     nbBtnPTRE++;
                                 } else if (isInList) {
