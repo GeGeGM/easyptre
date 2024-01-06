@@ -60,6 +60,7 @@ var ptrePushDelayMicroSec = 500;
 var urlPTREImportSR    = 'https://ptre.chez.gg/scripts/oglight_import.php?tool=' + toolName;
 var urlPTREPushActivity = 'https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlPTRESyncTargets = 'https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
+var urlPTREGetPlayerInfos = 'https://ptre.chez.gg/scripts/oglight_get_player_infos.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js';
 
 // *** *** ***
@@ -171,15 +172,81 @@ GM_addStyle(`
 .td_cell {
     padding: 3px;
 }
+.ptre_ship {
+    background-image: url('https://gf3.geo.gfsrv.net/cdn84/3b19b4263662f5a383524052047f4f.png');
+    background-repeat: no-repeat;
+    height: 28px;
+    width: 28px;
+    display: block;
+}
+.ptre_ship_202 {
+    background-position: 0 0;
+}
+.ptre_ship_203 {
+    background-position: -28px 0;
+}
+.ptre_ship_204 {
+    background-position: -56px 0;
+}
+.ptre_ship_205 {
+    background-position: -84px 0;
+}
+.ptre_ship_206 {
+    background-position: -112px 0;
+}
+.ptre_ship_207 {
+    background-position: -140px 0;
+}
+.ptre_ship_208 {
+    background-position: -168px 0;
+}
+.ptre_ship_209 {
+    background-position: -196px 0;
+}
+.ptre_ship_210 {
+    background-position: -224px 0;
+}
+.ptre_ship_211 {
+    background-position: -252px 0;
+}
+.ptre_ship_212 {
+    background-position: -280px 0;
+}
+.ptre_ship_213 {
+    background-position: -308px 0;
+}
+.ptre_ship_214 {
+    background-position: -336px 0;
+}
+.ptre_ship_215 {
+    background-position: -364px 0;
+}
+.ptre_ship_217 {
+    background-position: -448px 0;
+}
+.ptre_ship_218 {
+    background-position: -392px 0;
+}
+.ptre_ship_219 {
+    background-position: -420px 0;
+}
+.td_ship {
+    padding: 3px;
+}
+.button {
+    cursor: pointer;
+    display: inline-block;
+    background-color: #8495b5;
+}
 #boxPTRESettings {
-    width: 400px;
+    width: 500px;
     padding:10px;
     z-index: 1000;
     position: fixed;
     bottom: 30px;
     right: 10px;
     border: solid black 2px;
-    background:rgba(0,26,52,0.8);
+    background:rgba(0,26,52,0.95);
 }
 #boxPTREMessage {
     padding:10px;
@@ -188,7 +255,17 @@ GM_addStyle(`
     bottom: 30px;
     right: 10px;
     border: solid black 2px;
-    background:rgba(0,26,52,0.8);"
+    background:rgba(0,26,52,0.95);
+}
+#boxPTREInfos {
+    width: 300px;
+    padding:10px;
+    z-index: 1000;
+    position: fixed;
+    bottom: 30px;
+    right: 540px;
+    border: solid black 2px;
+    background:rgba(0,26,52,0.95);
 }
 #btnSaveOptPTRE {
     cursor:pointer;
@@ -315,6 +392,10 @@ function displayMessageInSettings(message) {
     if (document.getElementById('messageDivInSettings')) {
         document.getElementById('messageDivInSettings').innerHTML = message;
     }
+}
+
+function setNumber(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
 // *** *** ***
@@ -586,10 +667,10 @@ function displayPTREMenu(mode = 'AGR') {
             other_mode = 'AGR';
         }
         var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" class="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" class="button" value="CLOSE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="status_warning"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" value="SAVE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" class="button" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
         // If AGR is detected
@@ -614,9 +695,9 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += '</td></tr>';
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" value="SYNC WITH PTRE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" class="button" value="SYNC TARGETS" /></td></tr>';
         if (isAGROn) {
-            divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
+            divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" class="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
         } else {
             divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
         }
@@ -625,9 +706,9 @@ function displayPTREMenu(mode = 'AGR') {
         var targetList = '';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table width="90%">';
         if (mode == 'AGR') {
-            divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+            divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
         } else {
-            divPTRE += '<tr><td class="td_cell" align="center"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+            divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
         }
         if (mode == 'AGR' && isAGROn) {
             updateLocalAGRList();
@@ -642,9 +723,9 @@ function displayPTREMenu(mode = 'AGR') {
             if (targetList) {
                 $.each(targetList, function(i, PlayerCheck) {
                     //consoleDebug(PlayerCheck);
-                    divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">';
-                    divPTRE += '- <a id="checkedPlayer'+PlayerCheck.id+'" idplayer="'+PlayerCheck.id+'" cursor:pointer;">'+PlayerCheck.pseudo+'</a></td>';
-                    divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">PTRE Profile</a></td>';
+                    divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">- '+PlayerCheck.pseudo+'</td>';
+                    divPTRE += '<td class="td_cell" align="center"><input id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button" value="FLEET"></td>';
+                    divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
                     if (mode == 'AGR') {
                         var checked = '';
                         if (isTargetPrivate(PlayerCheck.id)) {
@@ -661,7 +742,7 @@ function displayPTREMenu(mode = 'AGR') {
 
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <input id="forceCheckVersionButton" type="button" value="CHECK" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <input id="forceCheckVersionButton" type="button" class="button" value="CHECK" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
@@ -714,7 +795,7 @@ function displayPTREMenu(mode = 'AGR') {
             }
 
             targetListTemp.forEach(function(item, index, object) {
-                console.log(item.id + ' ' + item.pseudo);
+                consoleDebug(item.id + ' ' + item.pseudo);
                 if (isTargetPrivate(item.id)) {
                     consoleDebug("Ignoring " + item.pseudo);
                     nb_private++;
@@ -744,6 +825,16 @@ function displayPTREMenu(mode = 'AGR') {
             });
         });
 
+        // Action: Player Infos
+        if (targetList) {
+            $.each(targetList, function(i, PlayerCheck) {
+                document.getElementById('btnGetPlayerInfos'+PlayerCheck.id).addEventListener("click", function (event)
+                {
+                    getPlayerInfos(PlayerCheck.id, PlayerCheck.pseudo);
+                });
+            });
+        }
+
         // Action: Delete player
         if (targetList) {
             $.each(targetList, function(i, PlayerCheck) {
@@ -768,6 +859,9 @@ function displayPTREMenu(mode = 'AGR') {
         document.getElementById('btnCloseOptPTRE').addEventListener("click", function (event)
         {
             document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
+            if (document.getElementById('divPTREInfos')) {
+                document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
+            }
         });
 
         // Action: Save
@@ -971,6 +1065,52 @@ function addPTREStuffsToMessagesPage() {
             }
         }
     }
+}
+
+// This function creates empty Info Box.
+// Its ready to be updated
+function setupInfoBox() {
+    if (document.getElementById('divPTREInfos')) {
+        document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
+    }
+    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><input id="btnCloseInfosPTRE" type="button" class="button" value="CLOSE" /><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="status_warning">LOADING...</span><center><br><br><br></div></td></tr></table>';
+    var eletementSetPTRE = document.createElement("div");
+    eletementSetPTRE.innerHTML = divPTRE;
+    eletementSetPTRE.id = 'divPTREInfos';
+
+    if (document.getElementById('ingamepage')) {
+        document.getElementById('ingamepage').appendChild(eletementSetPTRE);
+    }
+
+    document.getElementById('btnCloseInfosPTRE').addEventListener("click", function (event)
+    {
+        document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
+    });
+}
+
+// This function calls PTRE backend to get player informations
+// And sends results to Info Box
+function getPlayerInfos(playerID, pseudo) {
+    setupInfoBox();
+
+    $.ajax({
+        dataType: "json",
+        url: urlPTREGetPlayerInfos + '&team_key=' + GM_getValue(ptreTeamKey, '') + '&player_id=' + playerID + '&pseudo=' + pseudo + '&noacti=yes',
+        success: function(reponse) {
+            if (reponse.code == 1) {
+                var content = '<center><table width="90%"><tr><td class="td_ship ptre_tab_title" align="center">' + pseudo + '</td><td class="td_ship ptre_tab_title" align="center">' + setNumber(reponse.top_sr_fleet_points) + ' fleet points</td></tr>';
+                content+= '<tr><td class="td_ship" align="center">[<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PROFILE</a>]</td><td class="td_ship" align="center">[<a href="' + reponse.top_sr_link + '" target="_blank">BEST REPORT</a>]</td></tr>';
+                content+= '<tr><td class="td_ship" colspan="2"><hr></td></tr>';
+                reponse.fleet_json.forEach(function(item, index, object) {
+                    content+= '<tr><td class="td_ship" align="center"><span class="ptre_ship ptre_ship_' + item.ship_type + '"></td><td class="td_ship" align="center"></span><b>' + setNumber(item.count) + '</b></td></tr>';
+                });
+                content+= '</table></center>';
+                document.getElementById('infoBoxContent').innerHTML = content;
+            } else {
+                document.getElementById('infoBoxContent').innerHTML = '<span class="status_negatif">' + reponse.message + '</span>';
+            }
+        }
+    });
 }
 
 // *** *** ***
