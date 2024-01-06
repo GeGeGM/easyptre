@@ -258,7 +258,7 @@ GM_addStyle(`
     background:rgba(0,26,52,0.95);
 }
 #boxPTREInfos {
-    width: 300px;
+    min-width: 300px;
     padding:10px;
     z-index: 1000;
     position: fixed;
@@ -667,7 +667,7 @@ function displayPTREMenu(mode = 'AGR') {
             other_mode = 'AGR';
         }
         var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRE" type="button" class="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" class="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnHelpPTRE" type="button" class="button" value="HELP" /> <input id="btnRefreshOptPTRE" type="button" class="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" class="button" value="CLOSE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="status_warning"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" class="button" value="SAVE" /></td></tr>';
@@ -834,6 +834,12 @@ function displayPTREMenu(mode = 'AGR') {
                 });
             });
         }
+
+        // Action: Help
+        document.getElementById('btnHelpPTRE').addEventListener("click", function (event)
+        {
+            displayHelp();
+        });
 
         // Action: Delete player
         if (targetList) {
@@ -1111,6 +1117,20 @@ function getPlayerInfos(playerID, pseudo) {
             }
         }
     });
+}
+
+function displayHelp() {
+    setupInfoBox();
+    content = '<span class="ptre_maintitle">EasyPTRE Help</span><br><br><span class="ptre_tab_title">Purpose</span><br><br>EasyPTRE works as a side-car of AGR in order to enable PTRE basic features. Once configured, you will be able to: <br>- Push and share spy reports<br>- Display player top fleet from PTRE<br>- Track targets activities and check results on PTRE website<br>- Sync targets list with your Team';
+    content+= '<br><br><span class="ptre_tab_title">Team Key setting</span><br><br>To use it, you need to create a Team on <a href="https://ptre.chez.gg?page=team" target="_blank">PTRE website</a> and add Team Key to EasyPTRE settings.<br>PTRE Team Key should look like: TM-XXXX-XXXX-XXXX-XXXX. Create your Team or ask your teammates for it.';
+    content+= '<br><br><span class="ptre_tab_title">Spy report push</span><br><br>You can push spy reports from the messages page or when opening a spy report. Spy report will be shared to your Team and over Discord (if <a href="https://ptre.chez.gg/?page=discord_integration" target="_blank">configuration</a> is done).';
+    content+= '<br><br><span class="ptre_tab_title">Target lists</span><br><br>EasyPTRE targets lists determines players that will be activity-tracked when exploring the galaxy. ';
+    content+= 'EasyPTRE manages two targets lists that works at same time (both lists are tracked):<br>- AGR target list: it is based on you AGR left pannel: Target, To attack, Watch, Miner. It ignores Friends and traders. To update this list, open your several AGR target pannels<br>- PTRE target list: this list containes targets shared by your team';
+    content+= '<br><br>You can sync your target lists with your teammates (you may ignore some of your targets in order to NOT share them with friends and keep it to yourself).';
+    content+= '<br><br>Common targets list (for your PTRE Team) can be configured <a href="https://ptre.chez.gg/?page=players_list" target="_blank">on PTRE players list page</a>.';
+    content+= '<br><br><span class="ptre_tab_title">Need more help?</span><br><br>You can get some help on <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a>, come and ask us.';
+
+    document.getElementById('infoBoxContent').innerHTML = content;
 }
 
 // *** *** ***
