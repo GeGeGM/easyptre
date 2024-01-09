@@ -403,7 +403,7 @@ function setNumber(x) {
 // *** *** ***
 
 // Remove player from PTRE/AGR list
-function deletePlayerFromList(playerId, playerPseudo, type) {
+function deletePlayerFromList(playerId, type) {
 
     // Check if player is part of the list
     if (isPlayerInTheList(playerId, type)) {
@@ -854,7 +854,7 @@ function displayPTREMenu(mode = 'AGR') {
                 document.getElementById('removePlayerFromListBySettings_'+PlayerCheck.id).addEventListener("click", function (event)
                 {
                     // Delete player from list
-                    var mess = deletePlayerFromList(PlayerCheck.id, PlayerCheck.pseudo, mode);
+                    var mess = deletePlayerFromList(PlayerCheck.id, mode);
                     displayMessageInSettings(mess);
                     document.getElementById('rawPLayer_'+PlayerCheck.id).remove();
                 });
@@ -1221,7 +1221,7 @@ function addPTREStuffsToGalaxyPage() {
                                     lignePosition.children[7].appendChild(btnSupPlayer);//
                                     document.getElementById('suppcheckptr_'+nbBtnPTRE).addEventListener("click", function (event)
                                     {
-                                        var retSupp = deletePlayerFromList(playerId, playerPseudo, 'PTRE');
+                                        var retSupp = deletePlayerFromList(playerId, 'PTRE');
                                         displayPTREPopUpMessage(retSupp);
                                     }, true);
                                     nbBtnPTRE++;
