@@ -1391,8 +1391,10 @@ function processGalaxyData(data){
             cache: false,
             success : function(reponse){
                 var reponseDecode = jQuery.parseJSON(reponse);
-                displayPTREPopUpMessage(reponseDecode.message);
                 displayPTREGalaxyMessage(reponseDecode.message);
+                if (reponseDecode.code != 1) {
+                    displayPTREPopUpMessage(reponseDecode.message);
+                }
             }
         });
         console.log('[PTRE] [' + galaxy + ':' + system + '] Pushing activities');
