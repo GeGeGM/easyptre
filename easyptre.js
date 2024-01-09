@@ -287,15 +287,32 @@ GM_addStyle(`
 // Displays PTRE responses messages
 // Responses from server
 function displayPTREPopUpMessage(message) {
-    var divPTREMessage = '<div id="boxPTREMessage">PTRE: <span id="ptreMessage">' + message + '</span></div>';
+    var previousContent = '';
+    if (document.getElementById('boxPTREMessage') && document.getElementById("ptreMessage")) {
+        // Get previous content and remove box
+        previousContent = document.getElementById("ptreMessage").innerHTML;
+        document.getElementById('boxPTREMessage').remove();
+    }
 
+    // Recreate box
+    var divPTREMessage = '<div id="boxPTREMessage">PTRE:<span id="ptreMessage">' + previousContent + '<span id="fisrtPtreMessage"><br>' + message + '</span></span></div>';
     var boxPTREMessage = document.createElement("div");
     boxPTREMessage.innerHTML = divPTREMessage;
     boxPTREMessage.id = 'boxPTREMessage';
 
     if (document.getElementById('links')) {
         document.getElementById('links').appendChild(boxPTREMessage);
-        setTimeout(function() {document.getElementById('boxPTREMessage').remove();}, ptreMessageDisplayTime * 1000);
+        setTimeout(function() {cleanFirstPTREPopUpMessage();}, ptreMessageDisplayTime * 1000);
+    }
+}
+
+// Remove first message in list and remove entire message box if empty
+function cleanFirstPTREPopUpMessage() {
+    if (document.getElementById('fisrtPtreMessage')) {
+        document.getElementById('fisrtPtreMessage').remove();
+        if (document.getElementById("ptreMessage").innerHTML == '') {
+            document.getElementById('boxPTREMessage').remove();
+        }
     }
 }
 
