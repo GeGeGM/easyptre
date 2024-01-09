@@ -247,7 +247,7 @@ GM_addStyle(`
 }
 #boxPTREMessage {
     padding:10px;
-    z-index: 1000;
+    z-index: 1001;
     position: fixed;
     bottom: 30px;
     right: 10px;
