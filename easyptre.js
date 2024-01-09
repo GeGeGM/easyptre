@@ -68,8 +68,7 @@ var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js
 // *** *** ***
 
 // Update main pages
-if (!/page=standalone&component=empire/.test(location.href))
-{
+if (!/page=standalone&component=empire/.test(location.href)) {
     // Bouton options
     var ptreMenuName = toolName;
     var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
@@ -84,8 +83,7 @@ if (!/page=standalone&component=empire/.test(location.href))
     tab.id = 'optionPTRE';
     document.getElementById('menuTableTools').appendChild(tab);
 
-    document.getElementById('affOptionsPTRE').addEventListener("click", function (event)
-    {
+    document.getElementById('affOptionsPTRE').addEventListener("click", function (event) {
         displayPTREMenu();
     }, true);
 
@@ -117,15 +115,14 @@ if (!/page=standalone&component=empire/.test(location.href))
 }
 
 // Galaxy page: Set routines
-if (/component=galaxy/.test(location.href)){
+if (/component=galaxy/.test(location.href)) {
     consoleDebug("Galaxy detected: Setting routines");
     setTimeout(addPTREStuffsToGalaxyPage, 250);
     setTimeout(checkForNewSystem, 500);
 }
 
 // Add PTRE send SR button to messages page
-if (/page=messages/.test(location.href))
-{
+if (/page=messages/.test(location.href)) {
     if (GM_getValue(ptreTeamKey) != '') {
         setTimeout(addPTREStuffsToMessagesPage, 800);
     }
@@ -797,8 +794,7 @@ function displayPTREMenu(mode = 'AGR') {
         });
 
          // Action: Sync targets
-        document.getElementById('synctTargetsWithPTRE').addEventListener("click", function (event)
-        {
+        document.getElementById('synctTargetsWithPTRE').addEventListener("click", function (event) {
             var AGRJSON = GM_getValue(ptreAGRPlayerListJSON, '');
             var PTREJSON = GM_getValue(ptrePTREPlayerListJSON, '');
             var targetList = [];
@@ -852,24 +848,21 @@ function displayPTREMenu(mode = 'AGR') {
         // Action: Player Infos
         if (targetList) {
             $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('btnGetPlayerInfos'+PlayerCheck.id).addEventListener("click", function (event)
-                {
+                document.getElementById('btnGetPlayerInfos'+PlayerCheck.id).addEventListener("click", function (event) {
                     getPlayerInfos(PlayerCheck.id, PlayerCheck.pseudo);
                 });
             });
         }
 
         // Action: Help
-        document.getElementById('btnHelpPTRE').addEventListener("click", function (event)
-        {
+        document.getElementById('btnHelpPTRE').addEventListener("click", function (event) {
             displayHelp();
         });
 
         // Action: Delete player
         if (targetList) {
             $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('removePlayerFromListBySettings_'+PlayerCheck.id).addEventListener("click", function (event)
-                {
+                document.getElementById('removePlayerFromListBySettings_'+PlayerCheck.id).addEventListener("click", function (event) {
                     // Delete player from list
                     var mess = deletePlayerFromList(PlayerCheck.id, mode);
                     displayMessageInSettings(mess);
@@ -879,15 +872,13 @@ function displayPTREMenu(mode = 'AGR') {
         }
 
         // Action: Check version
-        document.getElementById('forceCheckVersionButton').addEventListener("click", function (event)
-        {
+        document.getElementById('forceCheckVersionButton').addEventListener("click", function (event) {
             document.getElementById('ptreUpdateVersionMessage').innerHTML = '';
             updateLastAvailableVersion(true);
         });
 
         // Action: Close
-        document.getElementById('btnCloseOptPTRE').addEventListener("click", function (event)
-        {
+        document.getElementById('btnCloseOptPTRE').addEventListener("click", function (event) {
             document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
             if (document.getElementById('divPTREInfos')) {
                 document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
@@ -895,8 +886,7 @@ function displayPTREMenu(mode = 'AGR') {
         });
 
         // Action: Save
-        document.getElementById('btnSaveOptPTRE').addEventListener("click", function (event)
-        {
+        document.getElementById('btnSaveOptPTRE').addEventListener("click", function (event) {
             // Save PTRE Team Key
             var newTK = document.getElementById('ptreTK').value;
             // Check PTRE Team Key Format
@@ -921,14 +911,12 @@ function displayPTREMenu(mode = 'AGR') {
                 displayMessageInSettings('Wrong Team Key Format');
             }
         });
-        document.getElementById('btnRefreshOptPTRE').addEventListener("click", function (event)
-        {
+        document.getElementById('btnRefreshOptPTRE').addEventListener("click", function (event) {
             document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
             setTimeout(function() {displayPTREMenu();}, 100);
         });
         if (isAGROn) {
-            document.getElementById('btnRefreshOptPTRESwitchList').addEventListener("click", function (event)
-            {
+            document.getElementById('btnRefreshOptPTRESwitchList').addEventListener("click", function (event) {
                 document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
                 setTimeout(function() {displayPTREMenu(other_mode);}, 100);
             });
@@ -1112,8 +1100,7 @@ function setupInfoBox() {
         document.getElementById('ingamepage').appendChild(eletementSetPTRE);
     }
 
-    document.getElementById('btnCloseInfosPTRE').addEventListener("click", function (event)
-    {
+    document.getElementById('btnCloseInfosPTRE').addEventListener("click", function (event) {
         document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
     });
 }
@@ -1259,7 +1246,7 @@ function addPTREStuffsToGalaxyPage() {
 // Function called on galaxy page
 // Checks if a new system is displayed
 // If yes, we will push activities
-function checkForNewSystem(){
+function checkForNewSystem() {
     // Get current params
     var systemElem = $("input#system_input")[0];
     var galaxyElem = $("input#galaxy_input")[0];
@@ -1290,7 +1277,7 @@ function checkForNewSystem(){
     }
 }
 
-function processGalaxyData(data){
+function processGalaxyData(data) {
 
     var json = $.parseJSON(data);
     var systemPos = json.system.galaxyContent;
@@ -1308,7 +1295,7 @@ function processGalaxyData(data){
 
     $.each(systemPos, function(pos, infoPos){
 
-        if (infoPos.player){
+        if (infoPos.player) {
             var player_id = infoPos.player['playerId'];
             var player_name = infoPos.player['playerName'];
             //consoleDebug(infoPos);
@@ -1383,7 +1370,7 @@ function processGalaxyData(data){
     //consoleDebug("DATAS: " + jsonSystem);
     var dataPost = jsonSystem;
 
-    if (jsonSystem != ''){
+    if (jsonSystem != '') {
         $.ajax({
             url : urlPTREPushActivity,
             type : 'POST',
