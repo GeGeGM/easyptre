@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.7.5
+// @version      0.7.6
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -636,8 +636,9 @@ function updateLocalAGRList() {
                 var txtjsonDataAgo = ligneJoueurAGR.getAttributeNode('ago-data').value;
                 var jsonDataAgo = JSON.parse(txtjsonDataAgo);
                 var token = jsonDataAgo.action.token;
-                // Do not add friends to target list
-                if (token == 62 || token == 64 || token == 66 || token == 67) {
+                // Do not add Friends and Traders to target list
+                // This will add user custom list too
+                if (token != 52 && token != 55) {
                     var IdPlayer = jsonDataAgo.action.id;
                     var PseudoPlayer = ligneJoueurAGR.children[1].innerText;
                     //consoleDebug('AGR native list member: ' + PseudoPlayer + ' (' + IdPlayer + ') | token:' + token + ')');
