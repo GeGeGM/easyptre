@@ -937,49 +937,6 @@ function displayPTREMenu(mode = 'AGR') {
     }
 }
 
-// This is a callback function called when user open a message pop-up
-function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
-    if (document.getElementsByClassName('ui-dialog').length > 0) {
-        if (document.getElementsByClassName('msg_actions').length > 0) {
-            if (document.getElementsByClassName('ui-dialog-content').length > 0) {
-                consoleDebug("Message Pop-up!");
-                var head = document.getElementsByClassName('detail_msg_head')[0];
-                if (head && head.getElementsByClassName('msg_actions clearfix') && head.getElementsByClassName('msg_actions clearfix').length > 0) {
-                    var apikey_elem = document.getElementsByClassName('ui-dialog-content')[0].innerHTML;
-                    var regex = /sr-.*?\'/gm;
-                    var matches = apikey_elem.match(regex);
-                    var apiKeyRE = matches[0].slice(0, -1);
-                    var spanBtnPTRE = document.createElement("span");
-                    spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendSRFromPopup-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
-                    spanBtnPTRE.id = 'PTREspan';
-                    head.getElementsByClassName('msg_actions clearfix')[0].append(spanBtnPTRE);
-                    if (document.getElementById('sendSRFromPopup-' + apiKeyRE)) {
-                        document.getElementById('sendSRFromPopup-' + apiKeyRE).addEventListener("click", function (event) {
-                            //apiKeyRE = this.getAttribute("apikey");
-                            var TKey = GM_getValue(ptreTeamKey, '');
-                            if (TKey != '') {
-                                var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
-                                $.ajax({
-                                    dataType: "json",
-                                    url: urlPTRESpy,
-                                    success: function(reponse) {
-                                        if (reponse.code == 1) {
-                                            document.getElementById('sendSRFromPopup-'+apiKeyRE).src = imgPTREOK;
-                                        } else {
-                                            document.getElementById('sendSRFromPopup-'+apiKeyRE).src = imgPTREKO;
-                                        }
-                                        displayPTREPopUpMessage(reponse.message_verbose);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            }
-        }
-    }
-}
-
 // This function adds PTRE send SR button to AGR Spy Table
 function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
     if (document.getElementById('agoSpyReportOverview')) {
@@ -1040,13 +997,6 @@ function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
 
 // Add PTRE button to spy reports
 function addPTREStuffsToMessagesPage() {
-
-    // Check message pop-up
-    let observer = new MutationObserver(addPTRESendSRButtonToMessagePopup);
-    var node = document.getElementsByClassName('messagesHolder')[0];
-    observer.observe(node, {
-        childList: true, // observer les enfants directs
-    });
 
     // Add PTRE button to messages
     var TKey = GM_getValue(ptreTeamKey, '');
