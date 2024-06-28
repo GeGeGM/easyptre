@@ -122,9 +122,14 @@ if (/component=galaxy/.test(location.href)) {
 }
 
 // Add PTRE send SR button to messages page
-if (/page=messages/.test(location.href)) {
+if (/component=messages/.test(location.href)) {
     if (GM_getValue(ptreTeamKey) != '') {
+        // Update Message Page (spy report part)
         setTimeout(addPTREStuffsToMessagesPage, 800);
+        // Update AGR Spy Table
+        if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
+            setTimeout(addPTRESendSRButtonToAGRSpyTable, 800);
+        }
     }
 }
 
@@ -969,19 +974,25 @@ function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
 }
 
 // This function adds PTRE send SR button to AGR Spy Table
-function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
-    if (document.getElementById('spyTable')) {
+function addPTRESendSRButtonToAGRSpyTable() {
+    if (document.getElementById('agoSpyReportOverview')) {
         var TKey = GM_getValue(ptreTeamKey, '');
         if (TKey != '') {
             console.log("[PTRE] Updating AGR Spy Table");
-            var table = document.getElementById("spyTable");
+            var table = document.getElementsByClassName("ago_reports")[0];
             for (var i = 0, row; row = table.rows[i]; i++) {
                 var nbCol = row.cells.length;
                 if (row.cells[0].tagName == "TD") {
                     var rowCurrent = table.getElementsByTagName("tr")[i];
                     var messageID = rowCurrent.id.slice(2);
                     if (document.getElementById("m"+messageID)) {
-                        var apiKeyRE = document.getElementById("m"+messageID).getAttribute("data-api-key");
+                        // Find API Key in page
+                        var apiKeyRE;
+                        var msgElement = document.querySelector('div.msg[data-msg-id="' + messageID + '"] .rawMessageData');
+                        if (msgElement) {
+                            // Obtenir la valeur de data-raw-hashcode
+                            apiKeyRE = msgElement.getAttribute('data-raw-hashcode');
+                        }
                         var tdAGRButtons = rowCurrent.getElementsByTagName("td")[nbCol-1];
                         tdAGRButtons.style.width = "110px";
                         // Create PTRE button
@@ -1012,10 +1023,8 @@ function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
                     }
                 }
             }
-            observer.disconnect();
         } else {
             displayPTREPopUpMessage("Error. Add Team Key to PTRE settings");
-            observer.disconnect();
         }
     }
 }
@@ -1025,22 +1034,10 @@ function addPTREStuffsToMessagesPage() {
 
     // Check message pop-up
     let observer = new MutationObserver(addPTRESendSRButtonToMessagePopup);
-    var node = document.getElementById('messages');
+    var node = document.getElementsByClassName('messagesHolder')[0];
     observer.observe(node, {
         childList: true, // observer les enfants directs
     });
-
-    // Check AGR Table
-    if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
-        let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
-        var nodeSpyTable = document.getElementById('fleetsTab');
-        spyTableObserver.observe(nodeSpyTable, {
-            attributes: true,
-            childList: true, // observer les enfants directs
-            subtree: true, // et les descendants aussi
-            characterDataOldValue: true // transmettre les anciennes données au callback
-        });
-    }
 
     // Add PTRE button to messages
     if (document.getElementById('subtabs-nfFleet20')) {
