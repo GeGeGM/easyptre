@@ -31,14 +31,16 @@ var versionCheckTimeout = 86400;
 var lastPTREActivityPushMicroTS = 0;
 
 // GM keys
-var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
-var ptreImproveAGRSpyTable = "ptre-" + country + "-" + universe + "-ImproveAGRSpyTable";
-var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerListJSON";
-var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
-var ptreAGRPrivatePlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPrivatePlayerListJSON";
-var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsoleDebug";
-var ptreLastAvailableVersion = "ptre-" + country + "-" + universe + "-LastAvailableVersion";
-var ptreLastAvailableVersionRefresh = "ptre-" + country + "-" + universe + "-LastAvailableVersionRefresh";
+const ptrePrefixKey = "ptre-" + country + "-" + universe;
+const ptreTeamKey = ptrePrefixKey + "-TK";
+const ptreImproveAGRSpyTable = ptrePrefixKey + "-ImproveAGRSpyTable";
+const ptrePTREPlayerListJSON = ptrePrefixKey + "-PTREPlayerListJSON";
+const ptreAGRPlayerListJSON = ptrePrefixKey + "-AGRPlayerListJSON";
+const ptreAGRPrivatePlayerListJSON = ptrePrefixKey + "-AGRPrivatePlayerListJSON";
+const ptreEnableConsoleDebug = ptrePrefixKey + "-EnableConsoleDebug";
+const ptreLastAvailableVersion = ptrePrefixKey + "-LastAvailableVersion";
+const ptreLastAvailableVersionRefresh = ptrePrefixKey + "-LastAvailableVersionRefresh";
+const ptreGalaxyData = ptrePrefixKey + "-GalaxyData";
 
 // Images
 var imgPTRE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB1FBMVEUAAEAAAEE1IjwvHTsEA0GBTCquYhxbNjINCUAFBEEqGjwyIDsAAUAYED+kXR++aBS7aBaKUCctHDwTDUBDKTeBSymwYxuYVyQPCkA8JTm4Zxi7ZxW9aBSrYR2fWyG+aRS8ZxS2Zhg6JDlqPzC+aRW8ZxV1RCwBAkEMCEGUVSW8aBSlXh8bET8oGj27aBdNLzZSMjW8aBaHTigGBUEXDz5kOS1qOymbWCG9aRayZBt0QihnOisiFj0PCj9FKjdKLDVIKzVGKjZHKjZILDYXDz8BAUENCD4OCD4KBj8OCT4MCD8CAkEiFj6MUSadWB+fWR2NUSYVDj8HBUBqPzGJTyeYViGeWB6fWR8+JzkFA0AWDj4kFz2ITiazZBl2RSwIBkASDD8ZED5hOTCwYhqbWSIHBD80IDodEz4PCT8kFjsKB0AhFDwTDD8DA0E1IToQCTybVh6pYB6ETSlWNDQrGzwHBUEjFj1PMDV+SSqoXhwfETmdVhyxZBuWViRrPy8DAkFjOzGPUiarXhgeETm9aBWiXCB9SSp4RiyeWiG1ZRm9aRW8aBWrXhmdVxysXhgPCT2UVCKzZRyxZByyZRyiXB8dEDoDAkAhFj4oGj4kGD4GBED///9i6fS4AAAAAWJLR0Sb79hXhAAAAAlwSFlzAAAOwgAADsIBFShKgAAAAAd0SU1FB+YMAw4EFzatfRkAAAE3SURBVCjPY2AgDBhxSzEx45JkYWVj5wDq5eTi5kGT4uXjFxAUEhYRFROXQLNJUkpaWkZWTkpeQVEJ1WRGZRVpaWlVGSChoqaOIqWhCRIFAy1tHRQpXTFVmJS0nj6yiYwGhnAZaX4jY7iEiamZuYUAHBhaWlnbQKVs7ewdHEHAyQlC2Tu7wM1jdHVzd3PzYGT08HRz8/JmRLbMh9XXzz8gMCg4JDQsPALFY5FR0TGxcfEMCYlJySnRcOHUtHROoLqMzCywouwcxlzePDewVH5BYVFxCQfUAsbSsvIKvsoqiFS1vLxhTW2dpEu9q3BeQyOboTx/UzNUqgUUfCpSrW3tHZ1d/MBw6e5BkgIBGXl5aEhiSCEAXKqXXxUNyPRBpPonTJyEBiZPmQqWmjZ9BgaYOYuIRIgVAABizF3wXn23IAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowNDoxNyswMDowMEeHM70AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDQ6MTcrMDA6MDA22osBAAAAAElFTkSuQmCC';
@@ -1283,10 +1285,13 @@ function processGalaxyData(data) {
     var json = $.parseJSON(data);
     var systemPos = json.system.galaxyContent;
     var tabActiPos = [];
-    var galaxy = "";
-    var system = "";
-    var jsonSystem = '';
+    var galaxy = systemPos[0].galaxy;
+    var system = systemPos[0].system;
+    var position = 0;
+    var jsonSystem = "";
+    var coords = "";
     var ptreStoredTK = GM_getValue(ptreTeamKey, '');
+    var timestamp_current = serverTime.getTime();
 
     if (isAGREnabled()) {
         // Update AGR local list
@@ -1294,21 +1299,58 @@ function processGalaxyData(data) {
     }
     //debugListContent();
 
+    console.log(systemPos);
+    console.log("Checking SS " + galaxy + ':' + system);
+
+    // Get Galaxy Data
+    var galaxyList = {};
+    var galaxyJSON = GM_getValue(ptreGalaxyData + 'G' + galaxy, '');
+    var lastUpdate = -1;
+    if (galaxyJSON != '') {
+        galaxyList = JSON.parse(galaxyJSON);
+        if (typeof galaxyList[system]['ts'] !== 'undefined') {
+            lastUpdate = galaxyList[system]['ts'];
+            var date = new Date(lastUpdate);
+            console.log('[' + coords + '] Last Update Date (' + lastUpdate + '): ' + date);
+        } else {
+            console.log('No entry');
+        }
+    } else {
+        console.log('No galaxy data. Init system');
+        galaxyList = {};
+        galaxyList[system] = {};
+    }
+    console.log('BEFORE');
+    console.log(galaxyList);
+    // Update SS update TS
+    galaxyList[system].ts = timestamp_current;
+
     $.each(systemPos, function(pos, infoPos){
 
         if (infoPos.player) {
             var player_id = infoPos.player['playerId'];
             var player_name = infoPos.player['playerName'];
+            position = infoPos.position;
+            coords = galaxy+":"+system+":"+position;
+            
             //consoleDebug(infoPos);
-            if (isPlayerInLists(player_id)){
+
+
+            //if (isPlayerInLists(player_id)){
+                
+            
+            
+                if (player_id != 99999) {
+                    galaxyList[system][position] = {};
+                    galaxyList[system][position].pid = player_id;
+                }
+                
+                
+
+
                 var ina = infoPos.positionFilters;
 
                 if (player_id != 99999 && !/inactive_filter/.test(ina)){
-                    galaxy = infoPos.galaxy;
-                    system = infoPos.system;
-                    var position = infoPos.position;
-                    var coords = galaxy+":"+system+":"+position;
-
                     //console.log(infoPos);
                     var planete = infoPos.planets;
                     var planet_id = planete[0]['planetId'];
@@ -1353,7 +1395,7 @@ function processGalaxyData(data) {
 
                     tabActiPos.push(jsonActiPos);
                 }
-            }
+            //}
         }
 
         if (tabActiPos.length > 0){
@@ -1368,6 +1410,13 @@ function processGalaxyData(data) {
         }
 
     });
+
+    console.log("Save Galaxy data");
+    console.log('AFTER');
+    console.log(galaxyList);
+    galaxyJSON = JSON.stringify(galaxyList);
+    GM_setValue(ptreGalaxyData + 'G' + galaxy, galaxyJSON);
+
     //consoleDebug("DATAS: " + jsonSystem);
     var dataPost = jsonSystem;
 
