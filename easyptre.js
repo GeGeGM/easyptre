@@ -1308,27 +1308,23 @@ function processGalaxyData(data) {
                 }
             }
         }
-
-        if (tabActiPos.length > 0){
-            jsonSystem = '{';
-            $.each(tabActiPos, function(nb, jsonPos){
-                jsonSystem += '"'+jsonPos.coords+'":'+JSON.stringify(jsonPos)+',';
-                //consoleDebug(jsonSystem);
-            });
-            jsonSystem = jsonSystem.substr(0,jsonSystem.length-1);
-            jsonSystem += '}';
-            displayPTREGalaxyMessage('Found ' + tabActiPos.length + ' positions to push');
-        }
-
     });
-    //consoleDebug("DATAS: " + jsonSystem);
-    var dataPost = jsonSystem;
 
-    if (jsonSystem != '') {
+    if (tabActiPos.length > 0){
+        // Build JSON
+        jsonSystem = '{';
+        $.each(tabActiPos, function(nb, jsonPos){
+            jsonSystem += '"'+jsonPos.coords+'":'+JSON.stringify(jsonPos)+',';
+            //consoleDebug(jsonSystem);
+        });
+        jsonSystem = jsonSystem.substr(0,jsonSystem.length-1);
+        jsonSystem += '}';
+
+        // Sent to PTRE
         $.ajax({
             url : urlPTREPushActivity,
             type : 'POST',
-            data: dataPost,
+            data: jsonSystem,
             cache: false,
             success : function(reponse){
                 var reponseDecode = jQuery.parseJSON(reponse);
