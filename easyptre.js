@@ -126,7 +126,7 @@ if (/component=galaxy/.test(location.href)) {
 if (/component=messages/.test(location.href)) {
     if (GM_getValue(ptreTeamKey) != '') {
         // Update Message Page (spy report part)
-        setTimeout(addPTREStuffsToMessagesPage, 800);
+        setTimeout(addPTREStuffsToMessagesPage, 1000);
         // Update AGR Spy Table
         if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
             let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
