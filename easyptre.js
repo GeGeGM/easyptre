@@ -128,7 +128,13 @@ if (/component=messages/.test(location.href)) {
         setTimeout(addPTREStuffsToMessagesPage, 800);
         // Update AGR Spy Table
         if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
-            setTimeout(addPTRESendSRButtonToAGRSpyTable, 800);
+            let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
+            var nodeSpyTable = document.getElementById('messagecontainercomponent');
+            spyTableObserver.observe(nodeSpyTable, {
+                attributes: true,
+                childList: true, // observer les enfants directs
+                subtree: true, // et les descendants aussi
+            });
         }
     }
 }
@@ -974,8 +980,10 @@ function addPTRESendSRButtonToMessagePopup(mutationList, observer) {
 }
 
 // This function adds PTRE send SR button to AGR Spy Table
-function addPTRESendSRButtonToAGRSpyTable() {
+function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
     if (document.getElementById('agoSpyReportOverview')) {
+        // Stop observer
+        observer.disconnect();
         var TKey = GM_getValue(ptreTeamKey, '');
         if (TKey != '') {
             console.log("[PTRE] Updating AGR Spy Table");
