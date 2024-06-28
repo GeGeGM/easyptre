@@ -20,6 +20,7 @@
 
 var toolName = 'EasyPTRE';
 var serveur = document.getElementsByName('ogame-universe')[0].content;
+var currentPlayerID = document.getElementsByName('ogame-player-id')[0].content;
 var splitted = serveur.split('-');
 var universe = splitted[0].slice(1);
 var splitted2 = splitted[1].split('.');
@@ -125,7 +126,7 @@ if (/component=galaxy/.test(location.href)) {
 if (/component=messages/.test(location.href)) {
     if (GM_getValue(ptreTeamKey) != '') {
         // Update Message Page (spy report part)
-        setTimeout(addPTREStuffsToMessagesPage, 800);
+        setTimeout(addPTREStuffsToMessagesPage, 1000);
         // Update AGR Spy Table
         if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
             let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
@@ -1048,45 +1049,42 @@ function addPTREStuffsToMessagesPage() {
     });
 
     // Add PTRE button to messages
-    if (document.getElementById('subtabs-nfFleet20')) {
-        if (/ui-tabs-active/.test(document.getElementById('subtabs-nfFleet20').className) && !document.getElementById('PTREspan')) {
-            var listMsg = $("li.msg ");
-            var tabMsg = [];
-            if (listMsg.length > 0) {
-                //clearInterval(interGetRE);
-                jQuery.each(listMsg, function(i, msgI) {
-                    //consoleDebug(i +' val: '+ element.innetHTML);
-                    var idMsg = msgI.getAttributeNode("data-msg-id").value;
-                    if (msgI.getElementsByClassName('icon_nf icon_apikey')[0]) {
-                        var apiKeyRE = /((sr)-[a-z]{2}-[0-9]+-[0-9a-z]+)/.exec(msgI.getElementsByClassName('icon_nf icon_apikey')[0].title)[0];
-                        //consoleDebug(apiKeyRE);
+    var TKey = GM_getValue(ptreTeamKey, '');
+    if (TKey != '') {
+        if (document.getElementsByClassName('messagesHolder')[0]) {
+            var messages = document.getElementsByClassName('msgWithFilter');
+            Array.prototype.forEach.call(messages, function(current_message) {
+                var apiKeyRE = "";
+                var messageID = current_message.getAttributeNode("data-msg-id").value;
+                var msgElement = document.querySelector('div.msg[data-msg-id="' + messageID + '"] .rawMessageData');
+                if (msgElement) {
+                    // Obtenir la valeur de data-raw-hashcode
+                    apiKeyRE = msgElement.getAttribute('data-raw-hashcode');
+                    if (currentPlayerID !== msgElement.getAttribute('data-raw-targetplayerid')) {
+                        // This is a Spy Report
                         var spanBtnPTRE = document.createElement("span"); // Create new div
                         spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
                         spanBtnPTRE.id = 'PTREspan';
-                        msgI.getElementsByClassName('msg_actions clearfix')[0].appendChild(spanBtnPTRE);
+                        current_message.getElementsByClassName("msg_actions")[0].getElementsByTagName("message-footer-actions")[0].appendChild(spanBtnPTRE);
                         document.getElementById('sendRE-' + apiKeyRE).addEventListener("click", function (event) { 
-                            apiKeyRE = this.getAttribute("apikey");
-                            var TKey = GM_getValue(ptreTeamKey, '');
-                            if (TKey != '') {
-                                var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
-                                $.ajax({
-                                    dataType: "json",
-                                    url: urlPTRESpy,
-                                    success: function(reponse) {
-                                        console.log('[PTRE] ' + reponse);
-                                        if (reponse.code == 1) {
-                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREOK;
-                                        } else {
-                                            document.getElementById('sendRE-'+apiKeyRE).src = imgPTREKO;
-                                        }
-                                        displayPTREPopUpMessage(reponse.message_verbose);
+                            var urlPTRESpy = urlPTREImportSR + '&team_key=' + TKey + '&sr_id=' + apiKeyRE;
+                            $.ajax({
+                                dataType: "json",
+                                url: urlPTRESpy,
+                                success: function(reponse) {
+                                    console.log('[PTRE] ' + reponse);
+                                    if (reponse.code == 1) {
+                                        document.getElementById('sendRE-'+apiKeyRE).src = imgPTREOK;
+                                    } else {
+                                        document.getElementById('sendRE-'+apiKeyRE).src = imgPTREKO;
                                     }
-                                });
-                            }
+                                    displayPTREPopUpMessage(reponse.message_verbose);
+                                }
+                            });
                         });
                     }
-                });
-            }
+                }
+            });
         }
     }
 }
