@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.7.6
+// @version      0.8.0
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -40,6 +40,7 @@ var ptreAGRPrivatePlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPri
 var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsoleDebug";
 var ptreLastAvailableVersion = "ptre-" + country + "-" + universe + "-LastAvailableVersion";
 var ptreLastAvailableVersionRefresh = "ptre-" + country + "-" + universe + "-LastAvailableVersionRefresh";
+var ptreMaxCounterSpyTsSeen = "ptre-" + country + "-" + universe + "-MaxCounterSpyTsSeen";
 
 // Images
 var imgPTRE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB1FBMVEUAAEAAAEE1IjwvHTsEA0GBTCquYhxbNjINCUAFBEEqGjwyIDsAAUAYED+kXR++aBS7aBaKUCctHDwTDUBDKTeBSymwYxuYVyQPCkA8JTm4Zxi7ZxW9aBSrYR2fWyG+aRS8ZxS2Zhg6JDlqPzC+aRW8ZxV1RCwBAkEMCEGUVSW8aBSlXh8bET8oGj27aBdNLzZSMjW8aBaHTigGBUEXDz5kOS1qOymbWCG9aRayZBt0QihnOisiFj0PCj9FKjdKLDVIKzVGKjZHKjZILDYXDz8BAUENCD4OCD4KBj8OCT4MCD8CAkEiFj6MUSadWB+fWR2NUSYVDj8HBUBqPzGJTyeYViGeWB6fWR8+JzkFA0AWDj4kFz2ITiazZBl2RSwIBkASDD8ZED5hOTCwYhqbWSIHBD80IDodEz4PCT8kFjsKB0AhFDwTDD8DA0E1IToQCTybVh6pYB6ETSlWNDQrGzwHBUEjFj1PMDV+SSqoXhwfETmdVhyxZBuWViRrPy8DAkFjOzGPUiarXhgeETm9aBWiXCB9SSp4RiyeWiG1ZRm9aRW8aBWrXhmdVxysXhgPCT2UVCKzZRyxZByyZRyiXB8dEDoDAkAhFj4oGj4kGD4GBED///9i6fS4AAAAAWJLR0Sb79hXhAAAAAlwSFlzAAAOwgAADsIBFShKgAAAAAd0SU1FB+YMAw4EFzatfRkAAAE3SURBVCjPY2AgDBhxSzEx45JkYWVj5wDq5eTi5kGT4uXjFxAUEhYRFROXQLNJUkpaWkZWTkpeQVEJ1WRGZRVpaWlVGSChoqaOIqWhCRIFAy1tHRQpXTFVmJS0nj6yiYwGhnAZaX4jY7iEiamZuYUAHBhaWlnbQKVs7ewdHEHAyQlC2Tu7wM1jdHVzd3PzYGT08HRz8/JmRLbMh9XXzz8gMCg4JDQsPALFY5FR0TGxcfEMCYlJySnRcOHUtHROoLqMzCywouwcxlzePDewVH5BYVFxCQfUAsbSsvIKvsoqiFS1vLxhTW2dpEu9q3BeQyOboTx/UzNUqgUUfCpSrW3tHZ1d/MBw6e5BkgIBGXl5aEhiSCEAXKqXXxUNyPRBpPonTJyEBiZPmQqWmjZ9BgaYOYuIRIgVAABizF3wXn23IAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowNDoxNyswMDowMEeHM70AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDQ6MTcrMDA6MDA22osBAAAAAElFTkSuQmCC';
@@ -126,7 +127,7 @@ if (/component=galaxy/.test(location.href)) {
 if (/component=messages/.test(location.href)) {
     if (GM_getValue(ptreTeamKey) != '') {
         // Update Message Page (spy report part)
-        setTimeout(addPTREStuffsToMessagesPage, 1000);
+        setTimeout(addPTREStuffsToMessagesPage, 1500);
         // Update AGR Spy Table
         if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
             let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
@@ -954,10 +955,10 @@ function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
                     if (document.getElementById("m"+messageID)) {
                         // Find API Key in page
                         var apiKeyRE;
-                        var msgElement = document.querySelector('div.msg[data-msg-id="' + messageID + '"] .rawMessageData');
-                        if (msgElement) {
+                        var rawMessageData = document.querySelector('div.msg[data-msg-id="' + messageID + '"] .rawMessageData');
+                        if (rawMessageData) {
                             // Obtenir la valeur de data-raw-hashcode
-                            apiKeyRE = msgElement.getAttribute('data-raw-hashcode');
+                            apiKeyRE = rawMessageData.getAttribute('data-raw-hashcode');
                         }
                         var tdAGRButtons = rowCurrent.getElementsByTagName("td")[nbCol-1];
                         tdAGRButtons.style.width = "110px";
@@ -1002,15 +1003,19 @@ function addPTREStuffsToMessagesPage() {
     var TKey = GM_getValue(ptreTeamKey, '');
     if (TKey != '') {
         if (document.getElementsByClassName('messagesHolder')[0]) {
+            var maxCounterSpyTsSeen = GM_getValue(ptreMaxCounterSpyTsSeen, 0);
+            var maxCounterSpyTsSeenNow = 0;
+            var tabActiPos = [];
             var messages = document.getElementsByClassName('msgWithFilter');
             Array.prototype.forEach.call(messages, function(current_message) {
                 var apiKeyRE = "";
+
                 var messageID = current_message.getAttributeNode("data-msg-id").value;
-                var msgElement = document.querySelector('div.msg[data-msg-id="' + messageID + '"] .rawMessageData');
-                if (msgElement) {
+                var rawMessageData = document.querySelector('div.msg[data-msg-id="' + messageID + '"] .rawMessageData');
+                if (rawMessageData) {
                     // Obtenir la valeur de data-raw-hashcode
-                    apiKeyRE = msgElement.getAttribute('data-raw-hashcode');
-                    if (currentPlayerID !== msgElement.getAttribute('data-raw-targetplayerid')) {
+                    apiKeyRE = rawMessageData.getAttribute('data-raw-hashcode');
+                    if (currentPlayerID !== rawMessageData.getAttribute('data-raw-targetplayerid')) {
                         // This is a Spy Report
                         var spanBtnPTRE = document.createElement("span"); // Create new div
                         spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Send to PTRE"><img id="sendRE-' + apiKeyRE + '" apikey="' + apiKeyRE + '" style="cursor:pointer;" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a>';
@@ -1032,9 +1037,86 @@ function addPTREStuffsToMessagesPage() {
                                 }
                             });
                         });
+                    } else {
+                        var planet_acti;
+                        var jsonLune;
+                        const coords = rawMessageData.dataset.rawCoordinates.split(":");
+                        const message_ts = rawMessageData.dataset.rawDatetime;
+                        const spy_message_ts = message_ts * 1000;
+                        var alreadySentLabel = "";
+                        if (message_ts > maxCounterSpyTsSeen) {
+                            if (message_ts > maxCounterSpyTsSeenNow) {
+                                maxCounterSpyTsSeenNow = message_ts;
+                            }
+                            // Find Player ID
+                            const tmpHTML = document.createElement('div');
+                            tmpHTML.insertAdjacentHTML("afterbegin", current_message.querySelector("span.player").dataset.tooltipTitle);
+                            const playerID = tmpHTML.querySelector("[data-playerId]").dataset.playerid;
+
+                            if (rawMessageData.dataset.rawTargetplanettype === 1) {
+                                planet_acti = "*";
+                                jsonLune = {activity:"60"};
+                            } else {
+                                planet_acti = "60";
+                                jsonLune = {activity:"*"};
+                            }
+
+                            // Send counter-spy messages
+                            var jsonActiPos = {
+                                messageID : messageID,
+                                player_id : playerID,
+                                teamkey : TKey,
+                                coords : coords[0]+':'+coords[1]+':'+coords[2],
+                                galaxy : coords[0],
+                                system : coords[1],
+                                position : coords[2],
+                                main : false,
+                                activity : planet_acti,
+                                moon : jsonLune,
+                                spy_message_ts: spy_message_ts
+                            };
+                            tabActiPos.push(jsonActiPos);
+                        } else {
+                            alreadySentLabel = " already";
+                        }
+
+                        // Add button
+                        var spanBtnPTRE = document.createElement("span"); // Create new div
+                        spanBtnPTRE.innerHTML = '<a class="tooltip" target="ptre" title="Counter Spy' + alreadySentLabel + ' sent to PTRE"><img style="cursor:pointer;" class="mouseSwitch" src="' + imgPTREOK + '" height="26" width="26"></a>';
+                        spanBtnPTRE.id = 'PTREspan';
+                        current_message.getElementsByClassName("msg_actions")[0].getElementsByTagName("message-footer-actions")[0].appendChild(spanBtnPTRE);
                     }
                 }
             });
+
+            if (tabActiPos.length > 0){
+                // Save New max TS to not re-send same counter spy messages
+                GM_setValue(ptreMaxCounterSpyTsSeen, maxCounterSpyTsSeenNow);
+
+                // Build JSON
+                jsonSystem = '{';
+                $.each(tabActiPos, function(nb, jsonPos){
+                    jsonSystem += '"'+jsonPos.coords+'-'+jsonPos.messageID+'":'+JSON.stringify(jsonPos)+',';
+                });
+                jsonSystem = jsonSystem.substr(0,jsonSystem.length-1);
+                jsonSystem += '}';
+
+                // Sent to PTRE
+                $.ajax({
+                    url : urlPTREPushActivity,
+                    type : 'POST',
+                    data: jsonSystem,
+                    cache: false,
+                    success : function(reponse){
+                        var reponseDecode = jQuery.parseJSON(reponse);
+                        displayPTREPopUpMessage(reponseDecode.message);
+                        if (reponseDecode.code != 1) {
+                            displayPTREPopUpMessage(reponseDecode.message);
+                        }
+                    }
+                });
+                console.log('[PTRE] Pushing counter spy messages');
+            }
         }
     }
 }
