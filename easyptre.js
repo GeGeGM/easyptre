@@ -253,7 +253,7 @@ GM_addStyle(`
     padding:10px;
     z-index: 1000;
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
@@ -262,7 +262,7 @@ GM_addStyle(`
     padding:10px;
     z-index: 1001;
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
@@ -272,7 +272,7 @@ GM_addStyle(`
     padding:10px;
     z-index: 1000;
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     right: 540px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
@@ -1168,7 +1168,7 @@ function getPlayerInfos(playerID, pseudo) {
 
 function displayHelp() {
     setupInfoBox();
-    content = '<span class="ptre_maintitle">EasyPTRE Help</span><br><br><span class="ptre_tab_title">Purpose</span><br><br>EasyPTRE works as a side-car of AGR in order to enable PTRE basic features. Once configured, you will be able to: <br>- Push and share spy reports<br>- Display player top fleet from PTRE<br>- Track targets activities and check results on PTRE website<br>- Sync targets list with your Team';
+    content = '<span class="ptre_maintitle">EasyPTRE Help</span><br><br><span class="ptre_tab_title">Purpose</span><br><br>EasyPTRE works as a side-car of AGR in order to enable PTRE basic features. Once configured, you will be able to: <br>- Push and share spy reports<br>- Push counter spy messages as acivities<br>- Track targets galaxy activities and check results on PTRE website<br>- Display player top fleet from PTRE<br>- Sync targets list with your Team';
     content+= '<br><br><span class="ptre_tab_title">Team Key setting</span><br><br>To use it, you need to create a Team on <a href="https://ptre.chez.gg?page=team" target="_blank">PTRE website</a> and add Team Key to EasyPTRE settings.<br>PTRE Team Key should look like: TM-XXXX-XXXX-XXXX-XXXX. Create your Team or ask your teammates for it.';
     content+= '<br><br><span class="ptre_tab_title">Spy report push</span><br><br>You can push spy reports from the messages page or when opening a spy report. Spy report will be shared to your Team and over Discord (if <a href="https://ptre.chez.gg/?page=discord_integration" target="_blank">configuration</a> is done).';
     content+= '<br><br><span class="ptre_tab_title">Target lists</span><br><br>EasyPTRE targets lists determines players that will be activity-tracked when exploring the galaxy. ';
