@@ -252,7 +252,7 @@ GM_addStyle(`
     padding:10px;
     z-index: 1000;
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
@@ -261,7 +261,7 @@ GM_addStyle(`
     padding:10px;
     z-index: 1001;
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
@@ -271,7 +271,7 @@ GM_addStyle(`
     padding:10px;
     z-index: 1000;
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     right: 540px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
