@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.8.0
+// @version      0.8.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -1040,36 +1040,37 @@ function addPTREStuffsToMessagesPage() {
                     } else {
                         var planet_acti;
                         var jsonLune;
-                        const coords = rawMessageData.dataset.rawCoordinates.split(":");
                         const message_ts = rawMessageData.dataset.rawDatetime;
                         const spy_message_ts = message_ts * 1000;
                         var alreadySentLabel = "";
+
                         if (message_ts > maxCounterSpyTsSeen) {
                             if (message_ts > maxCounterSpyTsSeenNow) {
                                 maxCounterSpyTsSeenNow = message_ts;
                             }
+                            // Get Spy coords
+                            var temp = current_message.getElementsByClassName("msgTitle")[0].innerHTML;
+                            const regex = /\[(\d+):(\d+):(\d+)\]/;
+                            var coords;
+                            coords = temp.match(regex);
+                            // Set both position as active
+                            // TODO: find a way to find out if planet or moon in text :(
+                            planet_acti = "*";
+                            jsonLune = {activity:"*"};
                             // Find Player ID
                             const tmpHTML = document.createElement('div');
                             tmpHTML.insertAdjacentHTML("afterbegin", current_message.querySelector("span.player").dataset.tooltipTitle);
                             const playerID = tmpHTML.querySelector("[data-playerId]").dataset.playerid;
-
-                            if (rawMessageData.dataset.rawTargetplanettype === 1) {
-                                planet_acti = "*";
-                                jsonLune = {activity:"60"};
-                            } else {
-                                planet_acti = "60";
-                                jsonLune = {activity:"*"};
-                            }
 
                             // Send counter-spy messages
                             var jsonActiPos = {
                                 messageID : messageID,
                                 player_id : playerID,
                                 teamkey : TKey,
-                                coords : coords[0]+':'+coords[1]+':'+coords[2],
-                                galaxy : coords[0],
-                                system : coords[1],
-                                position : coords[2],
+                                coords : coords[1]+':'+coords[2]+':'+coords[3],
+                                galaxy : coords[1],
+                                system : coords[2],
+                                position : coords[3],
                                 main : false,
                                 activity : planet_acti,
                                 moon : jsonLune,
