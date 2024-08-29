@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.8.1
+// @version      0.9.0
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
 // @copyright    2022, GeGe_GM
 // @match        https://*.ogame.gameforge.com/game/*
+// @match        https://ptre.chez.gg/*
 // @updateURL    https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js
 // @downloadURL  https://openuserjs.org/install/GeGe_GM/EasyPTRE.user.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
@@ -17,18 +18,37 @@
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
+// Check current website
+var modeEasyPTRE = "ingame";
+if (/ptre.chez.gg/.test(location.href)) {
+    modeEasyPTRE = "ptre";
+    console.log("EasyPTRE: Mode PTRE");
+}
+
 
 var toolName = 'EasyPTRE';
-var serveur = document.getElementsByName('ogame-universe')[0].content;
-var currentPlayerID = document.getElementsByName('ogame-player-id')[0].content;
-var splitted = serveur.split('-');
-var universe = splitted[0].slice(1);
-var splitted2 = splitted[1].split('.');
-var country = splitted2[0];
-var galaxyContentLinkTest = "https:\/\/"+serveur+"\/game\/index.php?page=ingame&component=galaxy&action=fetchGalaxyContent&ajax=1&asJson=1";
+var server = -1;
+var country = "";
+var universe = -1;
+var currentPlayerID = -1;
+
+if (modeEasyPTRE == "ingame") {
+    server = document.getElementsByName('ogame-universe')[0].content;
+    var splitted = server.split('-');
+    universe = splitted[0].slice(1);
+    var splitted2 = splitted[1].split('.');
+    country = splitted2[0];
+    currentPlayerID = document.getElementsByName('ogame-player-id')[0].content;
+} else {
+    country = document.getElementsByName('ptre-country')[0].content;
+    universe = document.getElementsByName('ptre-universe')[0].content;
+}
+
+var galaxyContentLinkTest = "https:\/\/"+server+"\/game\/index.php?page=ingame&component=galaxy&action=fetchGalaxyContent&ajax=1&asJson=1";
 var lastActivitiesGalaSent = 0;
 var lastActivitiesSysSent = 0;
-var versionCheckTimeout = 86400;
+var versionCheckTimeout = 6*60*60;
+var technosCheckTimeout = 15*60;
 var lastPTREActivityPushMicroTS = 0;
 
 // GM keys
@@ -41,6 +61,9 @@ var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsol
 var ptreLastAvailableVersion = "ptre-" + country + "-" + universe + "-LastAvailableVersion";
 var ptreLastAvailableVersionRefresh = "ptre-" + country + "-" + universe + "-LastAvailableVersionRefresh";
 var ptreMaxCounterSpyTsSeen = "ptre-" + country + "-" + universe + "-MaxCounterSpyTsSeen";
+var ptreTechnosJSON = "ptre-" + country + "-" + universe + "-Technos";
+var ptreLastTechnosRefresh = "ptre-" + country + "-" + universe + "-LastTechnosRefresh";
+var ptrePlayerID = "ptre-" + country + "-" + universe + "-PlayerID";
 
 // Images
 var imgPTRE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB1FBMVEUAAEAAAEE1IjwvHTsEA0GBTCquYhxbNjINCUAFBEEqGjwyIDsAAUAYED+kXR++aBS7aBaKUCctHDwTDUBDKTeBSymwYxuYVyQPCkA8JTm4Zxi7ZxW9aBSrYR2fWyG+aRS8ZxS2Zhg6JDlqPzC+aRW8ZxV1RCwBAkEMCEGUVSW8aBSlXh8bET8oGj27aBdNLzZSMjW8aBaHTigGBUEXDz5kOS1qOymbWCG9aRayZBt0QihnOisiFj0PCj9FKjdKLDVIKzVGKjZHKjZILDYXDz8BAUENCD4OCD4KBj8OCT4MCD8CAkEiFj6MUSadWB+fWR2NUSYVDj8HBUBqPzGJTyeYViGeWB6fWR8+JzkFA0AWDj4kFz2ITiazZBl2RSwIBkASDD8ZED5hOTCwYhqbWSIHBD80IDodEz4PCT8kFjsKB0AhFDwTDD8DA0E1IToQCTybVh6pYB6ETSlWNDQrGzwHBUEjFj1PMDV+SSqoXhwfETmdVhyxZBuWViRrPy8DAkFjOzGPUiarXhgeETm9aBWiXCB9SSp4RiyeWiG1ZRm9aRW8aBWrXhmdVxysXhgPCT2UVCKzZRyxZByyZRyiXB8dEDoDAkAhFj4oGj4kGD4GBED///9i6fS4AAAAAWJLR0Sb79hXhAAAAAlwSFlzAAAOwgAADsIBFShKgAAAAAd0SU1FB+YMAw4EFzatfRkAAAE3SURBVCjPY2AgDBhxSzEx45JkYWVj5wDq5eTi5kGT4uXjFxAUEhYRFROXQLNJUkpaWkZWTkpeQVEJ1WRGZRVpaWlVGSChoqaOIqWhCRIFAy1tHRQpXTFVmJS0nj6yiYwGhnAZaX4jY7iEiamZuYUAHBhaWlnbQKVs7ewdHEHAyQlC2Tu7wM1jdHVzd3PzYGT08HRz8/JmRLbMh9XXzz8gMCg4JDQsPALFY5FR0TGxcfEMCYlJySnRcOHUtHROoLqMzCywouwcxlzePDewVH5BYVFxCQfUAsbSsvIKvsoqiFS1vLxhTW2dpEu9q3BeQyOboTx/UzNUqgUUfCpSrW3tHZ1d/MBw6e5BkgIBGXl5aEhiSCEAXKqXXxUNyPRBpPonTJyEBiZPmQqWmjZ9BgaYOYuIRIgVAABizF3wXn23IAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowNDoxNyswMDowMEeHM70AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDQ6MTcrMDA6MDA22osBAAAAAElFTkSuQmCC';
@@ -67,11 +90,12 @@ var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js
 
 // *** *** ***
 // MAIN EXEC
+// OGame pages - Enabled whatever AGR, OGL, OGI setup
 // *** *** ***
 
-// Update main pages
-if (!/page=standalone&component=empire/.test(location.href)) {
-    // Bouton options
+// Add EasyPTRE menu
+if (modeEasyPTRE == "ingame" && !/page=standalone&component=empire/.test(location.href)) {
+    // Setup Mneu Button
     var ptreMenuName = toolName;
     var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
     if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
@@ -88,43 +112,69 @@ if (!/page=standalone&component=empire/.test(location.href)) {
     document.getElementById('affOptionsPTRE').addEventListener("click", function (event) {
         displayPTREMenu();
     }, true);
+}
 
-    if (isAGREnabled()) {
-        if (document.getElementById('ago_panel_Player')) {
-            let observer2 = new MutationObserver(updateLocalAGRList);
-            var node2 = document.getElementById('ago_panel_Player');
-            observer2.observe(node2, {
-                attributes: true,
-                childList: true, // observer les enfants directs
-                subtree: true, // et les descendants aussi
-                characterDataOldValue: true // transmettre les anciennes données au callback
-            });
-        }
-        if (document.getElementById('ago_box_title')) {
-            // Add PTRE link to AGR pinned player
-            addPTRELinkToAGRPinnedTarget();
-            // Check if pinned player is updated
-            let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
-            var node = document.getElementById('ago_box_title');
-            observer.observe(node, {
-                attributes: true,
-                childList: true, // observer les enfants directs
-                subtree: true, // et les descendants aussi
-                characterDataOldValue: true // transmettre les anciennes données au callback
-            });
-        }
+// Check for new version only if we already did the check once
+// In order to not display the Tampermoney autorisation window during an inappropriate moment
+// It will be enabled when user opens the PTRE menu
+if (modeEasyPTRE == "ingame" && GM_getValue(ptreLastAvailableVersionRefresh, 0) != 0) {
+    updateLastAvailableVersion(false);
+} else {
+    consoleDebug("Version Check not initialized: open settings to initialize it");
+}
+
+// Save fleeters techs in order to send it to simulator from PTRE pages
+// Huge QOL to not add them manually
+if (modeEasyPTRE == "ingame" && /page=ingame&component=fleetdispatch/.test(location.href)) {
+    var currentTime = serverTime.getTime() / 1000;
+    if (currentTime > GM_getValue(ptreLastTechnosRefresh, 0) + technosCheckTimeout) {
+        setTimeout(doCheckLifeforms, 500);
+    }
+}
+
+
+
+// *** *** ***
+// MAIN EXEC
+// OGame pages - Only for AGR
+// *** *** ***
+
+// Update AGR Target List
+if (modeEasyPTRE == "ingame" && !/page=standalone&component=empire/.test(location.href) && isAGREnabled() && !isOGLorOGIEnabled()) {
+    if (document.getElementById('ago_panel_Player')) {
+        let observer2 = new MutationObserver(updateLocalAGRList);
+        var node2 = document.getElementById('ago_panel_Player');
+        observer2.observe(node2, {
+            attributes: true,
+            childList: true, // observer les enfants directs
+            subtree: true, // et les descendants aussi
+            characterDataOldValue: true // transmettre les anciennes données au callback
+        });
+    }
+    if (document.getElementById('ago_box_title')) {
+        // Add PTRE link to AGR pinned player
+        addPTRELinkToAGRPinnedTarget();
+        // Check if pinned player is updated
+        let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
+        var node = document.getElementById('ago_box_title');
+        observer.observe(node, {
+            attributes: true,
+            childList: true, // observer les enfants directs
+            subtree: true, // et les descendants aussi
+            characterDataOldValue: true // transmettre les anciennes données au callback
+        });
     }
 }
 
 // Galaxy page: Set routines
-if (/component=galaxy/.test(location.href)) {
+if (modeEasyPTRE == "ingame" && /component=galaxy/.test(location.href) && !isOGLorOGIEnabled()) {
     consoleDebug("Galaxy detected: Setting routines");
     setTimeout(addPTREStuffsToGalaxyPage, 250);
     setTimeout(checkForNewSystem, 500);
 }
 
 // Add PTRE send SR button to messages page
-if (/component=messages/.test(location.href)) {
+if (modeEasyPTRE == "ingame" && /component=messages/.test(location.href) && !isOGLorOGIEnabled()) {
     if (GM_getValue(ptreTeamKey) != '') {
         // Update Message Page (spy report part)
         setTimeout(addPTREStuffsToMessagesPage, 1500);
@@ -141,13 +191,41 @@ if (/component=messages/.test(location.href)) {
     }
 }
 
-// Check for new version only if we already did the check once
-// In order to not display the autorisation window during an inappropriate moment
-// It will be enabled when user opens the PTRE menu
-if (GM_getValue(ptreLastAvailableVersionRefresh, 0) != 0) {
-    updateLastAvailableVersion(false);
-} else {
-    consoleDebug("Version Check not initialized: open settings to initialize it");
+// *** *** ***
+// MAIN EXEC
+// PTRE pages only
+// *** *** ***
+
+// Display Lifeforms research on PTRE Lifeforms page
+if (modeEasyPTRE == "ptre" && /ptre.chez.gg\/\?page=lifeforms_researchs/.test(location.href)){
+    if (universe != 0) {
+        console.log("PTRE Lifeforms page detected: "+country+"-"+universe);
+        const json = GM_getValue(ptreTechnosJSON, '');
+        if (json != '') {
+            tab = parsePlayerResearchs(json, "tab");
+            document.getElementById("tech_from_easyptre").innerHTML = tab;
+            console.log("Updating lifeforms page");
+        } else {
+            console.log("No lifeforms data saved");
+        }
+    } 
+}
+
+// Update PTRE Spy Report Pages
+if (modeEasyPTRE == "ptre" && /ptre.chez.gg\/\?iid/.test(location.href)){
+    console.log("PTRE Spy Report page detected: "+country+"-"+universe);
+    const json = GM_getValue(ptreTechnosJSON, '');
+    if (json != '') {
+        const linkElement = document.getElementById("simulate_link");
+        let hrefValue = linkElement.getAttribute("href");
+        var prefill = parsePlayerResearchs(json, "prefill");
+        hrefValue = hrefValue.replace("replaceme", prefill);
+        linkElement.setAttribute("href", hrefValue);
+        document.getElementById("simulator_comment").innerHTML = "This link contains your LF techs";
+        console.log("Updating simulator link");
+    } else {
+        console.log("No lifeforms data saved");
+    }
 }
 
 // *** *** ***
@@ -248,32 +326,37 @@ GM_addStyle(`
     display: inline-block;
     background-color: #8495b5;
 }
+#divPTRESettings {
+    position: fixed;
+    bottom: 30px;
+    right: 10px;
+    z-index: 1000;
+    font-size: 10pt;
+}
 #boxPTRESettings {
     width: 500px;
     padding:10px;
-    z-index: 1000;
-    position: fixed;
-    bottom: 60px;
-    right: 10px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
 }
 #boxPTREMessage {
-    padding:10px;
-    z-index: 1001;
     position: fixed;
-    bottom: 60px;
+    bottom: 30px;
     right: 10px;
+    z-index: 1001;
+    padding:10px;
+    
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
 }
 #boxPTREInfos {
+    position: fixed;
+    bottom: 30px;
+    right: 540px;
+    z-index: 1000;
+    font-size: 10pt;
     min-width: 300px;
     padding:10px;
-    z-index: 1000;
-    position: fixed;
-    bottom: 60px;
-    right: 540px;
     border: solid black 2px;
     background:rgba(0,26,52,0.95);
 }
@@ -310,8 +393,8 @@ function displayPTREPopUpMessage(message) {
     boxPTREMessage.innerHTML = divPTREMessage;
     boxPTREMessage.id = 'boxPTREMessage';
 
-    if (document.getElementById('links')) {
-        document.getElementById('links').appendChild(boxPTREMessage);
+    if (document.getElementById('bottom')) {
+        document.getElementById('bottom').appendChild(boxPTREMessage);
         setTimeout(function() {cleanFirstPTREPopUpMessage();}, ptreMessageDisplayTime * 1000);
     }
 }
@@ -347,6 +430,14 @@ function isAGREnabled() {
     return false;
 }
 
+// Detects if OGL is enabled
+function isOGLorOGIEnabled() {
+    if (document.querySelector('body.oglight') || document.getElementsByClassName('ogl-harvestOptions').length != 0) {
+        return true;
+    }
+    return false;
+}
+
 // Convert planets activities to OGL - PTRE format
 function convertActivityToOGLFormat(showActivity, idleTime) {
     if (showActivity == '15') {
@@ -368,6 +459,10 @@ function consoleDebug(message) {
         console.log('[PTRE] ' + message);
     }
 }
+
+function round(x, y) {
+    return Number.parseFloat(x).toFixed(y);
+  }
 
 function updateLastAvailableVersion(force) {
     // Only check once a day
@@ -411,7 +506,7 @@ function updateLastAvailableVersion(force) {
         });
     } else {
         var temp = lastCheckTime + versionCheckTimeout - currentTime;
-        consoleDebug("Skipping last version check. Next check in " + temp + " sec min");
+        consoleDebug("Skipping last version check. Next check in " + round(temp, 0) + " sec min");
     }
 }
 
@@ -728,53 +823,75 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += debugMode;
         divPTRE += ' />';
         divPTRE += '</td></tr>';
-
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" class="button" value="SYNC TARGETS" /></td></tr>';
-        if (isAGROn) {
-            divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" class="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
-        } else {
-            divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
-        }
-        // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
-        var targetJSON = '';
-        var targetList = '';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table width="90%">';
-        if (mode == 'AGR') {
-            divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
-        } else {
-            divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
-        }
-        if (mode == 'AGR' && isAGROn) {
-            updateLocalAGRList();
-            targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
-            //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div><div>Add targets via AGR lists</div></div></td></tr>';
-        } else {
-            targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-            //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using PTRE target lists</div><div>Add targets via galaxy view</div></td></tr>';
-        }
-        if (targetJSON != '') {
-            targetList = JSON.parse(targetJSON);
-            if (targetList) {
-                $.each(targetList, function(i, PlayerCheck) {
-                    //consoleDebug(PlayerCheck);
-                    divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">- '+PlayerCheck.pseudo+'</td>';
-                    divPTRE += '<td class="td_cell" align="center"><input id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button" value="FLEET"></td>';
-                    divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
-                    if (mode == 'AGR') {
-                        var checked = '';
-                        if (isTargetPrivate(PlayerCheck.id)) {
-                            checked = ' checked';
-                        }
-                        divPTRE += '<td class="td_cell" align="center"><input class="sharedTargetStatus" id="'+PlayerCheck.id+'" type="checkbox"' + checked + '></td>';
-                    }
-                    divPTRE += '<td class="td_cell" align="center"><a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a></td>';
-                    divPTRE += '</tr>';
-                });
-            }
-        }
-        divPTRE += '</table></div></td></tr>';
 
+        // A reprendre
+        if (isOGLorOGIEnabled()) {
+            divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Targets list</span></td></tr>';
+            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><br><span class="status_warning">OGLight or OGInfinity is enabled: some EasyPTRE features are disabled to leave priority to your favorite tool, OGL/OGI.</span>';
+            divPTRE += '<br><br><span class="status_positif">EasyPTRE is still managing some tasks, <br>like Lifeforms researchs synchronization for simulators.</span></td></tr>';
+        } else {
+            // EasyPTRE enabled (AGR mode or vanilla mode)
+            // Targets list
+            divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" class="button" value="SYNC TARGETS" /></td></tr>';
+            if (isAGROn) {
+                divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" class="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
+            } else {
+                divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
+            }
+            // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
+            var targetJSON = '';
+            var targetList = '';
+            divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table width="90%">';
+            if (mode == 'AGR') {
+                divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+            } else {
+                divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+            }
+            if (mode == 'AGR' && isAGROn) {
+                updateLocalAGRList();
+                targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+                //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div><div>Add targets via AGR lists</div></div></td></tr>';
+            } else {
+                targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+                //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using PTRE target lists</div><div>Add targets via galaxy view</div></td></tr>';
+            }
+            if (targetJSON != '') {
+                targetList = JSON.parse(targetJSON);
+                if (targetList) {
+                    $.each(targetList, function(i, PlayerCheck) {
+                        //consoleDebug(PlayerCheck);
+                        divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">- '+PlayerCheck.pseudo+'</td>';
+                        divPTRE += '<td class="td_cell" align="center"><input id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button" value="FLEET"></td>';
+                        divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
+                        if (mode == 'AGR') {
+                            var checked = '';
+                            if (isTargetPrivate(PlayerCheck.id)) {
+                                checked = ' checked';
+                            }
+                            divPTRE += '<td class="td_cell" align="center"><input class="sharedTargetStatus" id="'+PlayerCheck.id+'" type="checkbox"' + checked + '></td>';
+                        }
+                        divPTRE += '<td class="td_cell" align="center"><a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a></td>';
+                        divPTRE += '</tr>';
+                    });
+                }
+            }
+            divPTRE += '</table></div></td></tr>';
+        }
+
+        // Lifeforms Menu
+        const currentTime = serverTime.getTime() / 1000;
+        const lastTechCheck = GM_getValue(ptreLastTechnosRefresh, 0);
+        var techMessage = '<span class="status_negatif">No Lifeforms researchs saved. Go to <a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet Page to update</a>.</span>';
+        if (lastTechCheck != 0) {
+            var nb_min = (currentTime - lastTechCheck) / 60;
+            techMessage = '<b>Lifeforms researchs saved '+round(nb_min, 0)+' minute(s) ago</b>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
+        }
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" colspan="2"><span class="ptre_title">Lifeforms infos</span></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2">'+techMessage+'</td></tr>';
+
+        // Footer
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <input id="forceCheckVersionButton" type="button" class="button" value="CHECK" /></td></tr>';
@@ -794,101 +911,19 @@ function displayPTREMenu(mode = 'AGR') {
         eletementSetPTRE.innerHTML = divPTRE;
         eletementSetPTRE.id = 'divPTRESettings';
 
-        if (document.getElementById('links')) {
-            document.getElementById('links').appendChild(eletementSetPTRE);
-        }
-
-        var targetStatus = document.getElementsByClassName('sharedTargetStatus');
-        $.each(targetStatus, function(nb, target) {
-            document.getElementById(target.id).addEventListener("click", function (event)
-            {
-                var status = tooglePrivatePlayer(target.id);
-                displayMessageInSettings('Target is now ' + status);
-            });
-        });
-
-         // Action: Sync targets
-        document.getElementById('synctTargetsWithPTRE').addEventListener("click", function (event) {
-            var AGRJSON = GM_getValue(ptreAGRPlayerListJSON, '');
-            var PTREJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-            var targetList = [];
-            var targetListTemp;
-            var player;
-            var nb_private = 0;
-
-            if (AGRJSON != '' && PTREJSON != '') {
-                targetListTemp = JSON.parse(AGRJSON);
-                var targetListPTRE = JSON.parse(PTREJSON);
-                targetListTemp = targetListTemp.concat(targetListPTRE);
-            } else if (AGRJSON != '') {
-                targetListTemp = JSON.parse(AGRJSON);
-            } else if (PTREJSON != '') {
-                targetListTemp = JSON.parse(PTREJSON);
-            } else {
-                targetListTemp = [];
-            }
-
-            targetListTemp.forEach(function(item, index, object) {
-                consoleDebug(item.id + ' ' + item.pseudo);
-                if (isTargetPrivate(item.id)) {
-                    consoleDebug("Ignoring " + item.pseudo);
-                    nb_private++;
-                } else {
-                    player = {id: item.id, pseudo: item.pseudo};
-                    targetList.push(player);
-                }
-            });
-
-            fetch(urlPTRESyncTargets + '&version=' + GM_info.script.version + '&team_key=' + ptreStoredTK,
-            { method:'POST', body:JSON.stringify(targetList) })
-            .then(response => response.json())
-            .then(data => {
-                if(data.code == 1) {
-                    var count = 0;
-                    var newTargetList = JSON.parse(JSON.stringify(data.targets_array));
-                    $.each(newTargetList, function(i, incomingPlayer) {
-                        if (!isPlayerInLists(incomingPlayer.player_id)) {
-                            addPlayerToList(incomingPlayer.player_id, incomingPlayer.pseudo, 'PTRE');
-                            count++;
-                        }
-                    });
-                    displayMessageInSettings(nb_private + ' private targets ignored. ' + data.message + ' ' + count + ' new targets added.');
-                } else {
-                    displayMessageInSettings(data.message);
-                }
-            });
-        });
-
-        // Action: Player Infos
-        if (targetList) {
-            $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('btnGetPlayerInfos'+PlayerCheck.id).addEventListener("click", function (event) {
-                    getPlayerInfos(PlayerCheck.id, PlayerCheck.pseudo);
-                });
-            });
-        }
-
-        // Action: Help
-        document.getElementById('btnHelpPTRE').addEventListener("click", function (event) {
-            displayHelp();
-        });
-
-        // Action: Delete player
-        if (targetList) {
-            $.each(targetList, function(i, PlayerCheck) {
-                document.getElementById('removePlayerFromListBySettings_'+PlayerCheck.id).addEventListener("click", function (event) {
-                    // Delete player from list
-                    var mess = deletePlayerFromList(PlayerCheck.id, mode);
-                    displayMessageInSettings(mess);
-                    document.getElementById('rawPLayer_'+PlayerCheck.id).remove();
-                });
-            });
+        if (document.getElementById('bottom')) {
+            document.getElementById('bottom').appendChild(eletementSetPTRE);
         }
 
         // Action: Check version
         document.getElementById('forceCheckVersionButton').addEventListener("click", function (event) {
             document.getElementById('ptreUpdateVersionMessage').innerHTML = '';
             updateLastAvailableVersion(true);
+        });
+
+        // Action: Help
+        document.getElementById('btnHelpPTRE').addEventListener("click", function (event) {
+            displayHelp();
         });
 
         // Action: Close
@@ -934,6 +969,91 @@ function displayPTREMenu(mode = 'AGR') {
                 document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));
                 setTimeout(function() {displayPTREMenu(other_mode);}, 100);
             });
+        }
+
+        if (!isOGLorOGIEnabled()) {
+            // Toogle target status
+            var targetStatus = document.getElementsByClassName('sharedTargetStatus');
+            $.each(targetStatus, function(nb, target) {
+                document.getElementById(target.id).addEventListener("click", function (event)
+                {
+                    var status = tooglePrivatePlayer(target.id);
+                    displayMessageInSettings('Target is now ' + status);
+                });
+            });
+
+            // Action: Sync targets
+            document.getElementById('synctTargetsWithPTRE').addEventListener("click", function (event) {
+                var AGRJSON = GM_getValue(ptreAGRPlayerListJSON, '');
+                var PTREJSON = GM_getValue(ptrePTREPlayerListJSON, '');
+                var targetList = [];
+                var targetListTemp;
+                var player;
+                var nb_private = 0;
+
+                if (AGRJSON != '' && PTREJSON != '') {
+                    targetListTemp = JSON.parse(AGRJSON);
+                    var targetListPTRE = JSON.parse(PTREJSON);
+                    targetListTemp = targetListTemp.concat(targetListPTRE);
+                } else if (AGRJSON != '') {
+                    targetListTemp = JSON.parse(AGRJSON);
+                } else if (PTREJSON != '') {
+                    targetListTemp = JSON.parse(PTREJSON);
+                } else {
+                    targetListTemp = [];
+                }
+
+                targetListTemp.forEach(function(item, index, object) {
+                    consoleDebug(item.id + ' ' + item.pseudo);
+                    if (isTargetPrivate(item.id)) {
+                        consoleDebug("Ignoring " + item.pseudo);
+                        nb_private++;
+                    } else {
+                        player = {id: item.id, pseudo: item.pseudo};
+                        targetList.push(player);
+                    }
+                });
+
+                fetch(urlPTRESyncTargets + '&version=' + GM_info.script.version + '&team_key=' + ptreStoredTK,
+                { method:'POST', body:JSON.stringify(targetList) })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.code == 1) {
+                        var count = 0;
+                        var newTargetList = JSON.parse(JSON.stringify(data.targets_array));
+                        $.each(newTargetList, function(i, incomingPlayer) {
+                            if (!isPlayerInLists(incomingPlayer.player_id)) {
+                                addPlayerToList(incomingPlayer.player_id, incomingPlayer.pseudo, 'PTRE');
+                                count++;
+                            }
+                        });
+                        displayMessageInSettings(nb_private + ' private targets ignored. ' + data.message + ' ' + count + ' new targets added.');
+                    } else {
+                        displayMessageInSettings(data.message);
+                    }
+                });
+            });
+
+            // Action: Player Infos
+            if (targetList) {
+                $.each(targetList, function(i, PlayerCheck) {
+                    document.getElementById('btnGetPlayerInfos'+PlayerCheck.id).addEventListener("click", function (event) {
+                        getPlayerInfos(PlayerCheck.id, PlayerCheck.pseudo);
+                    });
+                });
+            }
+
+            // Action: Delete player
+            if (targetList) {
+                $.each(targetList, function(i, PlayerCheck) {
+                    document.getElementById('removePlayerFromListBySettings_'+PlayerCheck.id).addEventListener("click", function (event) {
+                        // Delete player from list
+                        var mess = deletePlayerFromList(PlayerCheck.id, mode);
+                        displayMessageInSettings(mess);
+                        document.getElementById('rawPLayer_'+PlayerCheck.id).remove();
+                    });
+                });
+            }
         }
     }
 }
@@ -1172,6 +1292,8 @@ function displayHelp() {
     content = '<span class="ptre_maintitle">EasyPTRE Help</span><br><br><span class="ptre_tab_title">Purpose</span><br><br>EasyPTRE works as a side-car of AGR in order to enable PTRE basic features. Once configured, you will be able to: <br>- Push and share spy reports<br>- Push counter spy messages as acivities<br>- Track targets galaxy activities and check results on PTRE website<br>- Display player top fleet from PTRE<br>- Sync targets list with your Team';
     content+= '<br><br><span class="ptre_tab_title">Team Key setting</span><br><br>To use it, you need to create a Team on <a href="https://ptre.chez.gg?page=team" target="_blank">PTRE website</a> and add Team Key to EasyPTRE settings.<br>PTRE Team Key should look like: TM-XXXX-XXXX-XXXX-XXXX. Create your Team or ask your teammates for it.';
     content+= '<br><br><span class="ptre_tab_title">Spy report push</span><br><br>You can push spy reports from the messages page or when opening a spy report. Spy report will be shared to your Team and over Discord (if <a href="https://ptre.chez.gg/?page=discord_integration" target="_blank">configuration</a> is done).';
+    content+= '<br><br><span class="ptre_tab_title">Lifeforms Researchs synchronization</span><br><br>EasyPTRE will save your LF researchs so you never have to manually enter thme into simulator when using PTRE links. <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Details here</a>.';
+    content+= '<br><br><span class="ptre_tab_title">Activity sharing</span><br><br>EasyPTRE will send targets activities from galaxy and counter-spy messages from Inbox';
     content+= '<br><br><span class="ptre_tab_title">Target lists</span><br><br>EasyPTRE targets lists determines players that will be activity-tracked when exploring the galaxy. ';
     content+= 'EasyPTRE manages two targets lists that works at same time (both lists are tracked):<br>- AGR target list: it is based on you AGR left pannel: Target, To attack, Watch, Miner. It ignores Friends and traders. To update this list, open your AGR target pannels<br>- PTRE target list: this list containes targets shared by your team';
     content+= '<br><br>You can sync your target lists with your teammates (you may ignore some of your targets in order to NOT share them with friends and keep it to yourself).';
@@ -1421,4 +1543,106 @@ function processGalaxyData(data) {
     } else {
         displayPTREGalaxyMessage("No target in this system");
     }
+}
+
+function doCheckLifeforms() {
+    console.log("Fleet page detected: Updating Techs...");
+    GM_setValue(ptrePlayerID, currentPlayerID);
+    var spanElement = document.querySelector('.show_fleet_apikey');
+    var tooltipContent = spanElement.getAttribute('data-tooltip-title');
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = tooltipContent;
+    var inputElements = tempDiv.querySelectorAll('input');
+    var secondInputElement = inputElements[1];
+    var techJSON = secondInputElement ? secondInputElement.value : null;
+    if (techJSON != null) {
+        //techList = JSON.parse(techJSON);
+        GM_setValue(ptreTechnosJSON, techJSON);
+        var tempMessage = 'Saving Lifeforms researches: <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Display on PTRE</a>';
+        displayPTREPopUpMessage(tempMessage);
+        // Update last check TS
+        GM_setValue(ptreLastTechnosRefresh, currentTime);
+    } else {
+        console.log("Cant find Techs!");
+    }
+}
+
+// Convert IG API 2 JSON to Prefill format
+// mode can be "prefill" or "tab"
+function parsePlayerResearchs(json, mode) {
+    const obj = JSON.parse(json);
+    const characterClassId = obj.characterClassId;
+    const allianceClassId = obj.allianceClassId;
+    let out = {};
+
+    if (mode == "tab") {
+        var str = '<table width="60%" border="1"><tr><td style="padding: 5px" align="center">Ships</td>';
+        str+='<td style="padding: 5px" align="center"><img src="/img/ogame/speed.png" width="30px"><br>Speed</td>';
+        str+='<td style="padding: 5px" align="center"><img src="/img/ogame/armor.png" width="30px"><br>Armor</td>';
+        str+='<td style="padding: 5px" align="center"><img src="/img/ogame/shield.png" width="30px"><br>Shield</td>';
+        str+='<td style="padding: 5px" align="center"><img src="/img/ogame/weapon.png" width="30px"><br>Weapon</td>';
+        str+='<td style="padding: 5px" align="center"><img src="/img/ogame/cargo.png" width="30px"><br>Cargo</td>';
+        str+='<td style="padding: 5px" align="center"><br>Fuel</td></tr>';
+    } else {
+        out["0"] = {
+            "class": characterClassId,
+            "playerClass": characterClassId,
+            "allianceClass": allianceClassId,
+            "research": {},
+            "lifeformBonuses": {
+                "BaseStatsBooster": {},
+                "CharacterClassBooster": {}
+            }
+        };
+        for (const key in obj.researches) {
+            out["0"]["research"][key] = obj.researches[key];
+        }
+    }
+
+    for (const key in obj.ships) {
+        if (mode == "tab") {
+            var type = 'ship';
+            if (key > 400) {
+                type = 'def';
+            }
+            str+= '<tr><td align="center"><img src="/img/ogame/mini/'+type+'_'+key+'.png"></td>';
+            var temp = '-'; if (obj.ships[key].speed > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].speed*100, 2)+' %<span>'; }
+            str+= '<td align="center">'+temp+'</td>';
+            temp = '-'; if (obj.ships[key].armor > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].armor*100, 2)+' %<span>'; }
+            str+= '<td align="center">'+temp+'</td>';
+            temp = '-'; if (obj.ships[key].shield > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].shield*100, 2)+' %<span>'; }
+            str+= '<td align="center">'+temp+'</td>';
+            temp = '-'; if (obj.ships[key].weapon > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].weapon*100, 2)+' %<span>'; }
+            str+= '<td align="center">'+temp+'</td>';
+            temp = '-'; if (obj.ships[key].cargo > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].cargo*100, 2)+' %<span>'; }
+            str+= '<td align="center">'+temp+'</td>';
+            temp = '-'; if (obj.ships[key].fuel > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].fuel*100, 2)+' %<span>'; }
+            str+= '<td align="center">'+temp+'</td></tr>';
+        } else {
+            out["0"]["lifeformBonuses"]["BaseStatsBooster"][key] = {
+                "armor": obj.ships[key].armor,
+                "shield": obj.ships[key].shield,
+                "weapon": obj.ships[key].weapon,
+                "cargo": obj.ships[key].cargo,
+                "speed": obj.ships[key].speed,
+                "fuel": obj.ships[key].fuel
+            };
+        }
+    }
+
+    if (mode == "tab") {
+        str+= '</table>';
+        return str;
+    }
+
+    out["0"]["lifeformBonuses"]["CharacterClassBooster"]["1"] = obj.bonuses.characterClassBooster["1"];
+    out["0"]["lifeformBonuses"]["CharacterClassBooster"]["2"] = obj.bonuses.characterClassBooster["2"];
+    out["0"]["lifeformBonuses"]["CharacterClassBooster"]["3"] = obj.bonuses.characterClassBooster["3"];
+    
+    // Hook for simulator
+    let ARR_ATT = [];
+    ARR_ATT.push(out["0"]);
+    const jsonOut = JSON.stringify({ "0": ARR_ATT });
+
+    return btoa(jsonOut);
 }
