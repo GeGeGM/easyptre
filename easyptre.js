@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.9.0
+// @version      0.9.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -1595,7 +1595,7 @@ function parsePlayerResearchs(json, mode) {
             }
         };
         for (const key in obj.researches) {
-            out["0"]["research"][key] = obj.researches[key];
+            out["0"]["research"][key] = JSON.parse('{"level":'+obj.researches[key]+'}');
         }
     }
 
