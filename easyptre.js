@@ -179,7 +179,7 @@ if (modeEasyPTRE == "ingame" && /component=messages/.test(location.href) && !isO
         // Update Message Page (spy report part)
         setTimeout(addPTREStuffsToMessagesPage, 1500);
         // Update AGR Spy Table
-        if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable) == 'true')) {
+        if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true')) {
             let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
             var nodeSpyTable = document.getElementById('messagecontainercomponent');
             spyTableObserver.observe(nodeSpyTable, {
