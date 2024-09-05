@@ -1820,7 +1820,7 @@ function syncSharableData(mode) {
                 var reponseDecode = jQuery.parseJSON(reponse);
                 console.log(reponseDecode.message);
                 if (mode == 'manual') {
-                    displayPTREPopUpMessage(reponseDecode.message);
+                    displayMessageInSettings(reponseDecode.message);
                 }
             }
         });
