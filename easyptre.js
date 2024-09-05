@@ -53,7 +53,7 @@ var versionCheckTimeout = 6*60*60;
 var technosCheckTimeout = 15*60;
 var dataSharingDelay = 5;
 var lastPTREActivityPushMicroTS = 0;
-var ptreGalaxyMessageBoxContentFadeOut = 10000 * 10000;
+var ptreGalaxyMessageBoxContentFadeOut = 10000;
 
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
@@ -159,7 +159,7 @@ if (modeEasyPTRE == "ingame") {
 
     // Add PTRE Box to galaxy view
     if (/component=galaxy/.test(location.href)) {
-        var tempContent = '<table><tr><td valign="top"><input id="ptreSpanGalaxyPhalanxButton" type="button" class="button" value="PTRE PHALANX" /></td>';
+        var tempContent = '<table><tr><td valign="top"><input id="ptreSpanGalaxyPhalanxButton" type="button" class="button btn_blue" value="PTRE PHALANX" /></td>';
         tempContent+= '<td valign="top"><div id="ptreGalaxyMessageBoxContent"></div></td></tr></table>';
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = tempContent;
@@ -368,9 +368,7 @@ GM_addStyle(`
     padding: 3px;
 }
 .button {
-    cursor: pointer;
-    display: inline-block;
-    background-color: #8495b5;
+    height: 19px;
 }
 #divPTRESettings {
     position: fixed;
@@ -817,10 +815,10 @@ function displayPTREMenu(mode = 'AGR') {
             other_mode = 'AGR';
         }
         var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnHelpPTRE" type="button" class="button" value="HELP" /> <input id="btnRefreshOptPTRE" type="button" class="button" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" class="button" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnHelpPTRE" type="button" class="button btn_blue" value="HELP" /> <input id="btnRefreshOptPTRE" type="button" class="button btn_blue" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" class="button btn_blue" value="CLOSE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="status_warning"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" class="button" value="SAVE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" class="button btn_blue" value="SAVE" /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
         // If AGR is detected
@@ -853,9 +851,9 @@ function displayPTREMenu(mode = 'AGR') {
         } else {
             // EasyPTRE enabled (AGR mode or vanilla mode)
             // Targets list
-            divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?country='+country+'&univers='+universe+'&page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" class="button" value="SYNC TARGETS" /></td></tr>';
+            divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?country='+country+'&univers='+universe+'&page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" class="button btn_blue" value="SYNC TARGETS" /></td></tr>';
             if (isAGROn) {
-                divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" class="button" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
+                divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" class="button btn_blue" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
             } else {
                 divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
             }
@@ -882,7 +880,7 @@ function displayPTREMenu(mode = 'AGR') {
                     $.each(targetList, function(i, PlayerCheck) {
                         //consoleDebug(PlayerCheck);
                         divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">- '+PlayerCheck.pseudo+'</td>';
-                        divPTRE += '<td class="td_cell" align="center"><input id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button" value="FLEET"></td>';
+                        divPTRE += '<td class="td_cell" align="center"><input id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button btn_blue" value="FLEET"></td>';
                         divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
                         if (mode == 'AGR') {
                             var checked = '';
@@ -913,7 +911,7 @@ function displayPTREMenu(mode = 'AGR') {
 
         // Shared data
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Team shared data</span></td><td class="td_cell" align="right"><input id="synctDataWithPTRE" type="button" class="button" value="SYNC DATA" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Team shared data</span></td><td class="td_cell" align="right"><input id="synctDataWithPTRE" type="button" class="button btn_blue" value="SYNC DATA" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" colspan="2">Phalanx: ';
         var dataJSON = '';
         dataJSON = GM_getValue(ptreDataToSync, '');
@@ -934,7 +932,7 @@ function displayPTREMenu(mode = 'AGR') {
         // Footer
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <input id="forceCheckVersionButton" type="button" class="button" value="CHECK" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <input id="forceCheckVersionButton" type="button" class="button btn_blue" value="CHECK" /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
@@ -1293,7 +1291,7 @@ function setupInfoBox() {
     if (document.getElementById('divPTREInfos')) {
         document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
     }
-    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><input id="btnCloseInfosPTRE" type="button" class="button" value="CLOSE" /><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="status_warning">LOADING...</span><center><br><br><br></div></td></tr></table>';
+    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><input id="btnCloseInfosPTRE" type="button" class="button btn_blue" value="CLOSE" /><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="status_warning">LOADING...</span><center><br><br><br></div></td></tr></table>';
     var eletementSetPTRE = document.createElement("div");
     eletementSetPTRE.innerHTML = divPTRE;
     eletementSetPTRE.id = 'divPTREInfos';
