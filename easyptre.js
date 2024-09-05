@@ -82,7 +82,7 @@ var imgSupPlayer = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAA
 var ptreMessageDisplayTime = 5;
 var menuImageDisplayTime = 3;
 var ptreMenuDisplayTime = 1;
-var ptreTargetListMaxSize = 100;
+var ptreTargetListMaxSize = 300;
 var ptrePushDelayMicroSec = 500;
 // TODO: Set ptreAGRTargetListMaxSize
 
