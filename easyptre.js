@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.9.3
+// @version      0.9.4
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -93,7 +93,7 @@ var urlPTRESyncTargets = 'https://ptre.chez.gg/scripts/api_sync_target_list.php?
 var urlPTREGetPlayerInfos = 'https://ptre.chez.gg/scripts/oglight_get_player_infos.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlPTRESyncSharableData = 'https://ptre.chez.gg/scripts/api_sync_data.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlPTREGetPhalanxInfosFromGala = 'https://ptre.chez.gg/scripts/api_get_phalanx_infos.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
-var urlPTREGetGGEInfosFromGala = 'https://ptre.chez.gg/scripts/api_get_gge_infos.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
+var urlPTREGetGEEInfosFromGala = 'https://ptre.chez.gg/scripts/api_get_gee_infos.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js';
 
 // ****************************************
@@ -162,7 +162,7 @@ if (modeEasyPTRE == "ingame") {
     if (/component=galaxy/.test(location.href)) {
         var tempContent = '<table><tr><td valign="top">';
         tempContent+= '<div id="ptreGalaxyPhalanxButton" type="button" class="button btn_blue">PTRE PHALANX</div>';
-        tempContent+= ' <div id="ptreGalaxyGGEButton" type="button" class="button btn_blue">PTRE GGE</div></td>';
+        tempContent+= ' <div id="ptreGalaxyGEEButton" type="button" class="button btn_blue">PTRE GEE</div></td>';
         tempContent+= '<td valign="top"><div id="ptreGalaxyMessageBoxContent"></div></td></tr></table>';
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = tempContent;
@@ -176,8 +176,8 @@ if (modeEasyPTRE == "ingame") {
         document.getElementById('ptreGalaxyPhalanxButton').addEventListener("click", function (event) {
             getPhalanxInfosFromGala(galaxy, system);
         });
-        document.getElementById('ptreGalaxyGGEButton').addEventListener("click", function (event) {
-            getGGEInfosFromGala(galaxy, system);
+        document.getElementById('ptreGalaxyGEEButton').addEventListener("click", function (event) {
+            getGEEInfosFromGala(galaxy, system);
         });
     }
 }
@@ -277,6 +277,11 @@ if (modeEasyPTRE == "ptre") {
         } else {
             console.log("No lifeforms data saved");
         }
+    }
+
+    // Remove EasyPTRE notification from PTRE website
+    if (document.getElementById("easyptre_install_notification")) {
+        document.getElementById("easyptre_install_notification").remove();
     }
 }
 
@@ -1868,7 +1873,7 @@ function getPhalanxInfosFromGala(galaxy, system) {
 }
 
 // This function fetchs Galaxy Event Explorer infos
-function getGGEInfosFromGala(galaxy, system) {
+function getGEEInfosFromGala(galaxy, system) {
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
@@ -1876,7 +1881,7 @@ function getGGEInfosFromGala(galaxy, system) {
         return -1;
     }
     $.ajax({
-        url : urlPTREGetGGEInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
+        url : urlPTREGetGEEInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
         type : 'POST',
         data: null,
         cache: false,
