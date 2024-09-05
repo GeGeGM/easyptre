@@ -53,7 +53,7 @@ var versionCheckTimeout = 6*60*60;
 var technosCheckTimeout = 15*60;
 var dataSharingDelay = 5;
 var lastPTREActivityPushMicroTS = 0;
-var ptreSpanGalaxyPhalanxMessageFadeOut = 10000;
+var ptreGalaxyMessageBoxContentFadeOut = 10000 * 10000;
 
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
@@ -95,51 +95,52 @@ var urlPTRESyncSharableData = 'https://ptre.chez.gg/scripts/api_sync_data.php?to
 var urlPTREGetPhalanxInfosFromGala = 'https://ptre.chez.gg/scripts/api_get_phalanx_infos.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlToScriptMetaInfos = 'https://openuserjs.org/meta/GeGe_GM/EasyPTRE.meta.js';
 
-// *** *** ***
+// ****************************************
 // MAIN EXEC
 // OGame pages - Enabled whatever AGR, OGL, OGI setup
-// *** *** ***
-
-// Add EasyPTRE menu
-if (modeEasyPTRE == "ingame" && !/page=standalone&component=empire/.test(location.href)) {
-    // Setup Mneu Button
-    var ptreMenuName = toolName;
-    var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
-    if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
-        ptreMenuName = "UPDATE ME";
-    }
-    var aff_option = '<span class="menu_icon"><a id="iconeUpdate" href="https://ptre.chez.gg" target="blank_" ><img id="imgPTREmenu" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a></span>';
-    aff_option += '<a id="affOptionsPTRE" class="menubutton " href="#" accesskey="" target="_self"><span class="textlabel" id="ptreMenuName">' + ptreMenuName + '</span></a>';
-
-    var tab = document.createElement("li");
-    tab.innerHTML = aff_option;
-    tab.id = 'optionPTRE';
-    document.getElementById('menuTableTools').appendChild(tab);
-
-    document.getElementById('affOptionsPTRE').addEventListener("click", function (event) {
-        displayPTREMenu();
-    }, true);
-}
-
-// Check for new version only if we already did the check once
-// In order to not display the Tampermoney autorisation window during an inappropriate moment
-// It will be enabled when user opens the PTRE menu
-if (modeEasyPTRE == "ingame" && GM_getValue(ptreLastAvailableVersionRefresh, 0) != 0) {
-    updateLastAvailableVersion(false);
-} else {
-    consoleDebug("Version Check not initialized: open settings to initialize it");
-}
-
-// Save fleeters techs in order to send it to simulator from PTRE pages
-// Huge QOL to not add them manually
-if (modeEasyPTRE == "ingame" && /page=ingame&component=fleetdispatch/.test(location.href)) {
-    var currentTime = serverTime.getTime() / 1000;
-    if (currentTime > GM_getValue(ptreLastTechnosRefresh, 0) + technosCheckTimeout) {
-        setTimeout(doCheckLifeforms, 500);
-    }
-}
+// ****************************************
 
 if (modeEasyPTRE == "ingame") {
+
+    // Add EasyPTRE menu
+    if (!/page=standalone&component=empire/.test(location.href)) {
+        // Setup Mneu Button
+        var ptreMenuName = toolName;
+        var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
+        if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
+            ptreMenuName = "UPDATE ME";
+        }
+        var aff_option = '<span class="menu_icon"><a id="iconeUpdate" href="https://ptre.chez.gg" target="blank_" ><img id="imgPTREmenu" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a></span>';
+        aff_option += '<a id="affOptionsPTRE" class="menubutton " href="#" accesskey="" target="_self"><span class="textlabel" id="ptreMenuName">' + ptreMenuName + '</span></a>';
+
+        var tab = document.createElement("li");
+        tab.innerHTML = aff_option;
+        tab.id = 'optionPTRE';
+        document.getElementById('menuTableTools').appendChild(tab);
+
+        document.getElementById('affOptionsPTRE').addEventListener("click", function (event) {
+            displayPTREMenu();
+        }, true);
+    }
+
+    // Check for new version only if we already did the check once
+    // In order to not display the Tampermoney autorisation window during an inappropriate moment
+    // It will be enabled when user opens the PTRE menu
+    if (GM_getValue(ptreLastAvailableVersionRefresh, 0) != 0) {
+        updateLastAvailableVersion(false);
+    } else {
+        consoleDebug("Version Check not initialized: open settings to initialize it");
+    }
+
+    // Save fleeters techs in order to send it to simulator from PTRE pages
+    // Huge QOL to not add them manually
+    if (/page=ingame&component=fleetdispatch/.test(location.href)) {
+        var currentTime = serverTime.getTime() / 1000;
+        if (currentTime > GM_getValue(ptreLastTechnosRefresh, 0) + technosCheckTimeout) {
+            setTimeout(doCheckLifeforms, 500);
+        }
+    }
+
     // Capture Phalanx level
     if (/page=ingame&component=facilities/.test(location.href)) {
         if (document.getElementById('technologies')) {
@@ -156,15 +157,14 @@ if (modeEasyPTRE == "ingame") {
         }
     }
 
-    // Add Phalanx button to galaxy view
+    // Add PTRE Box to galaxy view
     if (/component=galaxy/.test(location.href)) {
-        var ptreSpanGalaxyPhalanxContent = '<table><tr><td valign="top"><input id="ptreSpanGalaxyPhalanxButton" type="button" class="button" value="PTRE PHALANX" /></td>';
-        ptreSpanGalaxyPhalanxContent+= '<td valign="top"><span id="ptreSpanGalaxyPhalanxMessage"></span></td></tr></table>';
-        var divPTREGalaxyPhalanx = document.createElement("div");
-        divPTREGalaxyPhalanx.innerHTML = ptreSpanGalaxyPhalanxContent;
-        divPTREGalaxyPhalanx.id = 'ptreGalaxyPhalanx';
-        //document.getElementById('galaxyContent').appendChild(divPTREGalaxyPhalanx);
-        document.getElementsByClassName("galaxyTable")[0].appendChild(divPTREGalaxyPhalanx);
+        var tempContent = '<table><tr><td valign="top"><input id="ptreSpanGalaxyPhalanxButton" type="button" class="button" value="PTRE PHALANX" /></td>';
+        tempContent+= '<td valign="top"><div id="ptreGalaxyMessageBoxContent"></div></td></tr></table>';
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = tempContent;
+        tempDiv.id = 'ptreGalaxyBox';
+        document.getElementsByClassName("galaxyTable")[0].appendChild(tempDiv);
 
         var systemElem = $("input#system_input")[0];
         var galaxyElem = $("input#galaxy_input")[0];
@@ -176,104 +176,108 @@ if (modeEasyPTRE == "ingame") {
     }
 }
 
-// *** *** ***
+// ****************************************
 // MAIN EXEC
 // OGame pages - Only for AGR
-// *** *** ***
+// ****************************************
 
-// Update AGR Target List
-if (modeEasyPTRE == "ingame" && !/page=standalone&component=empire/.test(location.href) && isAGREnabled() && !isOGLorOGIEnabled()) {
-    if (document.getElementById('ago_panel_Player')) {
-        let observer2 = new MutationObserver(updateLocalAGRList);
-        var node2 = document.getElementById('ago_panel_Player');
-        observer2.observe(node2, {
-            attributes: true,
-            childList: true, // observer les enfants directs
-            subtree: true, // et les descendants aussi
-            characterDataOldValue: true // transmettre les anciennes données au callback
-        });
-    }
-    if (document.getElementById('ago_box_title')) {
-        // Add PTRE link to AGR pinned player
-        addPTRELinkToAGRPinnedTarget();
-        // Check if pinned player is updated
-        let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
-        var node = document.getElementById('ago_box_title');
-        observer.observe(node, {
-            attributes: true,
-            childList: true, // observer les enfants directs
-            subtree: true, // et les descendants aussi
-            characterDataOldValue: true // transmettre les anciennes données au callback
-        });
-    }
-}
-
-// Galaxy page: Set routines
-if (modeEasyPTRE == "ingame" && /component=galaxy/.test(location.href) && !isOGLorOGIEnabled()) {
-    consoleDebug("Galaxy detected: Setting routines");
-    setTimeout(addPTREStuffsToGalaxyPage, 250);
-    setTimeout(checkForNewSystem, 500);
-}
-
-// Add PTRE send SR button to messages page
-if (modeEasyPTRE == "ingame" && /component=messages/.test(location.href) && !isOGLorOGIEnabled()) {
-    if (GM_getValue(ptreTeamKey) != '') {
-        // Update Message Page (spy report part)
-        setTimeout(addPTREStuffsToMessagesPage, 1500);
-        // Update AGR Spy Table
-        if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true')) {
-            let spyTableObserver = new MutationObserver(addPTRESendSRButtonToAGRSpyTable);
-            var nodeSpyTable = document.getElementById('messagecontainercomponent');
-            spyTableObserver.observe(nodeSpyTable, {
+if (modeEasyPTRE == "ingame") {
+    // Update AGR Target List
+    if (!/page=standalone&component=empire/.test(location.href) && isAGREnabled() && !isOGLorOGIEnabled()) {
+        if (document.getElementById('ago_panel_Player')) {
+            let observer2 = new MutationObserver(updateLocalAGRList);
+            var node2 = document.getElementById('ago_panel_Player');
+            observer2.observe(node2, {
                 attributes: true,
                 childList: true, // observer les enfants directs
                 subtree: true, // et les descendants aussi
+                characterDataOldValue: true // transmettre les anciennes données au callback
+            });
+        }
+        if (document.getElementById('ago_box_title')) {
+            // Add PTRE link to AGR pinned player
+            addPTRELinkToAGRPinnedTarget();
+            // Check if pinned player is updated
+            let observer = new MutationObserver(addPTRELinkToAGRPinnedTarget);
+            var node = document.getElementById('ago_box_title');
+            observer.observe(node, {
+                attributes: true,
+                childList: true, // observer les enfants directs
+                subtree: true, // et les descendants aussi
+                characterDataOldValue: true // transmettre les anciennes données au callback
             });
         }
     }
-}
 
-// *** *** ***
-// MAIN EXEC
-// PTRE pages only
-// *** *** ***
+    // Galaxy page: Set routines
+    if (/component=galaxy/.test(location.href) && !isOGLorOGIEnabled()) {
+        consoleDebug("Galaxy detected: Setting routines");
+        setTimeout(imroveGalaxyView, 250);
+        setTimeout(checkForNewSystem, 500);
+    }
 
-// Display Lifeforms research on PTRE Lifeforms page
-if (modeEasyPTRE == "ptre" && /ptre.chez.gg\/\?page=lifeforms_researchs/.test(location.href)){
-    if (universe != 0) {
-        console.log("PTRE Lifeforms page detected: "+country+"-"+universe);
-        const json = GM_getValue(ptreTechnosJSON, '');
-        if (json != '') {
-            tab = parsePlayerResearchs(json, "tab");
-            document.getElementById("tech_from_easyptre").innerHTML = tab;
-            console.log("Updating lifeforms page");
-        } else {
-            console.log("No lifeforms data saved");
+    // Add PTRE send SR button to messages page
+    if (/component=messages/.test(location.href) && !isOGLorOGIEnabled()) {
+        if (GM_getValue(ptreTeamKey) != '') {
+            // Update Message Page (spy report part)
+            setTimeout(addPTREStuffsToMessagesPage, 1500);
+            // Update AGR Spy Table
+            if (isAGREnabled() && (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true')) {
+                let spyTableObserver = new MutationObserver(improveAGRSpyTable);
+                var nodeSpyTable = document.getElementById('messagecontainercomponent');
+                spyTableObserver.observe(nodeSpyTable, {
+                    attributes: true,
+                    childList: true, // observer les enfants directs
+                    subtree: true, // et les descendants aussi
+                });
+            }
         }
-    } 
-}
-
-// Update PTRE Spy Report Pages
-if (modeEasyPTRE == "ptre" && /ptre.chez.gg\/\?iid/.test(location.href)){
-    console.log("PTRE Spy Report page detected: "+country+"-"+universe);
-    const json = GM_getValue(ptreTechnosJSON, '');
-    if (json != '') {
-        const linkElement = document.getElementById("simulate_link");
-        let hrefValue = linkElement.getAttribute("href");
-        var prefill = parsePlayerResearchs(json, "prefill");
-        hrefValue = hrefValue.replace("replaceme", prefill);
-        linkElement.setAttribute("href", hrefValue);
-        document.getElementById("simulator_comment").innerHTML = "This link contains your LF techs";
-        console.log("Updating simulator link");
-    } else {
-        console.log("No lifeforms data saved");
     }
 }
 
-// *** *** ***
+// ****************************************
+// MAIN EXEC
+// PTRE pages only
+// ****************************************
+
+if (modeEasyPTRE == "ptre") {
+    // Display Lifeforms research on PTRE Lifeforms page
+    if (/ptre.chez.gg\/\?page=lifeforms_researchs/.test(location.href)){
+        if (universe != 0) {
+            console.log("PTRE Lifeforms page detected: "+country+"-"+universe);
+            const json = GM_getValue(ptreTechnosJSON, '');
+            if (json != '') {
+                tab = parsePlayerResearchs(json, "tab");
+                document.getElementById("tech_from_easyptre").innerHTML = tab;
+                console.log("Updating lifeforms page");
+            } else {
+                console.log("No lifeforms data saved");
+            }
+        }
+    }
+
+    // Update PTRE Spy Report Pages
+    if (/ptre.chez.gg\/\?iid/.test(location.href)){
+        console.log("PTRE Spy Report page detected: "+country+"-"+universe);
+        const json = GM_getValue(ptreTechnosJSON, '');
+        if (json != '') {
+            const linkElement = document.getElementById("simulate_link");
+            let hrefValue = linkElement.getAttribute("href");
+            var prefill = parsePlayerResearchs(json, "prefill");
+            hrefValue = hrefValue.replace("replaceme", prefill);
+            linkElement.setAttribute("href", hrefValue);
+            document.getElementById("simulator_comment").innerHTML = "This link contains your LF techs";
+            console.log("Updating simulator link");
+        } else {
+            console.log("No lifeforms data saved");
+        }
+    }
+}
+
+// ****************************************
 // Add PTRE styles
 // Ugly style... yes!
-// *** *** ***
+// ****************************************
 GM_addStyle(`
 .status_positif {
     color:#508d0e;
@@ -405,7 +409,7 @@ GM_addStyle(`
 #btnSaveOptPTRE {
     cursor:pointer;
 }
-#ptreSpanGalaxyMessageD {
+#ptreGalaxyMiniMessage {
     color:green;
     font-weight:bold;"
 }
@@ -413,11 +417,11 @@ GM_addStyle(`
     height: 400px;
     overflow-y: scroll;
 }
-#ptreGalaxyPhalanx {
+#ptreGalaxyBox {
     background:rgba(0,26,52,0.95);
-}
-#ptreSpanGalaxyPhalanxMessage {
     font-weight: revert;
+}
+#ptreGalaxyMessageBoxContent {
     padding-left: 10px;
     padding-top: 3px;
     text-align: left;
@@ -425,12 +429,13 @@ GM_addStyle(`
 }
 `);
 
-// *** *** ***
+// ****************************************
 // NOTIFICATIONS FUNCTIONS
-// *** *** ***
+// ****************************************
 
 // Displays PTRE responses messages
 // Responses from server
+// Displayed on the rigth-bottom corner
 function displayPTREPopUpMessage(message) {
     var previousContent = '';
     if (document.getElementById('boxPTREMessage') && document.getElementById("ptreMessage")) {
@@ -462,17 +467,26 @@ function cleanFirstPTREPopUpMessage() {
 }
 
 // Display message under galaxy view
-function displayPTREGalaxyMessage(message) {
-    if (document.getElementById("ptreSpanGalaxyMessageD")) {
-        document.getElementById("ptreSpanGalaxyMessageD").innerHTML = "PTRE: " + message;
+function displayGalaxyMiniMessage(message) {
+    if (document.getElementById("ptreGalaxyMiniMessage")) {
+        document.getElementById("ptreGalaxyMiniMessage").innerHTML = "PTRE: " + message;
     } else {
         console.log("[PTRE] Error. Cant display: " + message);
     }
 }
 
-// *** *** ***
+// Display message content on galaxy page
+function displayGalaxyMessageContent(message) {
+    if (document.getElementById("ptreGalaxyMessageBoxContent")) {
+        document.getElementById("ptreGalaxyMessageBoxContent").innerHTML = message;
+    } else {
+        console.log("[PTRE] Error. Cant display: " + message);
+    }
+}
+
+// ****************************************
 // MINI FUNCTIONS
-// *** *** ***
+// ****************************************
 
 // Detects if AGR is enabled
 function isAGREnabled() {
@@ -514,52 +528,6 @@ function consoleDebug(message) {
 
 function round(x, y) {
     return Number.parseFloat(x).toFixed(y);
-  }
-
-function updateLastAvailableVersion(force) {
-    // Only check once a day
-
-    var lastCheckTime = GM_getValue(ptreLastAvailableVersionRefresh, 0);
-    var currentTime = serverTime.getTime() / 1000;
-
-    if (force === true || currentTime > lastCheckTime + versionCheckTimeout) {
-        consoleDebug("Checking last version available");
-        GM_xmlhttpRequest({
-            method:'GET',
-            url:urlToScriptMetaInfos,
-            nocache:true,
-            onload:result => {
-                //consoleDebug(result.responseText);
-                if (result.status == 200) {
-                    var tab = result.responseText.split('//');
-                    var availableVersion = tab[2].match(/\d+\.\d+.\d+/);
-                    availableVersion = availableVersion[0];
-                    consoleDebug("Current version: " + GM_info.script.version);
-                    consoleDebug("Last version: " + availableVersion);
-                    GM_setValue(ptreLastAvailableVersion, availableVersion);
-                    GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
-                    if (availableVersion !== GM_info.script.version) {
-                        if (document.getElementById('ptreUpdateVersionMessage')) {
-                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</span>';
-                        }
-                        if (document.getElementById('ptreMenuName')) {
-                            document.getElementById('ptreMenuName').innerHTML = 'UPDATE ME';
-                        }
-                        consoleDebug('Version ' + availableVersion + ' is available');
-                    } else {
-                        if (document.getElementById('ptreUpdateVersionMessage')) {
-                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_positif">EasyPTRE is up to date</span>';
-                        }
-                    }
-                } else {
-                    document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Error ' + result.status + ' (' + result.statusText + ')</span>';
-                }
-            }
-        });
-    } else {
-        var temp = lastCheckTime + versionCheckTimeout - currentTime;
-        consoleDebug("Skipping last version check. Next check in " + round(temp, 0) + " sec min");
-    }
 }
 
 function displayMessageInSettings(message) {
@@ -572,9 +540,9 @@ function setNumber(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-// *** *** ***
+// ****************************************
 // PTRE/AGR LIST RELATED
-// *** *** ***
+// ****************************************
 
 // Remove player from PTRE/AGR list
 function deletePlayerFromList(playerId, type) {
@@ -813,9 +781,9 @@ function updateLocalAGRList() {
     }
 }
 
-// *** *** ***
+// ****************************************
 // IMPROVE MAIN VIEWS
-// *** *** ***
+// ****************************************
 
 // This function adds PTRE link to AGR pinned target
 function addPTRELinkToAGRPinnedTarget() {
@@ -859,11 +827,11 @@ function displayPTREMenu(mode = 'AGR') {
         if (isAGROn) {
             // AGR Spy Table Improvement
             divPTRE += '<tr><td class="td_cell">Improve AGR Spy Table:</td>';
-            var improveAGRSpyTable = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
+            var improveAGRSpyTableValue = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
             divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREImproveAGRSpyTable" type="checkbox" ';
-            divPTRE += improveAGRSpyTable;
+            divPTRE += improveAGRSpyTableValue;
             divPTRE += ' />';
-            if (improveAGRSpyTable != 'checked') {
+            if (improveAGRSpyTableValue != 'checked') {
                 divPTRE += ' <span class="status_warning">(recommended)</span>';
             }
             divPTRE += '</td></tr>';
@@ -1032,7 +1000,6 @@ function displayPTREMenu(mode = 'AGR') {
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
                 // Display OK message and remove div after few sec
                 displayMessageInSettings('Team Key Format OK');
-                setTimeout(function() {document.getElementById('divPTRESettings').parentNode.removeChild(document.getElementById('divPTRESettings'));}, ptreMenuDisplayTime * 1000);
             } else {
                 displayMessageInSettings('Wrong Team Key Format');
             }
@@ -1137,7 +1104,7 @@ function displayPTREMenu(mode = 'AGR') {
 }
 
 // This function adds PTRE send SR button to AGR Spy Table
-function addPTRESendSRButtonToAGRSpyTable(mutationList, observer) {
+function improveAGRSpyTable(mutationList, observer) {
     if (document.getElementById('agoSpyReportOverview')) {
         // Stop observer
         observer.disconnect();
@@ -1381,21 +1348,20 @@ function displayHelp() {
     document.getElementById('infoBoxContent').innerHTML = content;
 }
 
-// *** *** ***
+// ****************************************
 // IMPROVE GALAXY VIEW
-// *** *** ***
+// ****************************************
 
 // Add buttons to galaxy
-function addPTREStuffsToGalaxyPage() {
+function imroveGalaxyView() {
     consoleDebug("Updating Galaxy View");
 
     // Add PTRE debug message Div
     if (!document.getElementById("ptreGalaxyMessageD")) {
-        var spanPTREGalaxyMessageD = '<span id="ptreSpanGalaxyMessageD"></span>';
-        var divPTREGalaxyMessageD = document.createElement("div");
-        divPTREGalaxyMessageD.innerHTML = spanPTREGalaxyMessageD;
-        divPTREGalaxyMessageD.id = 'ptreGalaxyMessageD';
-        document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(divPTREGalaxyMessageD);
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = '<span id="ptreGalaxyMiniMessage"></span>';
+        tempDiv.id = 'ptreGalaxyMessageD';
+        document.getElementsByClassName('galaxyRow ctGalaxyFleetInfo')[0].appendChild(tempDiv);
     }
 
     // Add new system trigger
@@ -1476,9 +1442,9 @@ function addPTREStuffsToGalaxyPage() {
     }
 }
 
-// *** *** ***
+// ****************************************
 // GALAXY EXEC STUFFS
-// *** *** ***
+// ****************************************
 
 // Function called on galaxy page
 // Checks if a new system is displayed
@@ -1501,7 +1467,7 @@ function checkForNewSystem() {
         lastActivitiesGalaSent = galaxy;
         lastActivitiesSysSent = system;
         console.log('[PTRE] [' + galaxy + ':' + system + "] Checking targets activities");
-        displayPTREGalaxyMessage('[' + galaxy + ':' + system + "] Checking targets activities");
+        displayGalaxyMiniMessage('[' + galaxy + ':' + system + "] Checking targets activities");
 
         // Get Galaxy System JSON
         $.post(galaxyContentLinkTest, {
@@ -1510,7 +1476,7 @@ function checkForNewSystem() {
         }, processGalaxyData);
     } else {
         console.log("[PTRE] Cant push. Wait...");
-        displayPTREGalaxyMessage("Cant push. Wait...");
+        displayGalaxyMiniMessage("Cant push. Wait...");
     }
 }
 
@@ -1611,7 +1577,7 @@ function processGalaxyData(data) {
             cache: false,
             success : function(reponse){
                 var reponseDecode = jQuery.parseJSON(reponse);
-                displayPTREGalaxyMessage(reponseDecode.message);
+                displayGalaxyMiniMessage(reponseDecode.message);
                 if (reponseDecode.code != 1) {
                     displayPTREPopUpMessage(reponseDecode.message);
                 }
@@ -1619,10 +1585,63 @@ function processGalaxyData(data) {
         });
         console.log('[PTRE] [' + galaxy + ':' + system + '] Pushing activities');
     } else {
-        displayPTREGalaxyMessage("No target in this system");
+        displayGalaxyMiniMessage("No target in this system");
     }
 }
 
+// ****************************************
+// CORE FUNCTIONS
+// ****************************************
+
+// Check if EasyPTRE needs to be updated
+function updateLastAvailableVersion(force) {
+    // Only check once a day
+
+    var lastCheckTime = GM_getValue(ptreLastAvailableVersionRefresh, 0);
+    var currentTime = serverTime.getTime() / 1000;
+
+    if (force === true || currentTime > lastCheckTime + versionCheckTimeout) {
+        consoleDebug("Checking last version available");
+        GM_xmlhttpRequest({
+            method:'GET',
+            url:urlToScriptMetaInfos,
+            nocache:true,
+            onload:result => {
+                //consoleDebug(result.responseText);
+                if (result.status == 200) {
+                    var tab = result.responseText.split('//');
+                    var availableVersion = tab[2].match(/\d+\.\d+.\d+/);
+                    availableVersion = availableVersion[0];
+                    consoleDebug("Current version: " + GM_info.script.version);
+                    consoleDebug("Last version: " + availableVersion);
+                    GM_setValue(ptreLastAvailableVersion, availableVersion);
+                    GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
+                    if (availableVersion !== GM_info.script.version) {
+                        if (document.getElementById('ptreUpdateVersionMessage')) {
+                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</span>';
+                        }
+                        if (document.getElementById('ptreMenuName')) {
+                            document.getElementById('ptreMenuName').innerHTML = 'UPDATE ME';
+                        }
+                        consoleDebug('Version ' + availableVersion + ' is available');
+                    } else {
+                        if (document.getElementById('ptreUpdateVersionMessage')) {
+                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_positif">EasyPTRE is up to date</span>';
+                        }
+                    }
+                } else {
+                    document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Error ' + result.status + ' (' + result.statusText + ')</span>';
+                }
+            }
+        });
+    } else {
+        var temp = lastCheckTime + versionCheckTimeout - currentTime;
+        consoleDebug("Skipping last version check. Next check in " + round(temp, 0) + " sec min");
+    }
+}
+
+// Save lifeforms researchs
+// Save JSON "API 2" from fleet page
 function doCheckLifeforms() {
     console.log("Fleet page detected: Updating Techs...");
     GM_setValue(ptrePlayerID, currentPlayerID);
@@ -1812,10 +1831,10 @@ function syncSharableData(mode) {
 
 // This function fetchs closest friend phalanx
 function getPhalanxInfosFromGala(galaxy, system) {
-    document.getElementById('ptreSpanGalaxyPhalanxMessage').innerHTML = "Loading info for " + galaxy + ":" + system + " ...";
+    displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
-        document.getElementById('ptreSpanGalaxyPhalanxMessage').innerHTML = '<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>';
+        displayGalaxyMessageContent('<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
     }
     var dataJSON = '';
@@ -1829,9 +1848,11 @@ function getPhalanxInfosFromGala(galaxy, system) {
             success : function(reponse){
                 var reponseDecode = jQuery.parseJSON(reponse);
                 var message = atob(reponseDecode.message);
-                console.log(message);
-                document.getElementById('ptreSpanGalaxyPhalanxMessage').innerHTML = message;
-                setTimeout(function() {document.getElementById('ptreSpanGalaxyPhalanxMessage').innerHTML = "";}, ptreSpanGalaxyPhalanxMessageFadeOut);
+                if (reponseDecode.code != 1) {
+                    console.log(message);
+                }
+                displayGalaxyMessageContent(message);
+                setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
             }
         });
     }
