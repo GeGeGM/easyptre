@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.9.2
+// @version      0.9.3
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -161,8 +161,8 @@ if (modeEasyPTRE == "ingame") {
     // Add PTRE Box to galaxy view
     if (/component=galaxy/.test(location.href)) {
         var tempContent = '<table><tr><td valign="top">';
-        tempContent+= '<input id="ptreGalaxyPhalanxButton" type="button" class="button btn_blue" value="PTRE PHALANX" />';
-        tempContent+= ' <input id="ptreGalaxyGGEButton" type="button" class="button btn_blue" value="PTRE GGE" /></td>';
+        tempContent+= '<div id="ptreGalaxyPhalanxButton" type="button" class="button btn_blue">PTRE PHALANX</div>';
+        tempContent+= ' <div id="ptreGalaxyGGEButton" type="button" class="button btn_blue">PTRE GGE</div></td>';
         tempContent+= '<td valign="top"><div id="ptreGalaxyMessageBoxContent"></div></td></tr></table>';
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = tempContent;
@@ -374,7 +374,7 @@ GM_addStyle(`
     padding: 3px;
 }
 .button {
-    height: 19px;
+    padding: 0px;
 }
 #divPTRESettings {
     position: fixed;
@@ -430,6 +430,7 @@ GM_addStyle(`
     padding-top: 3px;
     text-align: left;
     display: block;
+    line-height: 1.3em;
 }
 `);
 
@@ -821,10 +822,10 @@ function displayPTREMenu(mode = 'AGR') {
             other_mode = 'AGR';
         }
         var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><input id="btnHelpPTRE" type="button" class="button btn_blue" value="HELP" /> <input id="btnRefreshOptPTRE" type="button" class="button btn_blue" value="REFRESH" /> <input id="btnCloseOptPTRE" type="button" class="button btn_blue" value="CLOSE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><div id="btnHelpPTRE" type="button" class="button btn_blue">HELP</div> <div id="btnRefreshOptPTRE" type="button" class="button btn_blue">REFRESH</div> <div id="btnCloseOptPTRE" type="button" class="button btn_blue">CLOSE</div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="status_warning"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><input id="btnSaveOptPTRE" type="button" class="button btn_blue" value="SAVE" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><div id="btnSaveOptPTRE" type="button" class="button btn_blue">SAVE</div></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
 
         // If AGR is detected
@@ -857,9 +858,9 @@ function displayPTREMenu(mode = 'AGR') {
         } else {
             // EasyPTRE enabled (AGR mode or vanilla mode)
             // Targets list
-            divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?country='+country+'&univers='+universe+'&page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><input id="synctTargetsWithPTRE" type="button" class="button btn_blue" value="SYNC TARGETS" /></td></tr>';
+            divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?country='+country+'&univers='+universe+'&page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><div id="synctTargetsWithPTRE" class="button btn_blue"/>SYNC TARGETS</div></td></tr>';
             if (isAGROn) {
-                divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><input id="btnRefreshOptPTRESwitchList" type="button" class="button btn_blue" value="DISPLAY ' + other_mode + ' LIST" /></td></tr>';
+                divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><div id="btnRefreshOptPTRESwitchList" type="button" class="button btn_blue">DISPLAY ' + other_mode + ' LIST</div></td></tr>';
             } else {
                 divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
             }
@@ -886,7 +887,7 @@ function displayPTREMenu(mode = 'AGR') {
                     $.each(targetList, function(i, PlayerCheck) {
                         //consoleDebug(PlayerCheck);
                         divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">- '+PlayerCheck.pseudo+'</td>';
-                        divPTRE += '<td class="td_cell" align="center"><input id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button btn_blue" value="FLEET"></td>';
+                        divPTRE += '<td class="td_cell" align="center"><div id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button btn_blue">FLEET</div></td>';
                         divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
                         if (mode == 'AGR') {
                             var checked = '';
@@ -917,7 +918,7 @@ function displayPTREMenu(mode = 'AGR') {
 
         // Shared data
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Team shared data</span></td><td class="td_cell" align="right"><input id="synctDataWithPTRE" type="button" class="button btn_blue" value="SYNC DATA" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Team shared data</span></td><td class="td_cell" align="right"><div id="synctDataWithPTRE" class="button btn_blue">SYNC DATA</div></td></tr>';
         divPTRE += '<tr><td class="td_cell" colspan="2">Phalanx: ';
         var dataJSON = '';
         dataJSON = GM_getValue(ptreDataToSync, '');
@@ -938,7 +939,7 @@ function displayPTREMenu(mode = 'AGR') {
         // Footer
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <input id="forceCheckVersionButton" type="button" class="button btn_blue" value="CHECK" /></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <div id="forceCheckVersionButton" type="button" class="button btn_blue">CHECK</div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
@@ -1297,7 +1298,7 @@ function setupInfoBox() {
     if (document.getElementById('divPTREInfos')) {
         document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
     }
-    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><input id="btnCloseInfosPTRE" type="button" class="button btn_blue" value="CLOSE" /><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="status_warning">LOADING...</span><center><br><br><br></div></td></tr></table>';
+    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><div id="btnCloseInfosPTRE" type="button" class="button btn_blue">CLOSE</div><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="status_warning">LOADING...</span><center><br><br><br></div></td></tr></table>';
     var eletementSetPTRE = document.createElement("div");
     eletementSetPTRE.innerHTML = divPTRE;
     eletementSetPTRE.id = 'divPTREInfos';
@@ -1807,7 +1808,7 @@ function debugSharableData() {
 // - Phalanx levels
 function syncSharableData(mode) {
     console.log("Syncing data");
-    teamKey = GM_getValue(ptreTeamKey, '');
+    const teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
         displayPTREPopUpMessage("No TeamKey: Add a PTRE TeamKey in EasyPTRE settings");
         return -1;
@@ -1829,14 +1830,16 @@ function syncSharableData(mode) {
             }
         });
     } else {
-        displayPTREPopUpMessage("No data to sync to PTRE Team");
+        if (mode == 'manual' && document.getElementById('messageDivInSettings')) {
+            displayMessageInSettings("No data to sync to PTRE Team");
+        }
     }
 }
 
 // This function fetchs closest friend phalanx
 function getPhalanxInfosFromGala(galaxy, system) {
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
-    teamKey = GM_getValue(ptreTeamKey, '');
+    const teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
         displayGalaxyMessageContent('<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
@@ -1859,6 +1862,8 @@ function getPhalanxInfosFromGala(galaxy, system) {
                 setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
             }
         });
+    } else {
+        displayGalaxyMessageContent('<span class="status_negatif">No data to sync to PTRE Team</span>');
     }
 }
 
@@ -1870,23 +1875,19 @@ function getGGEInfosFromGala(galaxy, system) {
         displayGalaxyMessageContent('<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
     }
-    var dataJSON = '';
-    dataJSON = GM_getValue(ptreDataToSync, '');
-    if (dataJSON != '') {
-        $.ajax({
-            url : urlPTREGetGGEInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
-            type : 'POST',
-            data: dataJSON,
-            cache: false,
-            success : function(reponse){
-                var reponseDecode = jQuery.parseJSON(reponse);
-                var message = atob(reponseDecode.message);
-                if (reponseDecode.code != 1) {
-                    console.log(message);
-                }
-                displayGalaxyMessageContent(message);
-                setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
+    $.ajax({
+        url : urlPTREGetGGEInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
+        type : 'POST',
+        data: null,
+        cache: false,
+        success : function(reponse){
+            var reponseDecode = jQuery.parseJSON(reponse);
+            var message = atob(reponseDecode.message);
+            if (reponseDecode.code != 1) {
+                console.log(message);
             }
-        });
-    }
+            displayGalaxyMessageContent(message);
+            setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
+        }
+    });
 }
