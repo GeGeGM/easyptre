@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.9.4
+// @version      0.9.5
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -169,15 +169,11 @@ if (modeEasyPTRE == "ingame") {
         tempDiv.id = 'ptreGalaxyBox';
         document.getElementsByClassName("galaxyTable")[0].appendChild(tempDiv);
 
-        var systemElem = $("input#system_input")[0];
-        var galaxyElem = $("input#galaxy_input")[0];
-        var galaxy = galaxyElem.value;
-        var system = systemElem.value;
         document.getElementById('ptreGalaxyPhalanxButton').addEventListener("click", function (event) {
-            getPhalanxInfosFromGala(galaxy, system);
+            getPhalanxInfosFromGala();
         });
         document.getElementById('ptreGalaxyGEEButton').addEventListener("click", function (event) {
-            getGEEInfosFromGala(galaxy, system);
+            getGEEInfosFromGala();
         });
     }
 }
@@ -1843,38 +1839,40 @@ function syncSharableData(mode) {
 }
 
 // This function fetchs closest friend phalanx
-function getPhalanxInfosFromGala(galaxy, system) {
+function getPhalanxInfosFromGala() {
+    var systemElem = $("input#system_input")[0];
+    var galaxyElem = $("input#galaxy_input")[0];
+    var galaxy = galaxyElem.value;
+    var system = systemElem.value;
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     const teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
         displayGalaxyMessageContent('<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
     }
-    var dataJSON = '';
-    dataJSON = GM_getValue(ptreDataToSync, '');
-    if (dataJSON != '') {
-        $.ajax({
-            url : urlPTREGetPhalanxInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
-            type : 'POST',
-            data: dataJSON,
-            cache: false,
-            success : function(reponse){
-                var reponseDecode = jQuery.parseJSON(reponse);
-                var message = atob(reponseDecode.message);
-                if (reponseDecode.code != 1) {
-                    console.log(message);
-                }
-                displayGalaxyMessageContent(message);
-                setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
+    $.ajax({
+        url : urlPTREGetPhalanxInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
+        type : 'POST',
+        data: null,
+        cache: false,
+        success : function(reponse){
+            var reponseDecode = jQuery.parseJSON(reponse);
+            var message = atob(reponseDecode.message);
+            if (reponseDecode.code != 1) {
+                console.log(message);
             }
-        });
-    } else {
-        displayGalaxyMessageContent('<span class="status_negatif">No data to sync to PTRE Team</span>');
-    }
+            displayGalaxyMessageContent(message);
+            setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
+        }
+    });
 }
 
 // This function fetchs Galaxy Event Explorer infos
-function getGEEInfosFromGala(galaxy, system) {
+function getGEEInfosFromGala() {
+    var systemElem = $("input#system_input")[0];
+    var galaxyElem = $("input#galaxy_input")[0];
+    var galaxy = galaxyElem.value;
+    var system = systemElem.value;
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
