@@ -247,6 +247,11 @@ if (modeEasyPTRE == "ingame") {
 // ****************************************
 
 if (modeEasyPTRE == "ptre") {
+    // Remove EasyPTRE notification from PTRE website
+    if (document.getElementById("easyptre_install_notification")) {
+        document.getElementById("easyptre_install_notification").remove();
+    }
+
     // Display Lifeforms research on PTRE Lifeforms page
     if (/ptre.chez.gg\/\?page=lifeforms_researchs/.test(location.href)){
         if (universe != 0) {
@@ -279,10 +284,6 @@ if (modeEasyPTRE == "ptre") {
         }
     }
 
-    // Remove EasyPTRE notification from PTRE website
-    if (document.getElementById("easyptre_install_notification")) {
-        document.getElementById("easyptre_install_notification").remove();
-    }
 }
 
 // ****************************************
