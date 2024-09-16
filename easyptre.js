@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.10.0
+// @version      0.10.1
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -53,7 +53,7 @@ var lastActivitiesGalaSent = 0;
 var lastActivitiesSysSent = 0;
 var versionCheckTimeout = 6*60*60;
 var technosCheckTimeout = 15*60;
-var dataSharingDelay = 5;
+var dataSharingDelay = 1;
 var lastPTREActivityPushMicroTS = 0;
 var ptreGalaxyMessageBoxContentFadeOut = 60*1000;
 var ptreGalaxyActivityCount = 0;
@@ -116,7 +116,7 @@ if (modeEasyPTRE == "ingame") {
         var ptreMenuName = toolName;
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
-            ptreMenuName = "UPDATE ME";
+            ptreMenuName = "CLICK ME";
         }
         var aff_option = '<span class="menu_icon"><a id="iconeUpdate" href="https://ptre.chez.gg" target="blank_" ><img id="imgPTREmenu" class="mouseSwitch" src="' + imgPTRE + '" height="26" width="26"></a></span>';
         aff_option += '<a id="affOptionsPTRE" class="menubutton " href="#" accesskey="" target="_self"><span class="textlabel" id="ptreMenuName">' + ptreMenuName + '</span></a>';
@@ -1072,7 +1072,7 @@ function displayPTREMenu(mode = 'AGR') {
         var techMessage = '<span class="status_negatif">No Lifeforms researchs saved. Go to <a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet Page to update</a>.</span>';
         if (lastTechCheck != 0) {
             var nb_min = (currentTime - lastTechCheck) / 60;
-            techMessage = '<b>Lifeforms researchs saved for simulator '+round(nb_min, 0)+' minute(s) ago</b>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
+            techMessage = '<b>Lifeforms researchs saved for simulator <span class="status_positif">'+round(nb_min, 0)+'</span> minute(s) ago</b>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
         }
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" colspan="2"><span class="ptre_title">Lifeforms researchs</span></td></tr>';
@@ -1081,7 +1081,7 @@ function displayPTREMenu(mode = 'AGR') {
         // Shared data
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Team shared data</span></td><td class="td_cell" align="right"><div id="synctDataWithPTRE" class="button btn_blue">SYNC DATA</div></td></tr>';
-        divPTRE += '<tr><td class="td_cell" colspan="2">Phalanx: ';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2">Phalanx: ';
         var dataJSON = '';
         dataJSON = GM_getValue(ptreDataToSync, '');
 
@@ -1096,6 +1096,7 @@ function displayPTREMenu(mode = 'AGR') {
             });
         }
         divPTRE += '<span class="status_positif">' + phalanxCount + '</span> synced to PTRE Team</td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="/game/index.php?page=ingame&component=facilities">Visit every moon\'s buildings to update</a></td></tr>';
 
 
         // Footer
@@ -1158,7 +1159,7 @@ function displayPTREMenu(mode = 'AGR') {
             // Save PTRE Team Key
             var newTK = document.getElementById('ptreTK').value;
             // Check PTRE Team Key Format
-            if (newTK.replace(/-/g, "").length == 18 && newTK.substr(0,2) == "TM") {
+            if (newTK == '' || (newTK.replace(/-/g, "").length == 18 && newTK.substr(0,2) == "TM")) {
                 // If new TK, store it
                 if (newTK != ptreStoredTK) {
                     GM_setValue(ptreTeamKey, document.getElementById('ptreTK').value);
@@ -1173,7 +1174,11 @@ function displayPTREMenu(mode = 'AGR') {
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
                 // Display OK message and remove div after few sec
-                displayMessageInSettings('Team Key Format OK');
+                if (newTK == '') {
+                    displayMessageInSettings('Team Key removed');
+                } else {
+                    displayMessageInSettings('Team Key Format OK');
+                }
             } else {
                 displayMessageInSettings('Wrong Team Key Format');
             }
@@ -1952,7 +1957,7 @@ function updateLastAvailableVersion(force) {
                             document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</span>';
                         }
                         if (document.getElementById('ptreMenuName')) {
-                            document.getElementById('ptreMenuName').innerHTML = 'UPDATE ME';
+                            document.getElementById('ptreMenuName').innerHTML = 'CLICK ME';
                         }
                         consoleDebug('Version ' + availableVersion + ' is available');
                     } else {
