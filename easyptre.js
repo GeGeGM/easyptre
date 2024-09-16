@@ -26,14 +26,31 @@ if (/ptre.chez.gg/.test(location.href)) {
     console.log("[PTRE] EasyPTRE: Mode PTRE");
 }
 
+// Settings
+const ptreMessageDisplayTime = 5*1000;
+const menuImageDisplayTime = 3*1000;
+const ptrePushDelayMicroSec = 500;
+const versionCheckTimeout = 6*60*60;
+const technosCheckTimeout = 15*60;
+const dataSharingDelay = 200;
+const ptreGalaxyMessageBoxContentFadeOut = 60*1000;
+const improvePageDelay = 200;
+const ptreTargetListMaxSize = 300;
+const deepSpacePlayerId = 99999;
+// TODO: Set ptreAGRTargetListMaxSize
 
+// Variables
 var toolName = 'EasyPTRE';
 var server = -1;
 var country = "";
 var universe = -1;
 var currentPlayerID = -1;
 var ptreID = "ptre-id";
-const deepSpacePlayerId = 99999;
+var lastActivitiesGalaSent = 0;
+var lastActivitiesSysSent = 0;
+var lastPTREActivityPushMicroTS = 0;
+var ptreGalaxyActivityCount = 0;
+var ptreGalaxyEventCount = 0;
 
 if (modeEasyPTRE == "ingame") {
     server = document.getElementsByName('ogame-universe')[0].content;
@@ -47,18 +64,6 @@ if (modeEasyPTRE == "ingame") {
     universe = document.getElementsByName('ptre-universe')[0].content;
     GM_setValue(ptreID, document.getElementsByName('ptre-id')[0].content);
 }
-
-var galaxyContentLinkTest = "https:\/\/"+server+"\/game\/index.php?page=ingame&component=galaxy&action=fetchGalaxyContent&ajax=1&asJson=1";
-var lastActivitiesGalaSent = 0;
-var lastActivitiesSysSent = 0;
-var versionCheckTimeout = 6*60*60;
-var technosCheckTimeout = 15*60;
-var dataSharingDelay = 1;
-var lastPTREActivityPushMicroTS = 0;
-var ptreGalaxyMessageBoxContentFadeOut = 60*1000;
-var ptreGalaxyActivityCount = 0;
-var ptreGalaxyEventCount = 0;
-const improvePageDelay = 200;
 
 // GM keys
 var ptreTeamKey = "ptre-" + country + "-" + universe + "-TK";
@@ -84,15 +89,8 @@ var imgPTREKO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACel
 var imgAddPlayer = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABIFBMVEV+oLt6mrRcdotVbYFMXm5ZcIJcdIhcdYlcdYhcdIhZcIJLXm1GWWhZcYVZcYVGWGdQZ3lQZnhRaHtRaHpRZ3pQZ3lQZ3lPZnlRaHpPZXdOZXZDVmVCVWQpNT9IXG1HXGwpND4nMjs8TVtFWWlGWmpFWWo8TVomMTpdd4xcdotbdYpkfI9lfI9cdoqSoa3b3uLb3+KUo65whZbp6+z////r7e5xhpdadIp+kJ/29/f4+PmAkqH3+PhYc4h8j55+kaBYcoiYprH4+fn5+fqaqLKVo67q7O1lfY/d4eRmfZDe4eSXpbDs7e/5+vpyh5ecqbNXcohxhpbr7O7s7u9zh5hac4fg4+Xg4+aZp7JddotZc4dZcodnfpBnfpFcdYpZcobNc5NHAAAAKHRSTlMAAAAAOrnq7Ozstzk11NMzqKTY09rV2tXa2NOnozTU0jI6t+rs7LY38nTtTwAAAAFiS0dENKmx6f0AAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAHdElNRQfmDAMNMw+3gPsiAAAA/0lEQVQY022QeVPCMBDF1wuKJ4qANwqiEI1HXU3axBa5oYAH4H18/29hk8wwMMP+s29/s0leHsD8QiRqWVY0FtMtsrg0A8srhaIqcnZOtCisrkFcqyK9uLy6pkavw4bZs28Qb+/MbgI2dWfcQXQF00NyHMpxSBi79xT0S4wRA6nNufdQRqxUPc5tqiCp1R3HCRliORT1GklCqtHEiWo20pBqtSdhu5UOjwcdV8qKmrtSup2A6Id6QvjV8NLuoy9Ej44slYylp5GlKea3pn1z2wTy/ILYH5hAdmB3aKILXt/eP7T83IP9gy+z+/3zq8Vf5hBmj7K5Y1X5vG65k9O5fzTlR68NJU1NAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIyLTEyLTAzVDEzOjUxOjA3KzAwOjAwYSBSfQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMi0xMi0wM1QxMzo1MTowNyswMDowMBB96sEAAAAASUVORK5CYII=';
 var imgSupPlayer = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAvVBMVEV+oLt6mrRcdotVbYFMXm5ZcIJcdIhcdYlcdYhZcIJLXm1GWWhZcYVZcYVGWGdQZ3lQZnhRaHtRaHpRZ3pQZ3lQZ3lPZnlRaHpPZXdOZXZDVmVCVWQpNT9IXG1HXGwpND4nMjs8TVtFWWlGWmo8TVomMTpdd4xcdotbdYpadIpcdopwhZZ+kJ+Vo67q7O329/dlfY/d4eT///9mfZDe4eSXpbDs7e/4+Pn3+Phyh5eAkqFac4dZc4dZcodZcoZxO/KfAAAAJnRSTlMAAAAAOrnq7Oy3OTXU0zOopNjT2tXa1drY06ejNNTSMjq36uy2N8+M6pEAAAABYktHRDJA0kzIAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH5gwDDgk1VmNCsAAAAJNJREFUGNN1ztcOgkAURdFjA3sF7KKoMA6CIE1s//9ZtoTMOLAfV3JzD1CtSXI9S5YazRJabdPiMjtd9CyhPgYiDjESUSlEcmAiP6T2kcmmHySOe2JyHaJA9fwzl+9pUIOQxzDQ3udRnFyykjgi30fplSmlxZNyxo/zcCLiFLPbv93nWCwfvD1XOsrrjbFlMnb7ygvg8zvdxWLNowAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowOTo0OCswMDowMAzRxoAAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDk6NDgrMDA6MDB9jH48AAAAAElFTkSuQmCC';
 
-// Settings
-var ptreMessageDisplayTime = 5;
-var menuImageDisplayTime = 3;
-var ptreMenuDisplayTime = 1;
-var ptreTargetListMaxSize = 300;
-var ptrePushDelayMicroSec = 500;
-// TODO: Set ptreAGRTargetListMaxSize
-
 // PTRE URLs
+var galaxyContentLinkTest = "https:\/\/"+server+"\/game\/index.php?page=ingame&component=galaxy&action=fetchGalaxyContent&ajax=1&asJson=1";
 var urlPTREImportSR = 'https://ptre.chez.gg/scripts/oglight_import.php?tool=' + toolName;
 var urlPTREPushActivity = 'https://ptre.chez.gg/scripts/oglight_import_player_activity.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
 var urlPTRESyncTargets = 'https://ptre.chez.gg/scripts/api_sync_target_list.php?tool=' + toolName + '&country=' + country + '&univers=' + universe;
@@ -614,7 +612,7 @@ function displayPTREPopUpMessage(message) {
 
     if (document.getElementById('bottom')) {
         document.getElementById('bottom').appendChild(boxPTREMessage);
-        setTimeout(function() {cleanFirstPTREPopUpMessage();}, ptreMessageDisplayTime * 1000);
+        setTimeout(function() {cleanFirstPTREPopUpMessage();}, ptreMessageDisplayTime);
     }
 }
 
@@ -1172,7 +1170,7 @@ function displayPTREMenu(mode = 'AGR') {
                 GM_setValue(ptreEnableConsoleDebug, document.getElementById('PTREEnableConsoleDebug').checked + '');
                 // Update menu image and remove it after few sec
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
-                setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime * 1000);
+                setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime);
                 // Display OK message and remove div after few sec
                 if (newTK == '') {
                     displayMessageInSettings('Team Key removed');
@@ -2092,7 +2090,7 @@ function addDataToPTREData(newData) {
     dataJSON = JSON.stringify(dataList);
     GM_setValue(ptreDataToSync, dataJSON);
     // Sync data to PTRE (but not now, wait for no more refresh)
-    setTimeout(syncSharableData, dataSharingDelay * 1000);
+    setTimeout(syncSharableData, dataSharingDelay);
 }
 
 function debugSharableData() {
