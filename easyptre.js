@@ -580,10 +580,11 @@ function improvePageFacilities() {
             const levelSpan = sensorPhalanxLi.querySelector('span.level');
             var phalanx_level = levelSpan.getAttribute('data-value');
             var coords = document.getElementsByName('ogame-planet-coordinates')[0].content;
+            var moonID = document.getElementsByName('ogame-planet-id')[0].content;
             //console.log('[PTRE] ' + coords + ' Found Phalanx level '+phalanx_level);
 
             //var moon = {type: "moon", id: coords, val: {pha_lvl: phalanx_level, toto: "titi", tata: "tutu"}};
-            var phalanx = {type: "phalanx", id: coords, val: phalanx_level};
+            var phalanx = {type: "phalanx", id: moonID, coords: coords, val: phalanx_level};
             addDataToPTREData(phalanx);
         }
     }
@@ -961,6 +962,7 @@ function addPTRELinkToAGRPinnedTarget() {
 function displayPTREMenu(mode = 'AGR') {
 
     if (!document.getElementById('btnSaveOptPTRE')) {
+        purgeOldSharableData(); // Temporary
         var ptreStoredTK = GM_getValue(ptreTeamKey, '');
         // Get menu mode (what we will display)
         var other_mode = 'PTRE';
@@ -1929,12 +1931,13 @@ function processGalaxyDataCallback(data) {
 
 // Check if EasyPTRE needs to be updated
 function updateLastAvailableVersion(force) {
-    // Only check once a day
+    // Only check once a while
 
     var lastCheckTime = GM_getValue(ptreLastAvailableVersionRefresh, 0);
     var currentTime = serverTime.getTime() / 1000;
 
     if (force === true || currentTime > lastCheckTime + versionCheckTimeout) {
+        purgeOldSharableData(); // Temporary
         consoleDebug("Checking last version available");
         GM_xmlhttpRequest({
             method:'GET',
@@ -2106,6 +2109,36 @@ function debugSharableData() {
     } else {
         console.log("[PTRE] No data to display");
     }
+}
+
+// Temp function to clean old version data
+// To be removed mid-November 2024
+function purgeOldSharableData() {
+    console.log("[PTRE] Purge Old Sharable Data");
+    //debugSharableData();
+    var dataJSON = '';
+    var dataJSONNew = '';
+    dataJSON = GM_getValue(ptreDataToSync, '');
+
+    const regex = /\:/;
+
+    var dataList = [];
+    var dataListNew = [];
+    if (dataJSON != '') {
+        dataList = JSON.parse(dataJSON);
+        $.each(dataList, function(i, elem) {
+            //console.log("[" + elem.type + "] " + elem.id + " => " + elem.val);
+            if (regex.test(elem.id)) {
+                //console.log("Need to remove " + elem.id);
+            } else {
+                //console.log("Need to KEEP " + elem.id);
+                dataListNew.push(elem);
+            }
+        });
+        dataJSONNew = JSON.stringify(dataListNew);
+        GM_setValue(ptreDataToSync, dataJSONNew);
+    }
+    //debugSharableData();
 }
 
 // This function sends commun data to Team
