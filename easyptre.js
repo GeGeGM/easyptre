@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.10.1
+// @version      0.10.2
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -1382,7 +1382,7 @@ function addPTREStuffsToMessagesPage() {
                     } else {
                         var planet_acti;
                         var jsonLune;
-                        const message_ts = rawMessageData.dataset.rawDatetime;
+                        const message_ts = rawMessageData.dataset.rawTimestamp;
                         const spy_message_ts = message_ts * 1000;
                         var alreadySentLabel = "";
 
