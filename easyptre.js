@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.10.2
+// @version      0.10.3
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -221,31 +221,43 @@ if (modeEasyPTRE == "ptre") {
 // ****************************************
 GM_addStyle(`
 .status_positif {
-    color:#508d0e;
-    font-weight:bold;
+    color:#99CC00;
 }
 .status_negatif {
-    color: #bb2e15;
-    font-weight:bold;
+    color: #D43635;
 }
 .status_warning {
-    color:#bb6715;
-    font-weight:bold;
+    color:#D29D00;
 }
 .ptre_maintitle {
-    color: #299f9b;
+    color: #6f9fc8;
     font-weight:bold;
     text-decoration: underline;
 }
 .ptre_title {
-    color: #299f9b;
+    color: #6f9fc8;
     font-weight:bold;
 }
 .ptre_tab_title {
-    color: #299f9b;
+    color: #6f9fc8;
 }
 .td_cell {
     padding: 3px;
+}
+.tr_cell_radius {
+    background-color: transparent;
+}
+.td_cell_radius_0 {
+    background-color: #12171C;
+    padding: 3px;
+    border-radius: 6px;
+    border: 1px solid black;
+}
+.td_cell_radius_1 {
+    background-color: #0d1014;
+    padding: 3px;
+    border-radius: 6px;
+    border: 1px solid black;
 }
 .ptre_ship {
     background-image: url('https://gf3.geo.gfsrv.net/cdn84/3b19b4263662f5a383524052047f4f.png');
@@ -322,7 +334,7 @@ GM_addStyle(`
     width: 500px;
     padding:10px;
     border: solid black 2px;
-    background:rgba(0,26,52,0.95);
+    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
 }
 #boxPTREMessage {
     position: fixed;
@@ -332,7 +344,7 @@ GM_addStyle(`
     padding:10px;
     
     border: solid black 2px;
-    background:rgba(0,26,52,0.95);
+    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
 }
 #boxPTREInfos {
     position: fixed;
@@ -343,7 +355,7 @@ GM_addStyle(`
     min-width: 300px;
     padding:10px;
     border: solid black 2px;
-    background:rgba(0,26,52,0.95);
+    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
 }
 #btnSaveOptPTRE {
     cursor:pointer;
@@ -353,11 +365,11 @@ GM_addStyle(`
     font-weight:bold;"
 }
 #targetDivSettings {
-    height: 400px;
+    height: 350px;
     overflow-y: scroll;
 }
 #ptreGalaxyBox {
-    background:rgba(0,26,52,0.95);
+    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
     font-weight: revert;
 }
 #ptreGalaxyMessageBoxContent {
@@ -1026,34 +1038,34 @@ function displayPTREMenu(mode = 'AGR') {
             var targetList = '';
             divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id="targetDivSettings"><table width="90%">';
             if (mode == 'AGR') {
-                divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+                divPTRE += '<tr class="tr_cell_radius"><td class="td_cell_radius_0"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">Keep<br>Private</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
             } else {
-                divPTRE += '<tr><td class="td_cell"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
+                divPTRE += '<tr class="tr_cell_radius"><td class="td_cell_radius_0"><span class="ptre_tab_title">Player<br>Name</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">Fleet<br>Infos</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">PTRE<br>Profile</span></td><td class="td_cell_radius_0" align="center"><span class="ptre_tab_title">Remove<br>Target</span></td></tr>';
             }
             if (mode == 'AGR' && isAGROn) {
                 updateLocalAGRList();
                 targetJSON = GM_getValue(ptreAGRPlayerListJSON, '');
-                //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using AGR target list</div><div>Add targets via AGR lists</div></div></td></tr>';
             } else {
                 targetJSON = GM_getValue(ptrePTREPlayerListJSON, '');
-                //divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div class="status_positif">You are using PTRE target lists</div><div>Add targets via galaxy view</div></td></tr>';
             }
             if (targetJSON != '') {
                 targetList = JSON.parse(targetJSON);
                 if (targetList) {
+                    var i = 0;
                     $.each(targetList, function(i, PlayerCheck) {
                         //consoleDebug(PlayerCheck);
-                        divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'"><td class="td_cell">- '+PlayerCheck.pseudo+'</td>';
-                        divPTRE += '<td class="td_cell" align="center"><div id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button btn_blue">FLEET</div></td>';
-                        divPTRE += '<td class="td_cell" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
+                        i++;
+                        divPTRE += '<tr id="rawPLayer_'+PlayerCheck.id+'" class="tr_cell_radius"><td class="td_cell_radius_'+ (i%2) +'">- '+PlayerCheck.pseudo+'</td>';
+                        divPTRE += '<td class="td_cell_radius_'+ (i%2) +'" align="center"><div id="btnGetPlayerInfos'+PlayerCheck.id+'" type="button" class="button btn_blue">FLEET</div></td>';
+                        divPTRE += '<td class="td_cell_radius_'+ (i%2) +'" align="center"><a href="' + buildPTRELinkToPlayer(PlayerCheck.id) + '" target="_blank">Profile</a></td>';
                         if (mode == 'AGR') {
                             var checked = '';
                             if (isTargetPrivate(PlayerCheck.id)) {
                                 checked = ' checked';
                             }
-                            divPTRE += '<td class="td_cell" align="center"><input class="sharedTargetStatus" id="'+PlayerCheck.id+'" type="checkbox"' + checked + '></td>';
+                            divPTRE += '<td class="td_cell_radius_'+ (i%2) +'" align="center"><input class="sharedTargetStatus" id="'+PlayerCheck.id+'" type="checkbox"' + checked + '></td>';
                         }
-                        divPTRE += '<td class="td_cell" align="center"><a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a></td>';
+                        divPTRE += '<td class="td_cell_radius_'+ (i%2) +'" align="center"><a class="tooltip" id="removePlayerFromListBySettings_'+PlayerCheck.id+'" style="cursor:pointer;"><img class="mouseSwitch" src="' + imgSupPlayer + '" height="12" width="12"></a></td>';
                         divPTRE += '</tr>';
                     });
                 }
@@ -1106,7 +1118,7 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
-            divPTRE += '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</a></span>';
+            divPTRE += '<span class="status_negatif">New version '+ lastAvailableVersion + ' is available. Update <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a>.</span>';
         }
         divPTRE += '</span></td></tr>';
         // Check last script version
@@ -1955,7 +1967,7 @@ function updateLastAvailableVersion(force) {
                     GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
                     if (availableVersion !== GM_info.script.version) {
                         if (document.getElementById('ptreUpdateVersionMessage')) {
-                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Check <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> updates</span>';
+                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">New version '+ lastAvailableVersion + ' is available. You need to update <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> version.</span>';
                         }
                         if (document.getElementById('ptreMenuName')) {
                             document.getElementById('ptreMenuName').innerHTML = 'CLICK ME';
