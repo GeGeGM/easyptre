@@ -13,7 +13,7 @@ Your spy reports will be shared only with your team mates. PTRE can also create 
 
 ## Presentation
 
-**EasyPTRE** is a browser script providing PTRE basic features **working with** [AGR extention](https://www.antiga.me).
+**EasyPTRE** is a browser script providing PTRE basic features **working with** [AGR extention](https://www.antiga.me), OGLight and Infinity.
 You may check [PTRE website](https://ptre.chez.gg/) or [OGame Origin post](https://forum.origin.ogame.gameforge.com/forum/thread/60-easyptre-ig-script-for-ptre-compatible-with-agr/) for details.
 
 ## Tolerated tool
@@ -28,10 +28,24 @@ You may check [PTRE website](https://ptre.chez.gg/) or [OGame Origin post](https
 
 ## Features
 
-Only few PTRE features are available in EasyPTRE which are:
-- Saving spy reports to PTRE Team
-- Push spy report to Discord
-- Ingame activities push to PTRE database
+### Core features:
+
+- Sync **lifeforms researchs** to PTRE (so you can use PTRE links with your own techs)
+- Fetching **Galaxy Event Explorer** events from Team events **directly ingame**
+- Finding **closest friend phalanx**
+
+### Features dedicated to AGR:
+
+- **Saving spy reports** to PTRE Team
+- Pushing spy report **to Discord**
+- **Ingame activities push** to PTRE Team's database
+- **Galaxy events tracking** to PTRE Team's database (+ Discord notifications)
+- Push **counter spy messages** as activities
+- Fetching **player's fleet** (best report) directly ingame
+- **Sharing targets** across PTRE Team (it's still possible to keep some targets private to yourself)
+
+Full compatibility table:
+![enter image description here](https://ptre.chez.gg/img/ptre_tool_compatibility.png)
 
 ## Contribution
 
