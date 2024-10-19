@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.10.4
+// @version      0.10.5
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -337,7 +337,7 @@ GM_addStyle(`
     width: 500px;
     padding:10px;
     border: solid black 2px;
-    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
+    background-color: #171d22;
 }
 #boxPTREMessage {
     position: fixed;
@@ -347,7 +347,7 @@ GM_addStyle(`
     padding:10px;
     
     border: solid black 2px;
-    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
+    background-color: #171d22;
 }
 #boxPTREInfos {
     position: fixed;
@@ -358,7 +358,7 @@ GM_addStyle(`
     min-width: 300px;
     padding:10px;
     border: solid black 2px;
-    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
+    background-color: #171d22;
 }
 #btnSaveOptPTRE {
     cursor:pointer;
@@ -372,6 +372,7 @@ GM_addStyle(`
     overflow-y: scroll;
 }
 #ptreGalaxyBox {
+    background-color: #171d22;
     font-weight: revert;
 }
 #ptreGalaxyMessageBoxContent {
@@ -1115,7 +1116,7 @@ function displayPTREMenu(mode = 'AGR') {
 
         // Footer
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="left"><a href="https://ptre.chez.gg/" target="_blank">PTRE website</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td>';
+        divPTRE += '<tr><td class="td_cell" align="left" width="50%"><a href="https://ptre.chez.gg/" target="_blank">PTRE website</a>&nbsp;|&nbsp;<a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a>&nbsp;|&nbsp;<a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td>';
         divPTRE += '<td class="td_cell" align="right"><div id="forceCheckVersionButton" type="button" class="button btn_blue">CHECK VERSION</div> <div id="displayChangelog" type="button" class="button btn_blue">CHANGELOG</div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="right" colspan="2"><span class="ptre_bold">EasyPTRE v' + GM_info.script.version + '</span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
