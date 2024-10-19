@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.10.3
+// @version      0.10.4
 // @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -241,6 +241,9 @@ GM_addStyle(`
 .ptre_tab_title {
     color: #6f9fc8;
 }
+.ptre_bold {
+    font-weight:bold;
+}
 .td_cell {
     padding: 3px;
 }
@@ -369,7 +372,6 @@ GM_addStyle(`
     overflow-y: scroll;
 }
 #ptreGalaxyBox {
-    background: #000 url("//gf2.geo.gfsrv.net/cdn4e/d07c90d96bbc823d6d53953a94aacb.jpg") no-repeat;
     font-weight: revert;
 }
 #ptreGalaxyMessageBoxContent {
@@ -1022,14 +1024,14 @@ function displayPTREMenu(mode = 'AGR') {
         // A reprendre
         if (isOGLorOGIEnabled()) {
             divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Targets list & Galaxy data</span></td></tr>';
-            divPTRE += '<tr><td class="td_cell" colspan="2"><br><span class="warning_status">OGLight or OGInfinity is enabled: some EasyPTRE features are disabled to leave priority to your favorite tool, OGL / OGI<br><br>Pease also add your TeamKey into OGL / OGI</span>';
+            divPTRE += '<tr><td class="td_cell" colspan="2"><br><span class="warning_status">OGLight or OGInfinity is enabled: some EasyPTRE features are disabled to leave priority to your favorite tool, OGL / OGI. Please also add your PTRE TeamKey into OGL / OGI</span>';
             divPTRE += '<br><br>EasyPTRE is still managing some tasks like:<br>- Galaxy Event Explorer Infos (in galaxy view)<br>- Lifeforms/combat researchs sync (for PTRE spy reports)<br>- Phalanx infos sharing (in galaxy view or Discord)</td></tr>';
         } else {
             // EasyPTRE enabled (AGR mode or vanilla mode)
             // Targets list
             divPTRE += '<tr><td class="td_cell"><span class="ptre_title">' + mode + ' Targets list</span>&nbsp;(<a href="https://ptre.chez.gg/?country='+country+'&univers='+universe+'&page=players_list" target="_blank">Manage</a>)</td><td class="td_cell" align="right"><div id="synctTargetsWithPTRE" class="button btn_blue"/>SYNC TARGETS</div></td></tr>';
             if (isAGROn) {
-                divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><div id="btnRefreshOptPTRESwitchList" type="button" class="button btn_blue">DISPLAY ' + other_mode + ' LIST</div></td></tr>';
+                divPTRE += '<tr><td class="td_cell">Both lists are used</td><td class="td_cell" align="right"><div id="btnRefreshOptPTRESwitchList" type="button" class="button btn_blue">DISPLAY ' + other_mode + ' LIST</div></td></tr>';
             } else {
                 divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="error_status">AGR is not enabled: Only using PTRE list.</span></td></tr>';
             }
@@ -1084,7 +1086,7 @@ function displayPTREMenu(mode = 'AGR') {
         var techMessage = '<span class="error_status">No Lifeforms researchs saved. Go to <a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet Page to update</a>.</span>';
         if (lastTechCheck != 0) {
             var nb_min = (currentTime - lastTechCheck) / 60;
-            techMessage = '<b>Lifeforms researchs saved for simulator <span class="success_status">'+round(nb_min, 0)+'</span> minute(s) ago</b>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
+            techMessage = '<span class="ptre_bold">Lifeforms researchs saved for simulator <span class="success_status">'+round(nb_min, 0)+'</span> minute(s) ago</span>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
         }
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" colspan="2"><span class="ptre_title">Lifeforms researchs</span></td></tr>';
@@ -1113,9 +1115,9 @@ function displayPTREMenu(mode = 'AGR') {
 
         // Footer
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="left"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td>';
+        divPTRE += '<tr><td class="td_cell" align="left"><a href="https://ptre.chez.gg/" target="_blank">PTRE website</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td>';
         divPTRE += '<td class="td_cell" align="right"><div id="forceCheckVersionButton" type="button" class="button btn_blue">CHECK VERSION</div> <div id="displayChangelog" type="button" class="button btn_blue">CHANGELOG</div></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="right" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="right" colspan="2"><span class="ptre_bold">EasyPTRE v' + GM_info.script.version + '</span></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
@@ -1518,7 +1520,7 @@ function getPlayerInfos(playerID, pseudo) {
                 content+= '<tr><td class="td_ship" align="center">[<a href="' + buildPTRELinkToPlayer(playerID) + '" target="_blank">PROFILE</a>]</td><td class="td_ship" align="center">[<a href="' + reponse.top_sr_link + '" target="_blank">BEST REPORT</a>]</td></tr>';
                 content+= '<tr><td class="td_ship" colspan="2"><hr></td></tr>';
                 reponse.fleet_json.forEach(function(item, index, object) {
-                    content+= '<tr><td class="td_ship" align="center"><span class="ptre_ship ptre_ship_' + item.ship_type + '"></td><td class="td_ship" align="center"></span><b>' + setNumber(item.count) + '</b></td></tr>';
+                    content+= '<tr><td class="td_ship" align="center"><span class="ptre_ship ptre_ship_' + item.ship_type + '"></td><td class="td_ship" align="center"></span><span class="ptre_bold">' + setNumber(item.count) + '</span></td></tr>';
                 });
                 content+= '</table></center>';
                 document.getElementById('infoBoxContent').innerHTML = content;
@@ -1549,6 +1551,7 @@ function displayHelp() {
 function displayChangelog() {
     setupInfoBox();
     var content = '<div style="overflow-y: scroll; max-height: 900px"><span class="ptre_maintitle">EasyPTRE Changelog</span>';
+    content+= '<br><br><span class="ptre_tab_title">0.10.4</span><br><br>- Add Changelog feature<br>- Fix some minor CSS issues';
     content+= '<br><br><span class="ptre_tab_title">0.10.3</span><br><br>- Manage moon ID and relocation related to phalanx sharing<br>- Rework global design';
     content+= '<br><br><span class="ptre_tab_title">0.10.2</span><br><br>- Fix counter-spy timestamp after V12 update';
     content+= '<br><br><span class="ptre_tab_title">0.10.1</span><br><br>- Allow removing TeamKey from settings';
