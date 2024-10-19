@@ -2,7 +2,7 @@
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
 // @version      0.10.5
-// @description  Plugin to use PTRE's basics features with AGR. Check https://ptre.chez.gg/
+// @description  Plugin to use PTRE's features with AGR / OGL / OGI. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
 // @copyright    2022, GeGe_GM
