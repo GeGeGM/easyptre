@@ -1023,7 +1023,7 @@ function displayPTREMenu(mode = 'AGR') {
         if (isOGLorOGIEnabled()) {
             divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Targets list & Galaxy data</span></td></tr>';
             divPTRE += '<tr><td class="td_cell" colspan="2"><br><span class="status_warning">OGLight or OGInfinity is enabled: some EasyPTRE features are disabled to leave priority to your favorite tool, OGL / OGI<br><br>Pease also add your TeamKey into OGL / OGI</span>';
-            divPTRE += '<br><br><span class="status_positif">EasyPTRE is still managing some tasks like:<br>- Galaxy Event Explorer Infos (in galaxy view)<br>- Lifeforms/combat researchs sync (for PTRE spy reports)<br>- Phalanx infos sharing (in galaxy view or Discord)</span></td></tr>';
+            divPTRE += '<br><br>EasyPTRE is still managing some tasks like:<br>- Galaxy Event Explorer Infos (in galaxy view)<br>- Lifeforms/combat researchs sync (for PTRE spy reports)<br>- Phalanx infos sharing (in galaxy view or Discord)</td></tr>';
         } else {
             // EasyPTRE enabled (AGR mode or vanilla mode)
             // Targets list
