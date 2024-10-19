@@ -362,7 +362,7 @@ GM_addStyle(`
 }
 #ptreGalaxyMiniMessage {
     color:green;
-    font-weight:bold;"
+    font-weight:bold;
 }
 #targetDivSettings {
     height: 350px;
@@ -1113,8 +1113,9 @@ function displayPTREMenu(mode = 'AGR') {
 
         // Footer
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b> <div id="forceCheckVersionButton" type="button" class="button btn_blue">CHECK</div></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="left"><a href="https://ptre.chez.gg/" target="_blank">PTRE</a> | <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a> | <a href="https://ko-fi.com/ptreforogame" target="_blank">Donate</a></td>';
+        divPTRE += '<td class="td_cell" align="right"><div id="forceCheckVersionButton" type="button" class="button btn_blue">CHECK VERSION</div> <div id="displayChangelog" type="button" class="button btn_blue">CHANGELOG</div></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="right" colspan="2"><b>EasyPTRE  v' + GM_info.script.version + '</b></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
@@ -1149,6 +1150,11 @@ function displayPTREMenu(mode = 'AGR') {
         // Action: Help
         document.getElementById('btnHelpPTRE').addEventListener("click", function (event) {
             displayHelp();
+        });
+
+        // Action: Changelog
+        document.getElementById('displayChangelog').addEventListener("click", function (event) {
+            displayChangelog();
         });
 
         // Action: Display Galaxy Tracking
@@ -1537,6 +1543,20 @@ function displayHelp() {
     content+= '<br><br>Common targets list (for your PTRE Team) can be configured <a href="https://ptre.chez.gg/?page=players_list" target="_blank">on PTRE players list page</a>.';
     content+= '<br><br><span class="ptre_tab_title">Need more help?</span><br><br>You can get some help on <a href="https://discord.gg/WsJGC9G" target="_blank">Discord</a>, come and ask us.';
 
+    document.getElementById('infoBoxContent').innerHTML = content;
+}
+
+function displayChangelog() {
+    setupInfoBox();
+    var content = '<div style="overflow-y: scroll; max-height: 900px"><span class="ptre_maintitle">EasyPTRE Changelog</span>';
+    content+= '<br><br><span class="ptre_tab_title">0.10.3</span><br><br>- Manage moon ID and relocation related to phalanx sharing<br>- Rework global design';
+    content+= '<br><br><span class="ptre_tab_title">0.10.2</span><br><br>- Fix counter-spy timestamp after V12 update';
+    content+= '<br><br><span class="ptre_tab_title">0.10.1</span><br><br>- Allow removing TeamKey from settings';
+    content+= '<br><br><span class="ptre_tab_title">0.10.0</span><br><br>- Add Galaxy events tracking and sharing (same feature as OGL/OGI but for AGR)<br>- Share Phalanx level with PTRE Team (AGR/OGL/OGI)<br>- Add PTRE Toolbar to galaxy view (AGR/OGL/OGI)<br>- New button to fetch events from Galaxy Event Explorer (AGR/OGL/OGI)<br>- New button to fetch closest friend Phalanx (AGR/OGL/OGI)<br>- Save lifeform researchs to PTRE in order to send them from website to simulator (AGR/OGL/OGI)<br>- Rework buttons and UI';
+    content+= '<br><br><span class="ptre_tab_title">0.8.0</span><br><br>- Send counter spy messages as activities<br>- Fix AGR spy table customization (following message page rework)<br>- Fix send spy report button in message page (following message page rework)';
+    content+= '<br><br><span class="ptre_tab_title">0.7.6</span><br><br>- Import AGR custom lists to PTRE tracking list (in addition of basic lists)<br>- Improve notification system (keep 5 sec history)';
+    content+= '<br><br><span class="ptre_tab_title">0.7.5</span><br><br>- Display target top fleet directly into EasyPTRE pannel<br>- feature: Add help menu';
+    content+= '<br><br><span class="ptre_tab_title">0.7.4</span><br><br>- [Feature] Sync AGR/PTRE targets list with teammates via PTRE (non-mandatory)<br>- [Feature] Add a private targets list management system (in order to not share)<br>- [Feature] Add a debug mode option<br>- [Feature] Script will check, once a day, for updates and display a label<br>- [Fix] Fix pushing activities when refreshing same system<br>- [Fix] Remove AGR "Traders" from targets lists ("Friends" were already removed)<br>- [Fix] Fix galaxy page detection (depending on from where player clicks)<br>- [Fix] Add scrollbar to targets list<br>- [Fix] Move EasyPTRE pannel to right side in order to not overlap with AGR</div>';
     document.getElementById('infoBoxContent').innerHTML = content;
 }
 
