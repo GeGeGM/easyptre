@@ -220,13 +220,13 @@ if (modeEasyPTRE == "ptre") {
 // Ugly style... yes!
 // ****************************************
 GM_addStyle(`
-.status_positif {
+.success_status {
     color:#99CC00;
 }
-.status_negatif {
+.error_status {
     color: #D43635;
 }
-.status_warning {
+.warning_status {
     color:#D29D00;
 }
 .ptre_maintitle {
@@ -444,7 +444,7 @@ function improvePageGalaxy() {
     tempContent+= '<td valign="top"><span class="ptre_maintitle">PTRE TOOLBAR</span></td><td valign="top"><div id="ptreGalaxyPhalanxButton" type="button" class="button btn_blue">CLOSE PHALANX</div> <div id="ptreGalaxyGEEButton" type="button" class="button btn_blue">GALAXY EVENT EXPLORER</div></td>';
     tempContent+= '<td valign="top">';
     if (!isOGLorOGIEnabled()) {
-        tempContent+= '<span id="ptreGalaxyActivityCount" class="status_positif"></span> Activities | <span id="ptreGalaxyEventCount" class="status_positif"></span> Galaxy Events';
+        tempContent+= '<span id="ptreGalaxyActivityCount" class="success_status"></span> Activities | <span id="ptreGalaxyEventCount" class="success_status"></span> Galaxy Events';
     } else {
         tempContent+= '---';
     }
@@ -992,7 +992,7 @@ function displayPTREMenu(mode = 'AGR') {
         }
         var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
         divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><div id="btnHelpPTRE" type="button" class="button btn_blue">HELP</div> <div id="btnRefreshOptPTRE" type="button" class="button btn_blue">REFRESH</div> <div id="btnCloseOptPTRE" type="button" class="button btn_blue">CLOSE</div></td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="status_warning"></div></td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="warning_status"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><div id="btnSaveOptPTRE" type="button" class="button btn_blue">SAVE</div></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
@@ -1006,7 +1006,7 @@ function displayPTREMenu(mode = 'AGR') {
             divPTRE += improveAGRSpyTableValue;
             divPTRE += ' />';
             if (improveAGRSpyTableValue != 'checked') {
-                divPTRE += ' <span class="status_warning">(recommended)</span>';
+                divPTRE += ' <span class="warning_status">(recommended)</span>';
             }
             divPTRE += '</td></tr>';
         }
@@ -1022,7 +1022,7 @@ function displayPTREMenu(mode = 'AGR') {
         // A reprendre
         if (isOGLorOGIEnabled()) {
             divPTRE += '<tr><td class="td_cell"><span class="ptre_title">Targets list & Galaxy data</span></td></tr>';
-            divPTRE += '<tr><td class="td_cell" colspan="2"><br><span class="status_warning">OGLight or OGInfinity is enabled: some EasyPTRE features are disabled to leave priority to your favorite tool, OGL / OGI<br><br>Pease also add your TeamKey into OGL / OGI</span>';
+            divPTRE += '<tr><td class="td_cell" colspan="2"><br><span class="warning_status">OGLight or OGInfinity is enabled: some EasyPTRE features are disabled to leave priority to your favorite tool, OGL / OGI<br><br>Pease also add your TeamKey into OGL / OGI</span>';
             divPTRE += '<br><br>EasyPTRE is still managing some tasks like:<br>- Galaxy Event Explorer Infos (in galaxy view)<br>- Lifeforms/combat researchs sync (for PTRE spy reports)<br>- Phalanx infos sharing (in galaxy view or Discord)</td></tr>';
         } else {
             // EasyPTRE enabled (AGR mode or vanilla mode)
@@ -1031,7 +1031,7 @@ function displayPTREMenu(mode = 'AGR') {
             if (isAGROn) {
                 divPTRE += '<tr><td class="td_cell"><i>Both lists are used</i></td><td class="td_cell" align="right"><div id="btnRefreshOptPTRESwitchList" type="button" class="button btn_blue">DISPLAY ' + other_mode + ' LIST</div></td></tr>';
             } else {
-                divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="status_negatif">AGR is not enabled: Only using PTRE list.</span></td></tr>';
+                divPTRE += '<tr><td colspan="2" class="td_cell" align="center"><span class="error_status">AGR is not enabled: Only using PTRE list.</span></td></tr>';
             }
             // Display PTRE list if AGR list setting is disabled OR AGR extension not installed
             var targetJSON = '';
@@ -1081,10 +1081,10 @@ function displayPTREMenu(mode = 'AGR') {
         // Lifeforms Menu
         const currentTime = serverTime.getTime() / 1000;
         const lastTechCheck = GM_getValue(ptreLastTechnosRefresh, 0);
-        var techMessage = '<span class="status_negatif">No Lifeforms researchs saved. Go to <a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet Page to update</a>.</span>';
+        var techMessage = '<span class="error_status">No Lifeforms researchs saved. Go to <a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet Page to update</a>.</span>';
         if (lastTechCheck != 0) {
             var nb_min = (currentTime - lastTechCheck) / 60;
-            techMessage = '<b>Lifeforms researchs saved for simulator <span class="status_positif">'+round(nb_min, 0)+'</span> minute(s) ago</b>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
+            techMessage = '<b>Lifeforms researchs saved for simulator <span class="success_status">'+round(nb_min, 0)+'</span> minute(s) ago</b>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
         }
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" colspan="2"><span class="ptre_title">Lifeforms researchs</span></td></tr>';
@@ -1107,7 +1107,7 @@ function displayPTREMenu(mode = 'AGR') {
                 }
             });
         }
-        divPTRE += '<span class="status_positif">' + phalanxCount + '</span> synced to PTRE Team</td></tr>';
+        divPTRE += '<span class="success_status">' + phalanxCount + '</span> synced to PTRE Team</td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="/game/index.php?page=ingame&component=facilities">Visit every moon\'s buildings to update</a></td></tr>';
 
 
@@ -1118,7 +1118,7 @@ function displayPTREMenu(mode = 'AGR') {
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><span id="ptreUpdateVersionMessage">';
         var lastAvailableVersion = GM_getValue(ptreLastAvailableVersion, -1);
         if (lastAvailableVersion != -1 && lastAvailableVersion !== GM_info.script.version) {
-            divPTRE += '<span class="status_negatif">New version '+ lastAvailableVersion + ' is available. Update <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a>.</span>';
+            divPTRE += '<span class="error_status">New version '+ lastAvailableVersion + ' is available. Update <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a>.</span>';
         }
         divPTRE += '</span></td></tr>';
         // Check last script version
@@ -1484,7 +1484,7 @@ function setupInfoBox() {
     if (document.getElementById('divPTREInfos')) {
         document.getElementById('divPTREInfos').parentNode.removeChild(document.getElementById('divPTREInfos'));
     }
-    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><div id="btnCloseInfosPTRE" type="button" class="button btn_blue">CLOSE</div><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="status_warning">LOADING...</span><center><br><br><br></div></td></tr></table>';
+    var divPTRE = '<div id="boxPTREInfos"><table border="1" width="100%"><tr><td align="right"><div id="btnCloseInfosPTRE" type="button" class="button btn_blue">CLOSE</div><hr></td></tr><tr><td><div id="infoBoxContent"><br><br><center><span class="warning_status">LOADING...</span><center><br><br><br></div></td></tr></table>';
     var eletementSetPTRE = document.createElement("div");
     eletementSetPTRE.innerHTML = divPTRE;
     eletementSetPTRE.id = 'divPTREInfos';
@@ -1517,7 +1517,7 @@ function getPlayerInfos(playerID, pseudo) {
                 content+= '</table></center>';
                 document.getElementById('infoBoxContent').innerHTML = content;
             } else {
-                document.getElementById('infoBoxContent').innerHTML = '<span class="status_negatif">' + reponse.message + '</span>';
+                document.getElementById('infoBoxContent').innerHTML = '<span class="error_status">' + reponse.message + '</span>';
             }
         }
     });
@@ -1572,10 +1572,10 @@ function displayGalaxyTracking() {
             }
             content+= '</tr>';
             var percentTemp = round(countSsystem / 500 * 100, 0);
-            content2+='Tracked systems for galaxy '+gala+': <span class="status_positif">'+countSsystem+'</span> / 500 (<span class="status_positif">'+percentTemp+'%</span>)<br>';
+            content2+='Tracked systems for galaxy '+gala+': <span class="success_status">'+countSsystem+'</span> / 500 (<span class="success_status">'+percentTemp+'%</span>)<br>';
         }
     }
-    content+= '</table><br><br><span class="ptre_tab_title">Total</span><br><br>Tracked Galaxies: <span class="status_positif">'+countGala+'</span> | Tracked Systems: <span class="status_positif">'+countSsystemTotal+'</span><br><br><br>';
+    content+= '</table><br><br><span class="ptre_tab_title">Total</span><br><br>Tracked Galaxies: <span class="success_status">'+countGala+'</span> | Tracked Systems: <span class="success_status">'+countSsystemTotal+'</span><br><br><br>';
     content+='<span class="ptre_tab_title">Galaxy details</span><br><br>'+content2;
     //content+= '</table>';
 
@@ -1591,7 +1591,7 @@ function displayGalaxyTracking() {
 function validatePurgeGalaxyTracking() {
     setupInfoBox();
     var content = '<span class="ptre_maintitle">Delete Galaxy tracking data ?</span><br><br><br>';
-    content+= '<span class="status_negatif">This will delete galaxy data from local storage.</span><br><br>';
+    content+= '<span class="error_status">This will delete galaxy data from local storage.</span><br><br>';
     content+= 'It is recommended to delete thoses data only if you have issues with galaxy feature or if you have not play for a long time this universe.<br><br>';
     content+= 'You will have to rebuild it again by browsing galaxies.<br><br>';
     content+= '<div id="purgeGalaxyTracking" class="button btn_blue"/>PURGE DATA, REALLY?</div>';
@@ -1967,7 +1967,7 @@ function updateLastAvailableVersion(force) {
                     GM_setValue(ptreLastAvailableVersionRefresh, currentTime);
                     if (availableVersion !== GM_info.script.version) {
                         if (document.getElementById('ptreUpdateVersionMessage')) {
-                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">New version '+ lastAvailableVersion + ' is available. You need to update <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> version.</span>';
+                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="error_status">New version '+ lastAvailableVersion + ' is available. You need to update <a href="https://openuserjs.org/scripts/GeGe_GM/EasyPTRE" target="_blank">EasyPTRE</a> version.</span>';
                         }
                         if (document.getElementById('ptreMenuName')) {
                             document.getElementById('ptreMenuName').innerHTML = 'CLICK ME';
@@ -1975,11 +1975,11 @@ function updateLastAvailableVersion(force) {
                         consoleDebug('Version ' + availableVersion + ' is available');
                     } else {
                         if (document.getElementById('ptreUpdateVersionMessage')) {
-                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_positif">EasyPTRE is up to date</span>';
+                            document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="success_status">EasyPTRE is up to date</span>';
                         }
                     }
                 } else {
-                    document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="status_negatif">Error ' + result.status + ' (' + result.statusText + ')</span>';
+                    document.getElementById('ptreUpdateVersionMessage').innerHTML = '<span class="error_status">Error ' + result.status + ' (' + result.statusText + ')</span>';
                 }
             }
         });
@@ -2028,17 +2028,17 @@ function parsePlayerResearchs(json, mode) {
                 type = 'def';
             }
             str+= '<tr><td align="center"><img src="/img/ogame/mini/'+type+'_'+key+'.png"></td>';
-            var temp = '-'; if (obj.ships[key].speed > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].speed*100, 2)+' %<span>'; }
+            var temp = '-'; if (obj.ships[key].speed > 0) { temp = '<span class="success_status">'+round(obj.ships[key].speed*100, 2)+' %<span>'; }
             str+= '<td align="center">'+temp+'</td>';
-            temp = '-'; if (obj.ships[key].armor > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].armor*100, 2)+' %<span>'; }
+            temp = '-'; if (obj.ships[key].armor > 0) { temp = '<span class="success_status">'+round(obj.ships[key].armor*100, 2)+' %<span>'; }
             str+= '<td align="center">'+temp+'</td>';
-            temp = '-'; if (obj.ships[key].shield > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].shield*100, 2)+' %<span>'; }
+            temp = '-'; if (obj.ships[key].shield > 0) { temp = '<span class="success_status">'+round(obj.ships[key].shield*100, 2)+' %<span>'; }
             str+= '<td align="center">'+temp+'</td>';
-            temp = '-'; if (obj.ships[key].weapon > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].weapon*100, 2)+' %<span>'; }
+            temp = '-'; if (obj.ships[key].weapon > 0) { temp = '<span class="success_status">'+round(obj.ships[key].weapon*100, 2)+' %<span>'; }
             str+= '<td align="center">'+temp+'</td>';
-            temp = '-'; if (obj.ships[key].cargo > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].cargo*100, 2)+' %<span>'; }
+            temp = '-'; if (obj.ships[key].cargo > 0) { temp = '<span class="success_status">'+round(obj.ships[key].cargo*100, 2)+' %<span>'; }
             str+= '<td align="center">'+temp+'</td>';
-            temp = '-'; if (obj.ships[key].fuel > 0) { temp = '<span class="status_positif">'+round(obj.ships[key].fuel*100, 2)+' %<span>'; }
+            temp = '-'; if (obj.ships[key].fuel > 0) { temp = '<span class="success_status">'+round(obj.ships[key].fuel*100, 2)+' %<span>'; }
             str+= '<td align="center">'+temp+'</td></tr>';
         } else {
             out["0"]["lifeformBonuses"]["BaseStatsBooster"][key] = {
@@ -2195,7 +2195,7 @@ function getPhalanxInfosFromGala() {
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     const teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
-        displayGalaxyMessageContent('<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
+        displayGalaxyMessageContent('<span class="error_status">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
     }
     $.ajax({
@@ -2224,7 +2224,7 @@ function getGEEInfosFromGala() {
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     const teamKey = GM_getValue(ptreTeamKey, '');
     if (teamKey == '') {
-        displayGalaxyMessageContent('<span class="status_negatif">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
+        displayGalaxyMessageContent('<span class="error_status">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
     }
     $.ajax({
@@ -2258,5 +2258,5 @@ function displayTotalSystemsSaved() {
             });
         }
     }
-    return 'Tracked Galaxies: <span class="status_positif">'+countGala+'</span> | Tracked Systems: <span class="status_positif">'+countSsystem+'</span>';
+    return 'Tracked Galaxies: <span class="success_status">'+countGala+'</span> | Tracked Systems: <span class="success_status">'+countSsystem+'</span>';
 }
