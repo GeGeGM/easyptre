@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.10.5
+// @version      0.11.0
 // @description  Plugin to use PTRE's features with AGR / OGL / OGI. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -33,7 +33,6 @@ const ptrePushDelayMicroSec = 500;
 const versionCheckTimeout = 6*60*60;
 const technosCheckTimeout = 15*60;
 const dataSharingDelay = 200;
-const ptreGalaxyMessageBoxContentFadeOut = 60*1000;
 const improvePageDelay = 200;
 const ptreTargetListMaxSize = 300;
 const deepSpacePlayerId = 99999;
@@ -374,6 +373,7 @@ GM_addStyle(`
 #ptreGalaxyBox {
     background-color: #171d22;
     font-weight: revert;
+    padding-top: 10px;
 }
 #ptreGalaxyMessageBoxContent {
     padding-left: 10px;
@@ -444,7 +444,7 @@ function improvePageGalaxy() {
     console.log("[PTRE] Improving Galaxy Page");
 
     var tempContent = '<table width="100%"><tr>';
-    tempContent+= '<td valign="top"><span class="ptre_maintitle">PTRE TOOLBAR</span></td><td valign="top"><div id="ptreGalaxyPhalanxButton" type="button" class="button btn_blue">CLOSE PHALANX</div> <div id="ptreGalaxyGEEButton" type="button" class="button btn_blue">GALAXY EVENT EXPLORER</div></td>';
+    tempContent+= '<td valign="top"><span class="ptre_maintitle">PTRE TOOLBAR</span></td><td valign="top"><div id="ptreGalaxyPhalanxButton" type="button" class="button btn_blue">FRIENDS & PHALANX</div> <div id="ptreGalaxyGEEButton" type="button" class="button btn_blue">GALAXY EVENT EXPLORER</div></td>';
     tempContent+= '<td valign="top">';
     if (!isOGLorOGIEnabled()) {
         tempContent+= '<span id="ptreGalaxyActivityCount" class="success_status"></span> Activities | <span id="ptreGalaxyEventCount" class="success_status"></span> Galaxy Events';
@@ -1552,6 +1552,7 @@ function displayHelp() {
 function displayChangelog() {
     setupInfoBox();
     var content = '<div style="overflow-y: scroll; max-height: 900px"><span class="ptre_maintitle">EasyPTRE Changelog</span>';
+    content+= '<br><br><span class="ptre_tab_title">0.11.0</span><br><br>- Add Friends & Phalanx feature';
     content+= '<br><br><span class="ptre_tab_title">0.10.4</span><br><br>- Add Changelog feature<br>- Fix some minor CSS issues';
     content+= '<br><br><span class="ptre_tab_title">0.10.3</span><br><br>- Manage moon ID and relocation related to phalanx sharing<br>- Rework global design';
     content+= '<br><br><span class="ptre_tab_title">0.10.2</span><br><br>- Fix counter-spy timestamp after V12 update';
@@ -2234,7 +2235,6 @@ function getPhalanxInfosFromGala() {
                 console.log('[PTRE] ' + message);
             }
             displayGalaxyMessageContent(message);
-            setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
         }
     });
 }
@@ -2263,7 +2263,6 @@ function getGEEInfosFromGala() {
                 console.log('[PTRE] ' + message);
             }
             displayGalaxyMessageContent(message);
-            setTimeout(function() {document.getElementById('ptreGalaxyMessageBoxContent').innerHTML = "";}, ptreGalaxyMessageBoxContentFadeOut);
         }
     });
 }
