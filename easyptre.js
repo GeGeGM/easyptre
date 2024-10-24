@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.11.0
+// @version      0.11.1
 // @description  Plugin to use PTRE's features with AGR / OGL / OGI. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -71,6 +71,7 @@ var ptrePTREPlayerListJSON = "ptre-" + country + "-" + universe + "-PTREPlayerLi
 var ptreAGRPlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPlayerListJSON";
 var ptreAGRPrivatePlayerListJSON = "ptre-" + country + "-" + universe + "-AGRPrivatePlayerListJSON";
 var ptreEnableConsoleDebug = "ptre-" + country + "-" + universe + "-EnableConsoleDebug";
+var ptreAddBuddiesToFriendsAndPhalanx = "ptre-" + country + "-" + universe + "-AddBuddiesToFriendsAndPhalanx";
 var ptreLastAvailableVersion = "ptre-" + country + "-" + universe + "-LastAvailableVersion";
 var ptreLastAvailableVersionRefresh = "ptre-" + country + "-" + universe + "-LastAvailableVersionRefresh";
 var ptreMaxCounterSpyTsSeen = "ptre-" + country + "-" + universe + "-MaxCounterSpyTsSeen";
@@ -79,6 +80,8 @@ var ptreLastTechnosRefresh = "ptre-" + country + "-" + universe + "-LastTechnosR
 var ptrePlayerID = "ptre-" + country + "-" + universe + "-PlayerID";
 var ptreDataToSync = "ptre-" + country + "-" + universe + "-DataToSync";
 var ptreGalaxyData = "ptre-" + country + "-" + universe + "-GalaxyDataG";
+var ptreBuddiesList = "ptre-" + country + "-" + universe + "-BuddiesList";
+var ptreBuddiesListLastRefresh = "ptre-" + country + "-" + universe + "-BuddiesListLastRefresh";
 
 // Images
 var imgPTRE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB1FBMVEUAAEAAAEE1IjwvHTsEA0GBTCquYhxbNjINCUAFBEEqGjwyIDsAAUAYED+kXR++aBS7aBaKUCctHDwTDUBDKTeBSymwYxuYVyQPCkA8JTm4Zxi7ZxW9aBSrYR2fWyG+aRS8ZxS2Zhg6JDlqPzC+aRW8ZxV1RCwBAkEMCEGUVSW8aBSlXh8bET8oGj27aBdNLzZSMjW8aBaHTigGBUEXDz5kOS1qOymbWCG9aRayZBt0QihnOisiFj0PCj9FKjdKLDVIKzVGKjZHKjZILDYXDz8BAUENCD4OCD4KBj8OCT4MCD8CAkEiFj6MUSadWB+fWR2NUSYVDj8HBUBqPzGJTyeYViGeWB6fWR8+JzkFA0AWDj4kFz2ITiazZBl2RSwIBkASDD8ZED5hOTCwYhqbWSIHBD80IDodEz4PCT8kFjsKB0AhFDwTDD8DA0E1IToQCTybVh6pYB6ETSlWNDQrGzwHBUEjFj1PMDV+SSqoXhwfETmdVhyxZBuWViRrPy8DAkFjOzGPUiarXhgeETm9aBWiXCB9SSp4RiyeWiG1ZRm9aRW8aBWrXhmdVxysXhgPCT2UVCKzZRyxZByyZRyiXB8dEDoDAkAhFj4oGj4kGD4GBED///9i6fS4AAAAAWJLR0Sb79hXhAAAAAlwSFlzAAAOwgAADsIBFShKgAAAAAd0SU1FB+YMAw4EFzatfRkAAAE3SURBVCjPY2AgDBhxSzEx45JkYWVj5wDq5eTi5kGT4uXjFxAUEhYRFROXQLNJUkpaWkZWTkpeQVEJ1WRGZRVpaWlVGSChoqaOIqWhCRIFAy1tHRQpXTFVmJS0nj6yiYwGhnAZaX4jY7iEiamZuYUAHBhaWlnbQKVs7ewdHEHAyQlC2Tu7wM1jdHVzd3PzYGT08HRz8/JmRLbMh9XXzz8gMCg4JDQsPALFY5FR0TGxcfEMCYlJySnRcOHUtHROoLqMzCywouwcxlzePDewVH5BYVFxCQfUAsbSsvIKvsoqiFS1vLxhTW2dpEu9q3BeQyOboTx/UzNUqgUUfCpSrW3tHZ1d/MBw6e5BkgIBGXl5aEhiSCEAXKqXXxUNyPRBpPonTJyEBiZPmQqWmjZ9BgaYOYuIRIgVAABizF3wXn23IAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0xMi0wM1QxNDowNDoxNyswMDowMEeHM70AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMTItMDNUMTQ6MDQ6MTcrMDA6MDA22osBAAAAAElFTkSuQmCC';
@@ -157,6 +160,12 @@ if (modeEasyPTRE == "ingame") {
     if (/page=ingame&component=facilities/.test(location.href)) {
         consoleDebug("Facilities page detected");
         setTimeout(improvePageFacilities, improvePageDelay);
+    }
+
+    // Buddies Page
+    if (/page=ingame&component=buddies/.test(location.href)) {
+        consoleDebug("Buddies page detected");
+        setTimeout(improvePageBuddies, improvePageDelay);
     }
 
     // Check for new version only if we already did the check once
@@ -257,6 +266,12 @@ GM_addStyle(`
 }
 .td_cell_radius_1 {
     background-color: #0d1014;
+    padding: 3px;
+    border-radius: 6px;
+    border: 1px solid black;
+}
+.td_cell_radius_2 {
+    background-color: #1031a0;
     padding: 3px;
     border-radius: 6px;
     border: 1px solid black;
@@ -603,6 +618,18 @@ function improvePageFacilities() {
             addDataToPTREData(phalanx);
         }
     }
+}
+
+// Parse Buddies page
+function improvePageBuddies() {
+    const currentTime = serverTime.getTime() / 1000;
+    const playerLinks = document.querySelectorAll('a[data-playerid]');
+    const playerIds = Array.from(playerLinks).map(link => link.getAttribute('data-playerid'));
+    consoleDebug(playerIds);
+    dataJSON = JSON.stringify(playerIds);
+    GM_setValue(ptreBuddiesList, dataJSON);
+    GM_setValue(ptreBuddiesListLastRefresh, currentTime);
+    displayPTREPopUpMessage('Saving buddies list (for Friends & Phalanx)');
 }
 
 // ****************************************
@@ -993,34 +1020,46 @@ function displayPTREMenu(mode = 'AGR') {
             mode = 'PTRE';
             other_mode = 'AGR';
         }
+        var tdId = 0;
         var divPTRE = '<div id="boxPTRESettings"><table border="1" width="100%">';
         divPTRE += '<tr><td class="td_cell"><span class="ptre_maintitle">EasyPTRE PANNEL</span></td><td class="td_cell" align="right"><div id="btnHelpPTRE" type="button" class="button btn_blue">HELP</div> <div id="btnRefreshOptPTRE" type="button" class="button btn_blue">REFRESH</div> <div id="btnCloseOptPTRE" type="button" class="button btn_blue">CLOSE</div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><div id=messageDivInSettings class="warning_status"></div></td></tr>';
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell"><div class="ptre_title">Settings</div></td><td class="td_cell" align="right"><div id="btnSaveOptPTRE" type="button" class="button btn_blue">SAVE</div></td></tr>';
-        divPTRE += '<tr><td class="td_cell"><div>PTRE Team Key:</div></td><td class="td_cell" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
+        divPTRE += '<tr><td colspan="2"><table width="100%"><tr class="tr_cell_radius"><td class="td_cell_radius_'+(tdId%2)+'"><div>PTRE Team Key:</div></td><td class="td_cell_radius_'+(tdId%2)+'" align="center"><div><input onclick="document.getElementById(\'ptreTK\').type = \'text\'" style="width:160px;" type="password" id="ptreTK" value="'+ ptreStoredTK +'"></div></td></tr>';
+        tdId++;
 
         // If AGR is detected
         if (isAGROn) {
             // AGR Spy Table Improvement
-            divPTRE += '<tr><td class="td_cell">Improve AGR Spy Table:</td>';
+            divPTRE += '<tr class="tr_cell_radius"><td class="td_cell_radius_'+(tdId%2)+'">Improve AGR Spy Table:</td>';
             var improveAGRSpyTableValue = (GM_getValue(ptreImproveAGRSpyTable, 'true') == 'true' ? 'checked' : '');
-            divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREImproveAGRSpyTable" type="checkbox" ';
+            divPTRE += '<td class="td_cell_radius_'+(tdId%2)+'" style="text-align: center;"><input id="PTREImproveAGRSpyTable" type="checkbox" ';
             divPTRE += improveAGRSpyTableValue;
             divPTRE += ' />';
             if (improveAGRSpyTableValue != 'checked') {
                 divPTRE += ' <span class="warning_status">(recommended)</span>';
             }
             divPTRE += '</td></tr>';
+            tdId++;
         }
         // Console Debug mode
-        divPTRE += '<tr><td class="td_cell">Enable Console Debug:</td>';
+        divPTRE += '<tr class="tr_cell_radius"><td class="td_cell_radius_'+(tdId%2)+'">Enable Console Debug:</td>';
         var debugMode = (GM_getValue(ptreEnableConsoleDebug, 'false') == 'true' ? 'checked' : '');
-        divPTRE += '<td class="td_cell" style="text-align: center;"><input id="PTREEnableConsoleDebug" type="checkbox" ';
+        divPTRE += '<td class="td_cell_radius_'+(tdId%2)+'" style="text-align: center;"><input id="PTREEnableConsoleDebug" type="checkbox" ';
         divPTRE += debugMode;
         divPTRE += ' />';
         divPTRE += '</td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
+        tdId++;
+        // Add Buddies to Friends and Phalanx feature
+        divPTRE += '<tr class="tr_cell_radius"><td class="td_cell_radius_'+(tdId%2)+'">Add Buddies to Friends & Phalanx feature:<br>(List is not shared, nor stored by PTRE)</td>';
+        var buddiesOn = (GM_getValue(ptreAddBuddiesToFriendsAndPhalanx, 'true') == 'true' ? 'checked' : '');
+        divPTRE += '<td class="td_cell_radius_'+(tdId%2)+'" style="text-align: center;"><input id="PTREAddBuddiesToFriendsAndPhalanx" type="checkbox" ';
+        divPTRE += buddiesOn;
+        divPTRE += ' />';
+        divPTRE += '</td></tr>';
+        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr></table></td></tr>';
+        tdId++;
 
         // A reprendre
         if (isOGLorOGIEnabled()) {
@@ -1086,8 +1125,16 @@ function displayPTREMenu(mode = 'AGR') {
         const lastTechCheck = GM_getValue(ptreLastTechnosRefresh, 0);
         var techMessage = '<span class="error_status">No Lifeforms researchs saved. Go to <a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet Page to update</a>.</span>';
         if (lastTechCheck != 0) {
+            var temp = "today";
             var nb_min = (currentTime - lastTechCheck) / 60;
-            techMessage = '<span class="ptre_bold">Lifeforms researchs saved for simulator <span class="success_status">'+round(nb_min, 0)+'</span> minute(s) ago</span>.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
+            if (nb_min <= 1) {
+                temp = 'now';
+            } else if (nb_min < 60) {
+                temp = 'last hour';
+            } else if (nb_min > 24*60) {
+                temp = round(nb_min/(24*60), 1) + ' days ago';
+            }
+            techMessage = 'Last Lifeforms researchs update (for simulators): <span class="success_status">'+temp+'.<br><a href="/game/index.php?page=ingame&component=fleetdispatch">Fleet menu to update</a> - <a href="https://ptre.chez.gg/?page=lifeforms_researchs" target="_blank">Check it out on PTRE</a>';
         }
         divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><hr /></td></tr>';
         divPTRE += '<tr><td class="td_cell" colspan="2"><span class="ptre_title">Lifeforms researchs</span></td></tr>';
@@ -1110,8 +1157,8 @@ function displayPTREMenu(mode = 'AGR') {
                 }
             });
         }
-        divPTRE += '<span class="success_status">' + phalanxCount + '</span> synced to PTRE Team</td></tr>';
-        divPTRE += '<tr><td class="td_cell" align="center" colspan="2"><a href="/game/index.php?page=ingame&component=facilities">Visit every moon\'s buildings to update</a></td></tr>';
+        divPTRE += '<span class="success_status">' + phalanxCount + '</span> synced to PTRE Team<br>';
+        divPTRE += '<a href="/game/index.php?page=ingame&component=facilities">Visit every moon\'s buildings to update</a></td></tr>';
 
 
         // Footer
@@ -1191,6 +1238,8 @@ function displayPTREMenu(mode = 'AGR') {
                 }
                 // Update Console Debug Mode
                 GM_setValue(ptreEnableConsoleDebug, document.getElementById('PTREEnableConsoleDebug').checked + '');
+                // Save Buddies status
+                GM_setValue(ptreAddBuddiesToFriendsAndPhalanx, document.getElementById('PTREAddBuddiesToFriendsAndPhalanx').checked + '');
                 // Update menu image and remove it after few sec
                 document.getElementById('imgPTREmenu').src = imgPTRESaveOK;
                 setTimeout(function() {document.getElementById('imgPTREmenu').src = imgPTRE;}, menuImageDisplayTime);
@@ -1552,6 +1601,7 @@ function displayHelp() {
 function displayChangelog() {
     setupInfoBox();
     var content = '<div style="overflow-y: scroll; max-height: 900px"><span class="ptre_maintitle">EasyPTRE Changelog</span>';
+    content+= '<br><br><span class="ptre_tab_title">0.11.1</span><br><br>- Add buddies to Friends & Phalanx feature<br>- Add filters to Friends & Phalanx feature';
     content+= '<br><br><span class="ptre_tab_title">0.11.0</span><br><br>- Add Friends & Phalanx feature';
     content+= '<br><br><span class="ptre_tab_title">0.10.4</span><br><br>- Add Changelog feature<br>- Fix some minor CSS issues';
     content+= '<br><br><span class="ptre_tab_title">0.10.3</span><br><br>- Manage moon ID and relocation related to phalanx sharing<br>- Rework global design';
@@ -2213,20 +2263,39 @@ function syncSharableData(mode) {
 
 // This function fetchs closest friend phalanx
 function getPhalanxInfosFromGala() {
+    const currentTime = serverTime.getTime() / 1000;
+    var warning = '';
     var systemElem = $("input#system_input")[0];
     var galaxyElem = $("input#galaxy_input")[0];
     var galaxy = galaxyElem.value;
     var system = systemElem.value;
     displayGalaxyMessageContent("Loading info for " + galaxy + ":" + system + " ...");
     const teamKey = GM_getValue(ptreTeamKey, '');
+
     if (teamKey == '') {
         displayGalaxyMessageContent('<span class="error_status">No TeamKey: Add a PTRE TeamKey in EasyPTRE settings</span>');
         return -1;
     }
+
+    // Buddies List warnings
+    var dataJSON = '';
+    if (GM_getValue(ptreAddBuddiesToFriendsAndPhalanx, 'true') == 'true') {
+        dataJSON = GM_getValue(ptreBuddiesList, '');
+        if (dataJSON != '') {
+            if ((currentTime - GM_getValue(ptreBuddiesListLastRefresh, 0)) > 7*24*60*60) {
+                warning = '<span class="warning_status">Buddies list might be outdated: </span> <a href="/game/index.php?page=ingame&component=buddies">Visit buddies page to update your friends list</a><br><br>';
+            }
+        } else {
+            warning = '<span class="warning_status">Buddies list is empty: </span> <a href="/game/index.php?page=ingame&component=buddies">Visit buddies page to add your friends to this view</a><br><br>';
+        }
+    } else {
+        warning = '<span class="warning_status">Buddies list is not managed: you may enable it in EasyPTRE settings</span><br><br>';
+    }
+
     $.ajax({
         url : urlPTREGetPhalanxInfosFromGala + '&version=' + GM_info.script.version + '&current_player_id=' + currentPlayerID + '&ptre_id=' + GM_getValue(ptreID, '') + '&team_key=' + teamKey + '&galaxy=' + galaxy + '&system=' + system,
         type : 'POST',
-        data: null,
+        data: dataJSON,
         cache: false,
         success : function(reponse){
             var reponseDecode = jQuery.parseJSON(reponse);
@@ -2234,7 +2303,7 @@ function getPhalanxInfosFromGala() {
             if (reponseDecode.code != 1) {
                 console.log('[PTRE] ' + message);
             }
-            displayGalaxyMessageContent(message);
+            displayGalaxyMessageContent(warning+message);
         }
     });
 }
