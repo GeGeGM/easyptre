@@ -1860,7 +1860,7 @@ function processGalaxyDataCallback(data) {
 
             // Push galaxy data
             if (!isOGLorOGIEnabled()) {
-                // And if there is some changes
+                // Push if new system or if there is some changes
                 consoleDebug("Position "+position+": "+previousSystemData[position]["playerId"]+"=>"+playerId+" "+previousSystemData[position]["planetId"]+"=>"+planetId+" "+previousSystemData[position]["moonId"]+"=>"+moonId);
                 if (systemIdInGalaxyList == -1 || playerId != previousSystemData[position]["playerId"] || planetId != previousSystemData[position]["planetId"] || moonId != previousSystemData[position]["moonId"]) {
                     systemNeedsToBeUpdated = 1;
