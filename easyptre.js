@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyPTRE
 // @namespace    https://openuserjs.org/users/GeGe_GM
-// @version      0.11.1
+// @version      0.11.2
 // @description  Plugin to use PTRE's features with AGR / OGL / OGI. Check https://ptre.chez.gg/
 // @author       GeGe_GM
 // @license      MIT
@@ -1860,62 +1860,59 @@ function processGalaxyDataCallback(data) {
 
             // Push galaxy data
             if (!isOGLorOGIEnabled()) {
-                // We push only if we alrady know the system
-                if (systemIdInGalaxyList > -1) {
-                    // And if there is some changes
-                    consoleDebug("Position "+position+": "+previousSystemData[position]["playerId"]+"=>"+playerId+" "+previousSystemData[position]["planetId"]+"=>"+planetId+" "+previousSystemData[position]["moonId"]+"=>"+moonId);
-                    if (playerId != previousSystemData[position]["playerId"] || planetId != previousSystemData[position]["planetId"] || moonId != previousSystemData[position]["moonId"]) {
-                        systemNeedsToBeUpdated = 1;
-                        var rank = -1;
-                        var status = "";
-                        var oldName = "";
-                        var planetIdToSend = planetId;
-                        var moonIdToSend = moonId;
-                        if (positionContent.player['highscorePositionPlayer'] > 0) {
-                            rank = positionContent.player['highscorePositionPlayer'];
-                        }
-                        if (playerId == -1) {
-                            // If player left
-                            // Replace moon ID per old
-                            planetIdToSend = previousSystemData[position]["planetId"];
-                            moonIdToSend = previousSystemData[position]["moonId"];
-                            playerName = "";
-                            // We dont save if for now
-                            // oldName =
-                        } else {
-                            if (positionContent.player['isOnVacation'] == true) {
-                                status+='v';
-                            }
-                            if (positionContent.player['isBanned'] == true) {
-                                status+='b';
-                            }
-                            if (positionContent.player['isInactive'] == true) {
-                                status+='i';
-                            }
-                            if (positionContent.player['isLongInactive'] == true) {
-                                status+='I';
-                            }
-                        }
-                        var jsonLuneG = {id:moonIdToSend, size:moonSize};
-                        var jsonTemp = {player_id : playerId,
-                                        teamkey : ptreStoredTK,
-                                        timestamp_ig : currentTimestamp,
-                                        id : planetIdToSend,
-                                        coords : coords,
-                                        galaxy : galaxy,
-                                        system : system,
-                                        position : position,
-                                        name: playerName,
-                                        old_player_id: previousSystemData[position]["playerId"],
-                                        old_name: oldName,
-                                        status: status,
-                                        rank: rank,
-                                        old_rank: -1,
-                                        moon : jsonLuneG};
-                        console.log(jsonTemp);
-                        tabNewSystemToPush.push(jsonTemp);
-                        ptreGalaxyEventCount++;
+                // And if there is some changes
+                consoleDebug("Position "+position+": "+previousSystemData[position]["playerId"]+"=>"+playerId+" "+previousSystemData[position]["planetId"]+"=>"+planetId+" "+previousSystemData[position]["moonId"]+"=>"+moonId);
+                if (systemIdInGalaxyList == -1 || playerId != previousSystemData[position]["playerId"] || planetId != previousSystemData[position]["planetId"] || moonId != previousSystemData[position]["moonId"]) {
+                    systemNeedsToBeUpdated = 1;
+                    var rank = -1;
+                    var status = "";
+                    var oldName = "";
+                    var planetIdToSend = planetId;
+                    var moonIdToSend = moonId;
+                    if (positionContent.player['highscorePositionPlayer'] > 0) {
+                        rank = positionContent.player['highscorePositionPlayer'];
                     }
+                    if (playerId == -1) {
+                        // If player left
+                        // Replace moon ID per old
+                        planetIdToSend = previousSystemData[position]["planetId"];
+                        moonIdToSend = previousSystemData[position]["moonId"];
+                        playerName = "";
+                        // We dont save if for now
+                        // oldName =
+                    } else {
+                        if (positionContent.player['isOnVacation'] == true) {
+                            status+='v';
+                        }
+                        if (positionContent.player['isBanned'] == true) {
+                            status+='b';
+                        }
+                        if (positionContent.player['isInactive'] == true) {
+                            status+='i';
+                        }
+                        if (positionContent.player['isLongInactive'] == true) {
+                            status+='I';
+                        }
+                    }
+                    var jsonLuneG = {id:moonIdToSend, size:moonSize};
+                    var jsonTemp = {player_id : playerId,
+                                    teamkey : ptreStoredTK,
+                                    timestamp_ig : currentTimestamp,
+                                    id : planetIdToSend,
+                                    coords : coords,
+                                    galaxy : galaxy,
+                                    system : system,
+                                    position : position,
+                                    name: playerName,
+                                    old_player_id: previousSystemData[position]["playerId"],
+                                    old_name: oldName,
+                                    status: status,
+                                    rank: rank,
+                                    old_rank: -1,
+                                    moon : jsonLuneG};
+                    console.log(jsonTemp);
+                    tabNewSystemToPush.push(jsonTemp);
+                    ptreGalaxyEventCount++;
                 }
             }
 
